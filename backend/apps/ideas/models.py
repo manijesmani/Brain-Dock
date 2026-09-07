@@ -2,6 +2,8 @@ import uuid
 from pathlib import PurePosixPath
 
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models.functions import Lower
 
@@ -151,6 +153,16 @@ class Idea(OwnedTimeStampedModel):
         verbose_name="اولویت",
     )
 
+    # Both search columns are maintained by a database trigger, never by
+    # application code. The bot, the admin and any data migration all write
+    # ideas too, and a trigger is the only place that covers every one of them.
+    search_vector = SearchVectorField(null=True, editable=False)
+
+    # Title and plain text, folded by the Persian normaliser and concatenated.
+    # Backs substring matching through a trigram index, which is what makes a
+    # partial Persian word findable in a language PostgreSQL cannot stem.
+    search_text = models.TextField(blank=True, default="", editable=False)
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "ایده"
@@ -158,6 +170,12 @@ class Idea(OwnedTimeStampedModel):
         indexes = [
             models.Index(fields=["owner", "status"]),
             models.Index(fields=["owner", "-updated_at"]),
+            GinIndex(fields=["search_vector"], name="idea_search_vector_gin"),
+            GinIndex(
+                name="idea_search_text_trgm",
+                fields=["search_text"],
+                opclasses=["gin_trgm_ops"],
+            ),
         ]
 
     def __str__(self) -> str:

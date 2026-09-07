@@ -9,3 +9,6 @@ django-cors-headers==4.9.0
 
 # Phase 2 -- attachment handling.
 Pillow==12.3.0
+
+# Phase 3 -- declarative query filters.
+django-filter==26.1

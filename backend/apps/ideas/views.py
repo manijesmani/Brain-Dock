@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
 from apps.ideas import selectors, services
+from apps.ideas.filters import IdeaFilter
 from apps.ideas.models import Category, Idea, IdeaStatus, Tag
 from apps.ideas.serializers import (
     CategorySerializer,
@@ -74,12 +75,14 @@ class TagViewSet(OwnedModelViewSet):
 
 class IdeaViewSet(OwnedModelViewSet):
     serializer_class = IdeaSerializer
+    filterset_class = IdeaFilter
 
     def get_queryset(self) -> QuerySet[Idea]:
         queryset = selectors.idea_queryset(owner=self.request.user)
 
         # The archive is a separate screen, so active and archived ideas are
-        # never mixed in one listing.
+        # never mixed in one listing. This is decided before the filterset
+        # runs, which is why `archived` is not one of its fields.
         if self.action == "list":
             archived = self.request.query_params.get("archived") == "true"
             if archived:
@@ -87,6 +90,13 @@ class IdeaViewSet(OwnedModelViewSet):
             return queryset.exclude(status=IdeaStatus.ARCHIVED)
 
         return queryset
+
+    def filter_queryset(self, queryset: QuerySet[Idea]) -> QuerySet[Idea]:
+        # Filtering only makes sense for the listing; applying it to a detail
+        # lookup would let a query parameter turn a fetch into a 404.
+        if self.action != "list":
+            return queryset
+        return super().filter_queryset(queryset)
 
     def get_serializer_class(self) -> type[BaseSerializer]:
         if self.action == "list":
