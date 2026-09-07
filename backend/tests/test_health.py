@@ -16,6 +16,7 @@ def test_health_reports_ok(api_client: APIClient) -> None:
     assert response.json() == {
         "status": "ok",
         "database": "ok",
+        "cache": "ok",
         "version": "0.1.0",
     }
 

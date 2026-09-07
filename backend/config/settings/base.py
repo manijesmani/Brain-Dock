@@ -41,6 +41,8 @@ LOCAL_APPS = [
     "core",
     "apps.users",
     "apps.ideas",
+    "apps.reminders",
+    "apps.notifications",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -172,6 +174,49 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "login": env("LOGIN_THROTTLE_RATE", default="10/min"),
     },
+}
+
+# --------------------------------------------------------------------------
+# Celery
+# --------------------------------------------------------------------------
+
+REDIS_URL = env("REDIS_URL", default="redis://127.0.0.1:6379/0")
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=REDIS_URL)
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=REDIS_URL)
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# Celery works in UTC like everything else; the Jalali calendar and the
+# Tehran clock exist only at the presentation layer.
+CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
+
+# A task that outlives its next scheduled run would let two ticks overlap.
+CELERY_TASK_TIME_LIMIT = 55
+CELERY_TASK_SOFT_TIME_LIMIT = 45
+
+# The project's entire schedule. Reminders are not queued individually -- one
+# tick reads the rows that have come due. See apps.reminders.tasks for why.
+CELERY_BEAT_SCHEDULE = {
+    "dispatch-due-reminders": {
+        "task": "reminders.dispatch_due",
+        "schedule": 60.0,
+        # A tick that could not run on time is worthless a minute later; the
+        # next one will pick up the same rows anyway.
+        "options": {"expires": 55},
+    },
+}
+
+# Throttle counters and Celery share one Redis instance. In development this
+# falls back to local memory so the app runs without Redis at all.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
 }
 
 # --------------------------------------------------------------------------

@@ -35,7 +35,7 @@ known-first-party = ["config", "core", "apps"]
 quote-style = "double"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings.dev"
+DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["test_*.py", "*_test.py"]
 testpaths = ["tests", "apps", "core"]
 addopts = "-ra --strict-markers"
