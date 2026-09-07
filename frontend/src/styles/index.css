@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@import "@fontsource-variable/vazirmatn";
+
+/*
+ * Every value below is transcribed verbatim from BrainDock.dc.html, the
+ * authoritative design reference. Nothing here is invented; if a value needs
+ * to change, it changes in the design first.
+ *
+ * Tailwind v4 has no tailwind.config.js -- the `@theme` block below IS the
+ * config. Each token declared there also becomes a utility class, so
+ * `--color-bd-accent` yields `bg-bd-accent`, `text-bd-accent`, and so on.
+ */
+
+/* Dark is the default theme. Light is opted into by adding `.bd-light`
+   to the root element, exactly as the design file does. */
+@custom-variant light (&:where(.bd-light, .bd-light *));
+
+@theme {
+  --font-sans: "Vazirmatn Variable", "Vazirmatn", system-ui, sans-serif;
+
+  /* Surfaces */
+  --color-bd-bg: #0f1113;
+  --color-bd-surface: #16191c;
+  --color-bd-surface-2: #1c2023;
+  --color-bd-surface-3: #23272b;
+
+  /* Borders */
+  --color-bd-border: #24282c;
+  --color-bd-border-2: #2f3439;
+
+  /* Text */
+  --color-bd-text: #e9ebed;
+  --color-bd-text-2: #9ba1a7;
+  --color-bd-text-3: #6e747a;
+
+  /* Accent: emerald green */
+  --color-bd-accent: #10b981;
+  --color-bd-accent-hover: #34d399;
+  --color-bd-accent-active: #0e9c74;
+  --color-bd-accent-ink: #06251b;
+  --color-bd-accent-soft: rgba(16, 185, 129, 0.14);
+
+  /* Idea status colours */
+  --color-st-idea: #9ba1a7;
+  --color-st-idea-bg: rgba(155, 161, 167, 0.13);
+  --color-st-plan: #60a5fa;
+  --color-st-plan-bg: rgba(59, 130, 246, 0.14);
+  --color-st-doing: #fbbf24;
+  --color-st-doing-bg: rgba(245, 158, 11, 0.14);
+  --color-st-done: #34d399;
+  --color-st-done-bg: rgba(16, 185, 129, 0.14);
+  --color-st-arch: #6e747a;
+  --color-st-arch-bg: rgba(110, 116, 122, 0.12);
+
+  /* Feedback */
+  --color-bd-warn: #fbbf24;
+  --color-bd-warn-bg: rgba(245, 158, 11, 0.12);
+  --color-bd-danger: #f87171;
+
+  /* Radii */
+  --radius-button: 8px;
+  --radius-input: 8px;
+  --radius-card: 10px;
+  --radius-dialog: 12px;
+
+  /* Shadows */
+  --shadow-bd: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-bd-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+
+  /* Entrance animations */
+  --animate-bd-in: bd-in 200ms ease-out;
+  --animate-bd-pop: bd-pop 150ms ease-out;
+
+  /*
+   * The fixed eight-colour category palette. Deliberately excludes emerald
+   * green (the accent), the `st-plan` blue and the `st-doing` amber, so a
+   * category dot can never be mistaken for a status indicator.
+   */
+  --color-cat-1: #3b82f6;
+  --color-cat-2: #8b5cf6;
+  --color-cat-3: #06b6d4;
+  --color-cat-4: #f472b6;
+  --color-cat-5: #f59e0b;
+  --color-cat-6: #94a3b8;
+  --color-cat-7: #ef4444;
+  --color-cat-8: #14b8a6;
+}
+
+/* Light theme: only the tokens that actually differ are redefined. */
+.bd-light {
+  --color-bd-bg: #f6f7f8;
+  --color-bd-surface: #ffffff;
+  --color-bd-surface-2: #f1f2f4;
+  --color-bd-surface-3: #e9ebed;
+
+  --color-bd-border: #e4e6e9;
+  --color-bd-border-2: #d2d6da;
+
+  --color-bd-text: #16181a;
+  --color-bd-text-2: #5c6167;
+  --color-bd-text-3: #8a9096;
+
+  --color-bd-accent: #047857;
+  --color-bd-accent-hover: #036049;
+  --color-bd-accent-active: #024c3a;
+  --color-bd-accent-ink: #ffffff;
+  --color-bd-accent-soft: rgba(4, 120, 87, 0.1);
+
+  --color-st-idea: #6b7280;
+  --color-st-idea-bg: rgba(107, 114, 128, 0.1);
+  --color-st-plan: #2563eb;
+  --color-st-plan-bg: rgba(37, 99, 235, 0.1);
+  --color-st-doing: #b45309;
+  --color-st-doing-bg: rgba(180, 83, 9, 0.1);
+  --color-st-done: #047857;
+  --color-st-done-bg: rgba(4, 120, 87, 0.1);
+  --color-st-arch: #8a9096;
+  --color-st-arch-bg: rgba(138, 144, 150, 0.1);
+
+  --color-bd-warn: #b45309;
+  --color-bd-warn-bg: rgba(180, 83, 9, 0.09);
+  --color-bd-danger: #dc2626;
+
+  --shadow-bd: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-bd-lg: 0 16px 36px -16px rgba(16, 24, 40, 0.22);
+}
+
+@keyframes bd-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bd-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Base element styling, mirroring the `[data-bd]` rules in the design file. */
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--color-bd-bg);
+    color: var(--color-bd-text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  ::placeholder {
+    color: var(--color-bd-text-3);
+  }
+
+  [contenteditable] {
+    outline: none;
+  }
+
+  button {
+    font-family: var(--font-sans);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bd-border-2);
+    border-radius: 8px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}

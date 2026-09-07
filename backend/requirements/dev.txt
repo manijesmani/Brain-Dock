@@ -1,0 +1,11 @@
+-r base.txt
+
+# Linting and formatting.
+ruff==0.16.6
+pre-commit==4.6.2
+
+# Testing. pytest is pinned to the 8.x line because pytest-django 4.14
+# has not been validated against pytest 9 yet.
+pytest==8.4.2
+pytest-django==4.14.0
+factory-boy==3.3.3

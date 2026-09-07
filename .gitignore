@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django
+*.log
+/backend/media/
+/backend/staticfiles/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+/frontend/dist/
+npm-debug.log*
+
+# Testing and tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
