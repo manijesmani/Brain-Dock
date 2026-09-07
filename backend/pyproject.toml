@@ -21,6 +21,11 @@ ignore = [
     "RUF001",
     "RUF002",
     "RUF003",
+    # Mutable class attributes are the declarative idiom of both Django and
+    # DRF: Meta.fields, Meta.constraints, Meta.indexes and every serializer
+    # field are class-level lists by design. Annotating each one as ClassVar
+    # would add noise without catching a real defect.
+    "RUF012",
 ]
 
 [tool.ruff.lint.isort]

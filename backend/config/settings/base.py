@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "core",
     "apps.users",
+    "apps.ideas",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -142,6 +143,11 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
     "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",
+    # Throttles are opt-in per view rather than global; the login endpoint is
+    # the one that needs a cap in this phase.
+    "DEFAULT_THROTTLE_RATES": {
+        "login": env("LOGIN_THROTTLE_RATE", default="10/min"),
+    },
 }
 
 # --------------------------------------------------------------------------
