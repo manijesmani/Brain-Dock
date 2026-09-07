@@ -9,11 +9,21 @@ a raw status assignment.
 from collections.abc import Iterable, Sequence
 from typing import Any
 
+from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
 from django.db.models.functions import Lower
 
+from apps.ideas.attachments import prepare_audio, prepare_image
 from apps.ideas.content import extract_plain_text, sanitize_document
-from apps.ideas.models import Category, Idea, IdeaPriority, IdeaStatus, Tag
+from apps.ideas.models import (
+    Attachment,
+    AttachmentKind,
+    Category,
+    Idea,
+    IdeaPriority,
+    IdeaStatus,
+    Tag,
+)
 from apps.users.models import User
 
 # The status an idea returns to when it is taken out of the archive. The
@@ -151,6 +161,52 @@ def update_idea(*, idea: Idea, **fields: Any) -> Idea:
         idea.tags.set(resolve_tags(owner=idea.owner, names=fields["tag_names"]))
 
     return idea
+
+
+def create_attachment(*, idea: Idea, upload: UploadedFile, kind: str) -> Attachment:
+    """Validates an upload and stores it against an idea.
+
+    The declared kind decides which inspector runs; the inspector then decides
+    whether the bytes really are what they claim to be.
+    """
+    original_name = (upload.name or "")[:255]
+
+    if kind == AttachmentKind.IMAGE:
+        prepared = prepare_image(upload)
+        attachment = Attachment(
+            owner=idea.owner,
+            idea=idea,
+            kind=AttachmentKind.IMAGE,
+            original_name=original_name,
+            content_type=prepared.content_type,
+            size_bytes=prepared.content.size,
+            width=prepared.width,
+            height=prepared.height,
+        )
+        name = f"upload{prepared.extension}"
+        attachment.file.save(name, prepared.content, save=False)
+        attachment.thumbnail.save(name, prepared.thumbnail, save=False)
+        attachment.save()
+        return attachment
+
+    prepared_audio = prepare_audio(upload)
+    attachment = Attachment(
+        owner=idea.owner,
+        idea=idea,
+        kind=AttachmentKind.AUDIO,
+        original_name=original_name,
+        content_type=prepared_audio.content_type,
+        size_bytes=upload.size or 0,
+        duration_ms=prepared_audio.duration_ms,
+    )
+    upload.seek(0)
+    attachment.file.save(f"upload{prepared_audio.extension}", upload, save=False)
+    attachment.save()
+    return attachment
+
+
+def delete_attachment(*, attachment: Attachment) -> None:
+    attachment.delete()
 
 
 def archive_idea(*, idea: Idea) -> Idea:

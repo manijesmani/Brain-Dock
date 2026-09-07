@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.ideas.models import Category, Idea, Tag
+from apps.ideas.models import Attachment, Category, Idea, Tag
 
 
 @admin.register(Category)
@@ -26,3 +26,19 @@ class IdeaAdmin(admin.ModelAdmin):
     autocomplete_fields = ("owner", "category")
     filter_horizontal = ("tags",)
     readonly_fields = ("plain_text", "created_at", "updated_at")
+
+
+@admin.register(Attachment)
+class AttachmentAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "idea", "kind", "size_bytes", "duration_ms", "created_at")
+    list_filter = ("kind",)
+    autocomplete_fields = ("owner", "idea")
+    readonly_fields = (
+        "content_type",
+        "size_bytes",
+        "width",
+        "height",
+        "duration_ms",
+        "created_at",
+        "updated_at",
+    )

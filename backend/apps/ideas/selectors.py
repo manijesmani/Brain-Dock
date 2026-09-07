@@ -7,7 +7,7 @@ there is one place to audit for cross-tenant leaks.
 
 from django.db.models import QuerySet
 
-from apps.ideas.models import Category, Idea, IdeaStatus, Tag
+from apps.ideas.models import Attachment, Category, Idea, IdeaStatus, Tag
 from apps.users.models import User
 
 
@@ -20,7 +20,15 @@ def tag_queryset(*, owner: User) -> QuerySet[Tag]:
 
 
 def idea_queryset(*, owner: User) -> QuerySet[Idea]:
-    return Idea.objects.filter(owner=owner).select_related("category").prefetch_related("tags")
+    return (
+        Idea.objects.filter(owner=owner)
+        .select_related("category")
+        .prefetch_related("tags", "attachments")
+    )
+
+
+def attachment_queryset(*, owner: User) -> QuerySet[Attachment]:
+    return Attachment.objects.filter(owner=owner).select_related("idea")
 
 
 def active_idea_queryset(*, owner: User) -> QuerySet[Idea]:

@@ -6,3 +6,6 @@ djangorestframework==3.18.0
 psycopg[binary]==3.3.5
 django-environ==0.14.0
 django-cors-headers==4.9.0
+
+# Phase 2 -- attachment handling.
+Pillow==12.3.0

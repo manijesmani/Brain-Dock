@@ -1,3 +1,6 @@
+import uuid
+from pathlib import PurePosixPath
+
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Lower
@@ -163,3 +166,72 @@ class Idea(OwnedTimeStampedModel):
     @property
     def is_archived(self) -> bool:
         return self.status == IdeaStatus.ARCHIVED
+
+
+class AttachmentKind(models.TextChoices):
+    IMAGE = "image", "عکس"
+    AUDIO = "audio", "صدا"
+
+
+def attachment_upload_path(instance: "Attachment", filename: str) -> str:
+    """Builds the stored path for an attachment.
+
+    The name supplied by the client is never part of the path: it could
+    collide, escape the directory, or leak something about the uploader. A
+    random name under the owner's directory avoids all three.
+    """
+    extension = PurePosixPath(filename).suffix.lower()
+    return f"attachments/{instance.owner_id}/{uuid.uuid4().hex}{extension}"
+
+
+def thumbnail_upload_path(instance: "Attachment", filename: str) -> str:
+    extension = PurePosixPath(filename).suffix.lower()
+    return f"attachments/{instance.owner_id}/thumbnails/{uuid.uuid4().hex}{extension}"
+
+
+class Attachment(OwnedTimeStampedModel):
+    """An image or audio file belonging to an idea.
+
+    `owner` is stored directly rather than reached through the idea, so every
+    query can filter on ownership without a join and the upload path can be
+    namespaced per user.
+    """
+
+    idea = models.ForeignKey(
+        Idea,
+        on_delete=models.CASCADE,
+        related_name="attachments",
+        verbose_name="ایده",
+    )
+    kind = models.CharField(max_length=5, choices=AttachmentKind, verbose_name="نوع")
+
+    file = models.FileField(upload_to=attachment_upload_path, verbose_name="فایل")
+    # Images only. Audio has no visual preview.
+    thumbnail = models.FileField(
+        upload_to=thumbnail_upload_path,
+        blank=True,
+        verbose_name="بندانگشتی",
+    )
+
+    original_name = models.CharField(max_length=255, blank=True, verbose_name="نام اصلی")
+    content_type = models.CharField(max_length=100, verbose_name="نوع محتوا")
+    size_bytes = models.PositiveIntegerField(verbose_name="حجم")
+
+    width = models.PositiveIntegerField(null=True, blank=True, verbose_name="عرض")
+    height = models.PositiveIntegerField(null=True, blank=True, verbose_name="ارتفاع")
+    duration_ms = models.PositiveIntegerField(null=True, blank=True, verbose_name="مدت (میلی‌ثانیه)")
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "پیوست"
+        verbose_name_plural = "پیوست‌ها"
+        indexes = [models.Index(fields=["idea", "kind"])]
+
+    def __str__(self) -> str:
+        return self.original_name or self.file.name
+
+    @property
+    def duration_seconds(self) -> float | None:
+        if self.duration_ms is None:
+            return None
+        return round(self.duration_ms / 1000, 1)

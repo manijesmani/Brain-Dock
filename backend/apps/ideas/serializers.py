@@ -1,8 +1,17 @@
 from typing import Any
 
+from django.urls import reverse
 from rest_framework import serializers
 
-from apps.ideas.models import Category, Idea, IdeaPriority, IdeaStatus, Tag
+from apps.ideas.models import (
+    Attachment,
+    AttachmentKind,
+    Category,
+    Idea,
+    IdeaPriority,
+    IdeaStatus,
+    Tag,
+)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -51,6 +60,63 @@ class TagSerializer(serializers.ModelSerializer):
         return name
 
 
+class AttachmentSerializer(serializers.ModelSerializer):
+    """Read representation of an attachment.
+
+    The stored path is never exposed. Clients receive API URLs instead, which
+    route through the ownership check before any bytes are served.
+    """
+
+    file_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    duration_seconds = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Attachment
+        fields = [
+            "id",
+            "idea",
+            "kind",
+            "file_url",
+            "thumbnail_url",
+            "original_name",
+            "content_type",
+            "size_bytes",
+            "width",
+            "height",
+            "duration_ms",
+            "duration_seconds",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def get_file_url(self, obj: Attachment) -> str:
+        return reverse("ideas:attachment-file", kwargs={"pk": obj.pk})
+
+    def get_thumbnail_url(self, obj: Attachment) -> str | None:
+        if not obj.thumbnail:
+            return None
+        return reverse("ideas:attachment-thumbnail", kwargs={"pk": obj.pk})
+
+
+class AttachmentUploadSerializer(serializers.Serializer):
+    """Write side of an upload.
+
+    `kind` states what the client believes it is sending; the inspectors in
+    apps.ideas.attachments decide whether the bytes agree.
+    """
+
+    idea = serializers.PrimaryKeyRelatedField(queryset=Idea.objects.none())
+    kind = serializers.ChoiceField(choices=AttachmentKind.choices)
+    file = serializers.FileField()
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request is not None and request.user.is_authenticated:
+            self.fields["idea"].queryset = Idea.objects.filter(owner=request.user)
+
+
 class IdeaSerializer(serializers.ModelSerializer):
     """Read and write representation of an idea.
 
@@ -75,6 +141,8 @@ class IdeaSerializer(serializers.ModelSerializer):
         write_only=True,
     )
     is_archived = serializers.BooleanField(read_only=True)
+    # Embedded so opening a note needs one request rather than two.
+    attachments = AttachmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Idea
@@ -88,10 +156,18 @@ class IdeaSerializer(serializers.ModelSerializer):
             "status",
             "priority",
             "is_archived",
+            "attachments",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "plain_text", "is_archived", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "plain_text",
+            "is_archived",
+            "attachments",
+            "created_at",
+            "updated_at",
+        ]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -122,10 +198,31 @@ class IdeaSerializer(serializers.ModelSerializer):
 
 
 class IdeaListSerializer(IdeaSerializer):
-    """Lighter payload for list views: the full document is omitted."""
+    """Lighter payload for list views.
+
+    The full document and the attachment records are dropped; a row in the
+    listing only needs to know whether to show the paperclip icon.
+    """
+
+    attachments = None
+    has_attachments = serializers.SerializerMethodField()
 
     class Meta(IdeaSerializer.Meta):
-        fields = [field for field in IdeaSerializer.Meta.fields if field != "content"]
+        fields = [
+            *(
+                field
+                for field in IdeaSerializer.Meta.fields
+                if field not in {"content", "attachments"}
+            ),
+            "has_attachments",
+        ]
+        read_only_fields = [
+            field for field in IdeaSerializer.Meta.read_only_fields if field != "attachments"
+        ]
+
+    def get_has_attachments(self, obj: Idea) -> bool:
+        # Reads the prefetched rows rather than issuing a COUNT per idea.
+        return bool(obj.attachments.all())
 
 
 class IdeaStatusChoiceSerializer(serializers.Serializer):

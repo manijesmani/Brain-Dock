@@ -5,6 +5,13 @@ from apps.users.models import User
 from tests.factories import DEFAULT_PASSWORD, UserFactory
 
 
+@pytest.fixture(autouse=True)
+def isolated_media_root(settings, tmp_path):
+    """Keeps uploaded test files out of the project's real media directory."""
+    settings.MEDIA_ROOT = tmp_path / "media"
+    return settings.MEDIA_ROOT
+
+
 @pytest.fixture
 def api_client() -> APIClient:
     return APIClient()
@@ -22,9 +29,16 @@ def other_user() -> User:
 
 
 @pytest.fixture
-def auth_client(api_client: APIClient, user: User) -> APIClient:
-    api_client.force_authenticate(user=user)
-    return api_client
+def auth_client(user: User) -> APIClient:
+    """A signed-in client.
+
+    Deliberately a separate instance from `api_client`: a test that wants both
+    an authenticated and an anonymous client must get two, otherwise
+    authenticating one would silently authenticate the other.
+    """
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
 
 
 @pytest.fixture

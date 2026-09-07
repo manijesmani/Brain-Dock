@@ -125,6 +125,26 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Attachments are private, so MEDIA_ROOT is never exposed by the web server.
+# Every download goes through a view that checks ownership and then hands the
+# file back to Nginx through this internal location, which is declared
+# `internal;` in the server config and so cannot be requested from outside.
+MEDIA_INTERNAL_URL = "/internal-media/"
+
+# --------------------------------------------------------------------------
+# Attachments
+# --------------------------------------------------------------------------
+
+MAX_IMAGE_UPLOAD_BYTES = env.int("MAX_IMAGE_UPLOAD_BYTES", default=10 * 1024 * 1024)
+MAX_AUDIO_UPLOAD_BYTES = env.int("MAX_AUDIO_UPLOAD_BYTES", default=25 * 1024 * 1024)
+
+# Bounding box for the grid preview on the note page.
+ATTACHMENT_THUMBNAIL_SIZE = (800, 600)
+
+# Uploads above this size are streamed to a temporary file instead of being
+# held in memory.
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
+
 # --------------------------------------------------------------------------
 # Django REST Framework
 # --------------------------------------------------------------------------
