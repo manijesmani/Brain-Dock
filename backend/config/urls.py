@@ -13,4 +13,5 @@ urlpatterns = [
     path("api/", include("apps.ideas.urls")),
     path("api/", include("apps.reminders.urls")),
     path("api/", include("apps.notifications.urls")),
+    path("api/telegram/", include("apps.telegrambot.urls")),
 ]

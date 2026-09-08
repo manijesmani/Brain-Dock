@@ -35,6 +35,17 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       // The project bans `any` outright rather than merely discouraging it.
       "@typescript-eslint/no-explicit-any": "error",
+
+      // Two rules from the strict set are relaxed, both because they fight
+      // ordinary React rather than catch anything. Everything else in
+      // strictTypeChecked stays on.
+
+      // `onClick={() => setOpen(false)}` is the idiom the whole ecosystem
+      // uses; the returned void is never read by anyone.
+      "@typescript-eslint/no-confusing-void-expression": ["error", { ignoreArrowShorthand: true }],
+      // A number interpolated into a path or a label has exactly one sensible
+      // rendering, so requiring String() around it only adds noise.
+      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
     },
   },
 

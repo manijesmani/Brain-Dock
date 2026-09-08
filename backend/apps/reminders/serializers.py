@@ -44,11 +44,24 @@ class ReminderSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
     next_run_at = serializers.DateTimeField(read_only=True)
 
+    # The dashboard lists reminders and needs to show which idea each belongs
+    # to; inlining the few fields it renders saves a request per row.
+    idea_title = serializers.CharField(source="idea.title", read_only=True)
+    idea_category_name = serializers.CharField(
+        source="idea.category.name", read_only=True, default=None
+    )
+    idea_category_color = serializers.CharField(
+        source="idea.category.color", read_only=True, default=None
+    )
+
     class Meta:
         model = Reminder
         fields = [
             "id",
             "idea",
+            "idea_title",
+            "idea_category_name",
+            "idea_category_color",
             "recurrence",
             "hour",
             "minute",
@@ -61,7 +74,16 @@ class ReminderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "next_run_at", "description", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "idea_title",
+            "idea_category_name",
+            "idea_category_color",
+            "next_run_at",
+            "description",
+            "created_at",
+            "updated_at",
+        ]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

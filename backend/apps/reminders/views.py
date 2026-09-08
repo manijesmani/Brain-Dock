@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
-from apps.reminders import services
+from apps.reminders import selectors, services
 from apps.reminders.models import Reminder
 from apps.reminders.serializers import ReminderSerializer
 from core.permissions import IsOwner
@@ -19,7 +19,24 @@ class ReminderViewSet(viewsets.ModelViewSet):
     permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, IsOwner]
 
     def get_queryset(self) -> QuerySet[Reminder]:
-        return Reminder.objects.filter(owner=self.request.user).select_related("idea", "owner")
+        queryset = Reminder.objects.filter(owner=self.request.user).select_related(
+            "idea", "idea__category", "owner"
+        )
+
+        window = self.request.query_params.get("window")
+        if window in {"today", "week"}:
+            # Both windows are decided by evaluating each rule rather than by
+            # comparing `next_run_at`, because today's agenda includes a slot
+            # that has already been delivered. See apps.reminders.selectors.
+            active = list(queryset.filter(is_active=True).order_by("next_run_at"))
+            chosen = (
+                selectors.due_today(active)
+                if window == "today"
+                else selectors.due_this_week(active)
+            )
+            return queryset.filter(pk__in=[item.pk for item in chosen]).order_by("next_run_at")
+
+        return queryset.order_by("next_run_at")
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         data = dict(serializer.validated_data)

@@ -1,0 +1,267 @@
+import {
+  LinkIcon,
+  MinusIcon,
+  MoonIcon,
+  PencilSimpleIcon,
+  PlusIcon,
+  SignOutIcon,
+  SunIcon,
+  TrashIcon,
+} from "@phosphor-icons/react";
+import { useNavigate } from "react-router-dom";
+
+import { ROUTES } from "@/app/routes";
+import { useApp } from "@/features/shell/appContext";
+import {
+  useCreateTelegramLink,
+  useDeleteCategory,
+  useDisconnectTelegram,
+  useLogout,
+  useTelegramLink,
+  useUpdateProfile,
+} from "@/shared/api/queries";
+import { useTheme } from "@/shared/hooks/useTheme";
+import { toPersianDigits } from "@/shared/lib/persian";
+import type { ReactNode } from "react";
+
+/** The stepper's bounds, matching the validators on the user model. */
+const STALE_MIN = 1;
+const STALE_MAX = 90;
+
+export function SettingsPage() {
+  const navigate = useNavigate();
+  const { user, categories, openCategoryDialog } = useApp();
+  const { theme, setTheme } = useTheme();
+
+  const { data: telegram } = useTelegramLink();
+  const createLink = useCreateTelegramLink();
+  const disconnect = useDisconnectTelegram();
+  const updateProfile = useUpdateProfile();
+  const deleteCategory = useDeleteCategory();
+  const logout = useLogout();
+
+  const linked = telegram?.is_linked ?? false;
+
+  const setStale = (value: number) => {
+    const clamped = Math.min(STALE_MAX, Math.max(STALE_MIN, value));
+    if (clamped !== user.stale_after_days) {
+      updateProfile.mutate({ stale_after_days: clamped });
+    }
+  };
+
+  return (
+    <main className="min-w-0 flex-1 px-[38px] pt-[30px] pb-[110px]">
+      <header className="mb-[22px]">
+        <h1 className="m-0 text-[22px] font-bold tracking-tight">تنظیمات</h1>
+      </header>
+
+      <div className="flex max-w-[740px] flex-col gap-4">
+        <Section>
+          <div className="mb-1.5 flex items-center gap-2.5">
+            <h2 className="m-0 text-[15px] font-semibold">اتصال ربات تلگرام</h2>
+            <span
+              className="inline-flex items-center gap-1.5 text-[12.5px]"
+              style={{
+                color: linked ? "var(--color-bd-accent)" : "var(--color-bd-text-3)",
+              }}
+            >
+              <span
+                className="size-[7px] rounded-full"
+                style={{
+                  background: linked ? "var(--color-bd-accent)" : "var(--color-bd-text-3)",
+                }}
+              />
+              {linked ? "متصل" : "متصل نیست"}
+            </span>
+          </div>
+          <p className="m-0 mb-[15px] text-[13px] leading-[1.8] text-bd-text-2">
+            ایده‌ها را در تلگرام بفرست تا مستقیم در BrainDock ثبت شوند.
+          </p>
+
+          {telegram?.link ? (
+            <div className="mb-[13px] flex items-center gap-2.5 rounded-[9px] border border-bd-border bg-bd-surface-2 px-3.5 py-[11px]">
+              <LinkIcon size={16} className="text-bd-text-3" />
+              <span dir="ltr" className="flex-1 font-mono text-[12.5px] text-bd-text">
+                {telegram.link}
+              </span>
+              <span className="text-[11.5px] text-bd-text-3">یک‌بارمصرف</span>
+            </div>
+          ) : null}
+
+          <div className="flex gap-[9px]">
+            {linked ? (
+              <button
+                type="button"
+                onClick={() => disconnect.mutate()}
+                className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[15px] text-[13px] text-bd-danger hover:bg-bd-surface-2"
+              >
+                قطع اتصال
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => createLink.mutate()}
+              disabled={createLink.isPending}
+              className="h-[38px] cursor-pointer rounded-button border-0 bg-bd-accent px-[15px] text-[13px] font-medium text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
+            >
+              ساخت لینک اتصال
+            </button>
+          </div>
+        </Section>
+
+        <Section>
+          <div className="mb-3.5 flex items-center">
+            <h2 className="m-0 flex-1 text-[15px] font-semibold">مدیریت دسته‌بندی‌ها</h2>
+            <button
+              type="button"
+              onClick={() => openCategoryDialog()}
+              className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-button border border-bd-border-2 bg-transparent px-3 text-[12.5px] text-bd-text hover:bg-bd-surface-2"
+            >
+              <PlusIcon size={14} />
+              دستهٔ جدید
+            </button>
+          </div>
+
+          <div className="overflow-hidden rounded-[9px] border border-bd-border">
+            {categories.length === 0 ? (
+              <div className="px-3.5 py-6 text-center text-[13px] text-bd-text-3">
+                هنوز دسته‌ای نساخته‌ای
+              </div>
+            ) : (
+              categories.map((category, index) => (
+                <div
+                  key={category.id}
+                  className="flex items-center gap-[11px] px-3.5 py-[11px]"
+                  style={{
+                    borderTop: index === 0 ? "0" : "1px solid var(--color-bd-border)",
+                  }}
+                >
+                  <span
+                    className="size-[9px] flex-none rounded-full"
+                    style={{ background: category.color }}
+                  />
+                  <span className="flex-1 text-[13.5px]">{category.name}</span>
+                  <span className="text-[12px] text-bd-text-3">
+                    {toPersianDigits(category.idea_count)} ایده
+                  </span>
+                  <button
+                    type="button"
+                    title="ویرایش"
+                    onClick={() => openCategoryDialog(category)}
+                    className="grid size-[30px] cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent text-bd-text-3 hover:bg-bd-surface-2 hover:text-bd-text"
+                  >
+                    <PencilSimpleIcon size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    title="حذف"
+                    onClick={() => deleteCategory.mutate(category.id)}
+                    className="grid size-[30px] cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent text-bd-text-3 hover:bg-bd-surface-2 hover:text-bd-danger"
+                  >
+                    <TrashIcon size={15} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </Section>
+
+        <Section>
+          <h2 className="m-0 mb-1.5 text-[15px] font-semibold">تعریف ایدهٔ راکد</h2>
+          <p className="m-0 mb-[15px] text-[13px] leading-[1.8] text-bd-text-2">
+            بعد از چند روز بدون تغییر، ایده راکد شمرده شود.
+          </p>
+          <div className="inline-flex items-center gap-0.5 rounded-[9px] border border-bd-border-2 p-[3px]">
+            <button
+              type="button"
+              onClick={() => setStale(user.stale_after_days - 1)}
+              disabled={user.stale_after_days <= STALE_MIN}
+              className="grid size-8 cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent text-bd-text-2 hover:bg-bd-surface-2 hover:text-bd-text disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <MinusIcon size={14} />
+            </button>
+            <span className="min-w-[72px] text-center text-[14px] font-semibold">
+              {toPersianDigits(user.stale_after_days)} روز
+            </span>
+            <button
+              type="button"
+              onClick={() => setStale(user.stale_after_days + 1)}
+              disabled={user.stale_after_days >= STALE_MAX}
+              className="grid size-8 cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent text-bd-text-2 hover:bg-bd-surface-2 hover:text-bd-text disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <PlusIcon size={14} />
+            </button>
+          </div>
+        </Section>
+
+        <Section>
+          <h2 className="m-0 mb-3.5 text-[15px] font-semibold">حالت نمایش</h2>
+          <div className="inline-flex gap-[3px] rounded-[9px] bg-bd-surface-2 p-[3px]">
+            <ThemeButton active={theme === "dark"} onClick={() => setTheme("dark")}>
+              <MoonIcon size={15} />
+              شب
+            </ThemeButton>
+            <ThemeButton active={theme === "light"} onClick={() => setTheme("light")}>
+              <SunIcon size={15} />
+              روز
+            </ThemeButton>
+          </div>
+        </Section>
+
+        <section className="flex items-center gap-3.5 rounded-card border border-bd-border bg-bd-surface px-[22px] py-[18px] shadow-bd">
+          <div className="flex-1">
+            <div className="text-[14px] font-semibold">خروج از حساب</div>
+            <div className="mt-0.5 text-[12.5px] text-bd-text-2">
+              {user.display_name} · حساب شخصی
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              void (async () => {
+                await logout.mutateAsync();
+                void navigate(ROUTES.login, { replace: true });
+              })();
+            }}
+            className="inline-flex h-[38px] cursor-pointer items-center gap-[7px] rounded-button border border-bd-border-2 bg-transparent px-[15px] text-[13px] text-bd-danger hover:bg-bd-surface-2"
+          >
+            <SignOutIcon size={16} />
+            خروج
+          </button>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function Section({ children }: { children: ReactNode }) {
+  return (
+    <section className="rounded-card border border-bd-border bg-bd-surface px-[22px] py-5 shadow-bd">
+      {children}
+    </section>
+  );
+}
+
+function ThemeButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-[34px] cursor-pointer items-center gap-2 rounded-[7px] border-0 px-4 text-[13px]"
+      style={{
+        background: active ? "var(--color-bd-surface-3)" : "transparent",
+        color: active ? "var(--color-bd-accent)" : "var(--color-bd-text-3)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}

@@ -5,7 +5,10 @@ status, priority, tag and category dropdowns, a search box, and four sort
 orders. Anything the toolbar cannot express is not offered here either.
 """
 
-from django.db.models import Case, IntegerField, QuerySet, Value, When
+from datetime import timedelta
+
+from django.db.models import Case, IntegerField, Q, QuerySet, Value, When
+from django.utils import timezone
 from django_filters import rest_framework as filters
 
 from apps.ideas.models import Idea, IdeaPriority, IdeaStatus
@@ -43,6 +46,9 @@ class IdeaFilter(filters.FilterSet):
     status = filters.ChoiceFilter(choices=BROWSABLE_STATUSES)
     priority = filters.ChoiceFilter(choices=IdeaPriority.choices)
     category = filters.NumberFilter(field_name="category_id")
+    # Ideas untouched for longer than the owner's own threshold. The dashboard
+    # reads this; the periodic job that turns it into a notification is phase 7.
+    stale = filters.BooleanFilter(method="filter_stale")
     # Tags are addressed by name, which is what the dropdown shows and what
     # the editor accepts.
     tag = filters.CharFilter(method="filter_by_tag")
@@ -51,10 +57,24 @@ class IdeaFilter(filters.FilterSet):
 
     class Meta:
         model = Idea
-        fields = ["status", "priority", "category", "tag", "search", "sort"]
+        fields = ["status", "priority", "category", "tag", "search", "sort", "stale"]
 
     def filter_by_tag(self, queryset: QuerySet[Idea], name: str, value: str) -> QuerySet[Idea]:
         return queryset.filter(tags__name__iexact=value.strip())
+
+    def filter_stale(self, queryset: QuerySet[Idea], name: str, value: bool) -> QuerySet[Idea]:
+        """Ideas still in play that have not moved for long enough.
+
+        Only `idea` and `planned` count: something already finished or in
+        progress is not being neglected.
+        """
+        threshold = timezone.now() - timedelta(days=self.request.user.stale_after_days)
+        condition = Q(
+            status__in=[IdeaStatus.IDEA, IdeaStatus.PLANNED],
+            updated_at__lt=threshold,
+        )
+
+        return queryset.filter(condition) if value else queryset.exclude(condition)
 
     def filter_by_search(self, queryset: QuerySet[Idea], name: str, value: str) -> QuerySet[Idea]:
         return search_ideas(queryset=queryset, term=value)

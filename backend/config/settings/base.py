@@ -43,6 +43,7 @@ LOCAL_APPS = [
     "apps.ideas",
     "apps.reminders",
     "apps.notifications",
+    "apps.telegrambot",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -218,6 +219,15 @@ CACHES = {
         "LOCATION": REDIS_URL,
     }
 }
+
+# --------------------------------------------------------------------------
+# Telegram
+# --------------------------------------------------------------------------
+
+# The bot itself lands in phase 6; the username is needed before that so
+# the settings page can render a working t.me link.
+TELEGRAM_BOT_USERNAME = env("TELEGRAM_BOT_USERNAME", default="BrainDockBot")
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
 
 # --------------------------------------------------------------------------
 # Application metadata

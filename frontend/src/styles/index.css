@@ -1,5 +1,10 @@
 @import "tailwindcss";
 @import "@fontsource-variable/vazirmatn";
+/* Outfit is used by the design for the BrainDock wordmark only. The mock
+   references it without ever loading it, so it silently falls back there;
+   loading it from npm renders the wordmark as drawn, still with no CDN. */
+@import "@fontsource/outfit/400.css";
+@import "@fontsource/outfit/700.css";
 
 /*
  * Every value below is transcribed verbatim from BrainDock.dc.html, the
@@ -17,6 +22,8 @@
 
 @theme {
   --font-sans: "Vazirmatn Variable", "Vazirmatn", system-ui, sans-serif;
+  --font-wordmark: "Outfit", "Vazirmatn Variable", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Surfaces */
   --color-bd-bg: #0f1113;
@@ -186,4 +193,158 @@
     border: 3px solid transparent;
     background-clip: content-box;
   }
+}
+
+/*
+ * Note body typography.
+ *
+ * Every measurement is taken from the rendered document in the design file,
+ * so what Tiptap produces sits at the same size, rhythm and colour as the
+ * mock -- which drew the same markup by hand.
+ */
+.bd-prose {
+  font-size: 16.5px;
+  line-height: 2.05;
+  color: var(--color-bd-text);
+}
+
+.bd-prose p {
+  margin: 0 0 20px;
+}
+
+.bd-prose h1 {
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 32px 0 14px;
+}
+
+.bd-prose h2 {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 30px 0 12px;
+}
+
+.bd-prose h3 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 26px 0 10px;
+}
+
+.bd-prose ul,
+.bd-prose ol {
+  margin: 0 0 20px;
+  padding-inline-start: 22px;
+}
+
+.bd-prose ul {
+  list-style: disc;
+}
+
+.bd-prose ol {
+  list-style: decimal;
+}
+
+.bd-prose li {
+  margin-bottom: 6px;
+}
+
+.bd-prose li:last-child {
+  margin-bottom: 0;
+}
+
+.bd-prose blockquote {
+  margin: 0 0 20px;
+  padding: 2px 16px 2px 0;
+  border-inline-start: 2px solid var(--color-bd-border-2);
+  color: var(--color-bd-text-2);
+}
+
+.bd-prose pre {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--color-bd-surface-2);
+  border: 1px solid var(--color-bd-border);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.8;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+}
+
+.bd-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+.bd-prose :not(pre) > code {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--color-bd-surface-2);
+}
+
+.bd-prose hr {
+  margin: 26px 0;
+  border: 0;
+  border-top: 1px solid var(--color-bd-border);
+}
+
+.bd-prose mark {
+  background: rgba(245, 158, 11, 0.35);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+/* Task lists: the design draws a 13px square with a 1.5px border, filled with
+   the accent when ticked. The mock hard-codes that border colour, which would
+   not adapt to the light theme; the token is used here instead. */
+.bd-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.bd-prose ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.bd-prose ul[data-type="taskList"] li > label {
+  flex: none;
+  margin-top: 8px;
+}
+
+.bd-prose ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.bd-prose input[type="checkbox"] {
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid var(--color-bd-text-3);
+  border-radius: 4px;
+  cursor: pointer;
+  vertical-align: -2px;
+}
+
+.bd-prose input[type="checkbox"]:checked {
+  background: var(--color-bd-accent-soft);
+  border-color: var(--color-bd-accent);
+}
+
+/* Placeholder, shown only while the document is empty. */
+.bd-prose p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-bd-text-3);
+  float: right;
+  height: 0;
+  pointer-events: none;
 }

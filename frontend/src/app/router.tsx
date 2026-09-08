@@ -1,17 +1,27 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { PlaceholderPage } from "@/app/PlaceholderPage";
 import { ROUTES } from "@/app/routes";
-import { HealthCheckPage } from "@/features/dashboard/HealthCheckPage";
+import { LoginPage } from "@/features/auth/LoginPage";
+import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { BrowsePage } from "@/features/ideas/BrowsePage";
+import { NotePage } from "@/features/ideas/NotePage";
+import { NotificationsPage } from "@/features/notifications/NotificationsPage";
+import { SettingsPage } from "@/features/settings/SettingsPage";
+import { AppLayout } from "@/features/shell/AppLayout";
 
 export const router = createBrowserRouter([
-  // Phase 0 acceptance screen; phase 5 swaps in the real dashboard.
-  { path: ROUTES.dashboard, element: <HealthCheckPage /> },
-  { path: ROUTES.ideas, element: <PlaceholderPage title="همهٔ ایده‌ها" /> },
-  { path: ROUTES.note, element: <PlaceholderPage title="صفحهٔ یادداشت" /> },
-  { path: ROUTES.archive, element: <PlaceholderPage title="آرشیو" /> },
-  { path: ROUTES.notifications, element: <PlaceholderPage title="اعلان‌ها" /> },
-  { path: ROUTES.settings, element: <PlaceholderPage title="تنظیمات" /> },
-  { path: ROUTES.login, element: <PlaceholderPage title="ورود" /> },
-  { path: "*", element: <PlaceholderPage title="صفحه پیدا نشد" /> },
+  { path: ROUTES.login, element: <LoginPage /> },
+  {
+    // Every screen but login lives inside the shell, which also guards the
+    // session: no user means a redirect to the login page.
+    element: <AppLayout />,
+    children: [
+      { path: ROUTES.dashboard, element: <DashboardPage /> },
+      { path: ROUTES.ideas, element: <BrowsePage /> },
+      { path: ROUTES.archive, element: <BrowsePage archived /> },
+      { path: ROUTES.note, element: <NotePage /> },
+      { path: ROUTES.notifications, element: <NotificationsPage /> },
+      { path: ROUTES.settings, element: <SettingsPage /> },
+    ],
+  },
 ]);
