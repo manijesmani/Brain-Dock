@@ -174,6 +174,7 @@ REST_FRAMEWORK = {
     # the one that needs a cap in this phase.
     "DEFAULT_THROTTLE_RATES": {
         "login": env("LOGIN_THROTTLE_RATE", default="10/min"),
+        "telegram_webhook": env("WEBHOOK_THROTTLE_RATE", default="120/min"),
     },
 }
 
@@ -228,6 +229,14 @@ CACHES = {
 # the settings page can render a working t.me link.
 TELEGRAM_BOT_USERNAME = env("TELEGRAM_BOT_USERNAME", default="BrainDockBot")
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
+
+# Handed to setWebhook and echoed back by Telegram in a header. It is the
+# only thing standing between the webhook and the open internet, so an unset
+# value makes the endpoint refuse everything rather than accept everything.
+TELEGRAM_WEBHOOK_SECRET = env("TELEGRAM_WEBHOOK_SECRET", default="")
+
+# Where the bot's links point. Also used by the stale digest in phase 7.
+SITE_URL = env("SITE_URL", default="http://localhost:5173")
 
 # --------------------------------------------------------------------------
 # Application metadata

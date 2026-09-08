@@ -6,7 +6,7 @@ those belong to the reminder engine.
 """
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 from apps.ideas.models import Idea
 from apps.users.models import User
@@ -19,6 +19,8 @@ class Message:
     recipient: User
     text: str
     idea: Idea | None = None
+    # Channels that cannot show buttons ignore this; only Telegram uses it.
+    reply_markup: Any | None = None
 
 
 class ChannelUnavailableError(RuntimeError):

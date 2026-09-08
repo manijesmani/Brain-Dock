@@ -31,9 +31,23 @@ from apps.reminders.recurrence import compute_next_run
 
 logger = logging.getLogger(__name__)
 
-# Channels a reminder goes out over. Telegram joins this list in phase 6; the
-# dispatcher already skips a channel a user cannot be reached on.
-REMINDER_CHANNELS = [DeliveryChannel.IN_APP]
+
+# Channels a reminder goes out over, in order. A user who cannot be reached on
+# one still gets the others: an unlinked Telegram account fails only its own
+# delivery row.
+#
+# Built lazily because importing the Telegram channel at module scope would
+# pull python-telegram-bot into every process that touches a reminder.
+def _channels() -> dict[str, object]:
+    from apps.notifications.channels.telegram import TelegramChannel
+
+    return {
+        DeliveryChannel.IN_APP: InAppChannel(),
+        DeliveryChannel.TELEGRAM: TelegramChannel(),
+    }
+
+
+REMINDER_CHANNELS = [DeliveryChannel.IN_APP, DeliveryChannel.TELEGRAM]
 
 
 def refresh_next_run(reminder: Reminder, *, after: Any = None) -> Reminder:
@@ -109,6 +123,29 @@ def deliver_reminder(*, reminder: Reminder, scheduled_for: Any) -> list[Reminder
     return deliveries
 
 
+def _message_for(reminder: Reminder, channel_name: str) -> Message:
+    """Renders the reminder for one channel.
+
+    Telegram gets buttons and its own wording; the notification centre gets
+    the single line the design shows there.
+    """
+    if channel_name == DeliveryChannel.TELEGRAM:
+        from apps.telegrambot import messages as telegram_messages
+
+        return Message(
+            recipient=reminder.owner,
+            text=telegram_messages.reminder_text(reminder),
+            idea=reminder.idea,
+            reply_markup=telegram_messages.reminder_keyboard(reminder),
+        )
+
+    return Message(
+        recipient=reminder.owner,
+        text=reminder_text(reminder),
+        idea=reminder.idea,
+    )
+
+
 def _claim_delivery(
     reminder: Reminder, scheduled_for: Any, channel: str
 ) -> ReminderDelivery | None:
@@ -130,12 +167,8 @@ def _claim_delivery(
 
 
 def _attempt(reminder: Reminder, delivery: ReminderDelivery, channel_name: str) -> None:
-    channel = InAppChannel()
-    message = Message(
-        recipient=reminder.owner,
-        text=reminder_text(reminder),
-        idea=reminder.idea,
-    )
+    channel = _channels()[channel_name]
+    message = _message_for(reminder, channel_name)
 
     try:
         if not channel.is_available_for(reminder.owner):

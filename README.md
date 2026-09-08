@@ -70,6 +70,33 @@ The dev server runs on `http://localhost:5173` and proxies `/api` to Django, so
 the browser stays on a single origin and session cookies behave exactly as they
 will behind Nginx in production.
 
+### Telegram bot
+
+The bot runs inside Django on a webhook; there is no second service.
+
+```bash
+# In backend/.env
+TELEGRAM_BOT_TOKEN=<from @BotFather>
+TELEGRAM_BOT_USERNAME=<the bot's username, without @>
+TELEGRAM_WEBHOOK_SECRET=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+SITE_URL=https://<public address>
+
+python manage.py telegram_webhook set     # register the webhook
+python manage.py telegram_webhook info    # check it
+python manage.py telegram_webhook delete  # remove it
+```
+
+Telegram delivers only to HTTPS, so registering a webhook needs a public
+address. In development, point one at the local server with a tunnel and pass
+it explicitly:
+
+```bash
+python manage.py telegram_webhook set --base-url https://<tunnel address>
+```
+
+An account is linked from the settings page: it issues a one-time `t.me` link
+that hands a token to the bot, which binds the chat to the account.
+
 ### Git hooks
 
 ```bash
@@ -84,6 +111,8 @@ pre-commit install
 | Command | Purpose |
 | --- | --- |
 | `python manage.py runserver` | Development server |
+| `celery -A config worker -l info` | Reminder worker |
+| `celery -A config beat -l info` | Reminder scheduler |
 | `pytest` | Test suite |
 | `ruff check .` | Lint |
 | `ruff format .` | Format |
@@ -105,7 +134,11 @@ backend/
   config/       Split settings, URLs, WSGI/ASGI entry points
   core/         Abstract model bases, permissions, pagination, error handling
   apps/
-    users/      Custom user model
+    users/          Custom user model
+    ideas/          Idea, Category, Tag, Attachment, search
+    reminders/      Reminder engine and its periodic tick
+    notifications/  Notification centre and delivery channels
+    telegrambot/    Webhook, handlers, account linking
   tests/
 frontend/
   src/
@@ -130,5 +163,9 @@ to `config.settings.prod` via `wsgi.py` and `asgi.py`.
 
 ## Status
 
-Phase 0 complete: project skeleton, split settings, custom user model, health
-endpoint, linting and Git hooks.
+Phases 0 to 6 complete: project skeleton, the idea API with session
+authentication, attachments, Persian search, the reminder engine and
+notification centre, the interface, and the Telegram bot.
+
+Remaining: stale-idea alerts and the dashboard (7), security hardening and
+tests (8), deployment (9).

@@ -222,15 +222,21 @@ class TestDispatch:
 class TestIdempotency:
     """Delivery must happen once per slot, however many times the tick runs."""
 
-    def test_a_delivery_row_is_written_for_the_slot(self, user: User) -> None:
+    def test_a_delivery_row_is_written_per_channel(self, user: User) -> None:
+        """One row per channel per slot -- that pairing is what the unique
+        constraint is on."""
         reminder = make_reminder(user)
         due_at = timezone.now() - timedelta(seconds=30)
         Reminder.objects.filter(pk=reminder.pk).update(next_run_at=due_at)
 
         dispatch_due_reminders()
 
-        delivery = ReminderDelivery.objects.get()
-        assert delivery.channel == DeliveryChannel.IN_APP
+        assert set(ReminderDelivery.objects.values_list("channel", flat=True)) == {
+            DeliveryChannel.IN_APP,
+            DeliveryChannel.TELEGRAM,
+        }
+
+        delivery = ReminderDelivery.objects.get(channel=DeliveryChannel.IN_APP)
         assert delivery.status == DeliveryStatus.SENT
         assert delivery.sent_at is not None
 
@@ -245,7 +251,7 @@ class TestIdempotency:
         services.deliver_reminder(reminder=reminder, scheduled_for=due_at)
 
         assert Notification.objects.count() == 1
-        assert ReminderDelivery.objects.count() == 1
+        assert ReminderDelivery.objects.filter(channel=DeliveryChannel.IN_APP).count() == 1
 
     def test_the_uniqueness_is_enforced_by_the_database(self, user: User) -> None:
         from django.db import IntegrityError, transaction
@@ -323,7 +329,7 @@ class TestConcurrentTicks:
 
         assert errors == []
         assert Notification.objects.count() == 1
-        assert ReminderDelivery.objects.count() == 1
+        assert ReminderDelivery.objects.filter(channel=DeliveryChannel.IN_APP).count() == 1
 
         Notification.objects.all().delete()
         ReminderDelivery.objects.all().delete()
