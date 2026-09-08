@@ -53,6 +53,8 @@ class ReminderSerializer(serializers.ModelSerializer):
     idea_category_color = serializers.CharField(
         source="idea.category.color", read_only=True, default=None
     )
+    # The dashboard's progress bar counts finished ideas in each section.
+    idea_status = serializers.CharField(source="idea.status", read_only=True)
 
     class Meta:
         model = Reminder
@@ -62,6 +64,7 @@ class ReminderSerializer(serializers.ModelSerializer):
             "idea_title",
             "idea_category_name",
             "idea_category_color",
+            "idea_status",
             "recurrence",
             "hour",
             "minute",
@@ -79,6 +82,7 @@ class ReminderSerializer(serializers.ModelSerializer):
             "idea_title",
             "idea_category_name",
             "idea_category_color",
+            "idea_status",
             "next_run_at",
             "description",
             "created_at",

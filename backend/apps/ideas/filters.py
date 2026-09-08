@@ -5,14 +5,11 @@ status, priority, tag and category dropdowns, a search box, and four sort
 orders. Anything the toolbar cannot express is not offered here either.
 """
 
-from datetime import timedelta
-
-from django.db.models import Case, IntegerField, Q, QuerySet, Value, When
-from django.utils import timezone
+from django.db.models import Case, IntegerField, QuerySet, Value, When
 from django_filters import rest_framework as filters
 
 from apps.ideas.models import Idea, IdeaPriority, IdeaStatus
-from apps.ideas.selectors import search_ideas
+from apps.ideas.selectors import search_ideas, stale_condition
 
 # The status dropdown deliberately omits `archived`: the archive is its own
 # screen, reached with `?archived=true`, not a value inside this filter.
@@ -63,16 +60,8 @@ class IdeaFilter(filters.FilterSet):
         return queryset.filter(tags__name__iexact=value.strip())
 
     def filter_stale(self, queryset: QuerySet[Idea], name: str, value: bool) -> QuerySet[Idea]:
-        """Ideas still in play that have not moved for long enough.
-
-        Only `idea` and `planned` count: something already finished or in
-        progress is not being neglected.
-        """
-        threshold = timezone.now() - timedelta(days=self.request.user.stale_after_days)
-        condition = Q(
-            status__in=[IdeaStatus.IDEA, IdeaStatus.PLANNED],
-            updated_at__lt=threshold,
-        )
+        """Defers to the shared definition in apps.ideas.selectors."""
+        condition = stale_condition(threshold_days=self.request.user.stale_after_days)
 
         return queryset.filter(condition) if value else queryset.exclude(condition)
 

@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.ideas.models import Idea
-from core.models import OwnedTimeStampedModel
+from core.models import OwnedTimeStampedModel, TimeStampedModel
 
 
 class NotificationKind(models.TextChoices):
@@ -54,3 +54,32 @@ class Notification(OwnedTimeStampedModel):
 
     def __str__(self) -> str:
         return self.text[:60]
+
+
+class StaleAlert(TimeStampedModel):
+    """Records that an idea has already been reported as neglected.
+
+    One row per idea rather than one per day, because the question is not
+    "did we tell them today" but "did we tell them about *this* period of
+    neglect". `notified_at` is compared against the idea's `updated_at`: the
+    moment the user touches the idea, the alert falls behind it and the idea
+    becomes eligible again once it goes stale afresh.
+
+    Without this the digest would repeat the same list every single run.
+    """
+
+    idea = models.OneToOneField(
+        Idea,
+        on_delete=models.CASCADE,
+        related_name="stale_alert",
+        verbose_name="ایده",
+    )
+    notified_at = models.DateTimeField(verbose_name="زمان اطلاع")
+
+    class Meta:
+        ordering = ["-notified_at"]
+        verbose_name = "هشدار ایدهٔ راکد"
+        verbose_name_plural = "هشدارهای ایدهٔ راکد"
+
+    def __str__(self) -> str:
+        return f"{self.idea_id} @ {self.notified_at:%Y-%m-%d}"

@@ -7,6 +7,7 @@ override what genuinely differs. Nothing in this module may depend on DEBUG.
 from pathlib import Path
 
 import environ
+from celery.schedules import crontab
 
 # BASE_DIR points at the `backend/` directory: this file is
 # backend/config/settings/base.py, so three parents up.
@@ -209,6 +210,16 @@ CELERY_BEAT_SCHEDULE = {
         # A tick that could not run on time is worthless a minute later; the
         # next one will pick up the same rows anyway.
         "options": {"expires": 55},
+    },
+    # Once a day. "You have not touched this in two weeks" does not become
+    # truer at a finer resolution, and the job is idempotent anyway: an idea
+    # already reported is not reported again until it is edited.
+    #
+    # The schedule is in UTC like everything else. 05:30 UTC is 09:00 in
+    # Tehran, which is where the hour is meant to land.
+    "send-stale-digests": {
+        "task": "notifications.send_stale_digests",
+        "schedule": crontab(hour=5, minute=30),
     },
 }
 

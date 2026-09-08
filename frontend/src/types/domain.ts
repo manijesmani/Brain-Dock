@@ -105,6 +105,7 @@ export interface Reminder {
   idea_title: string;
   idea_category_name: string | null;
   idea_category_color: string | null;
+  idea_status: IdeaStatus;
   recurrence: RecurrenceKind;
   hour: number;
   minute: number;

@@ -5,8 +5,11 @@ expected to go through these rather than touching the managers directly, so
 there is one place to audit for cross-tenant leaks.
 """
 
+from datetime import timedelta
+
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models import F, Q, QuerySet
+from django.utils import timezone
 
 from apps.ideas.models import Attachment, Category, Idea, IdeaStatus, Tag
 from apps.ideas.persian import normalize_persian
@@ -73,6 +76,28 @@ def search_ideas(*, queryset: QuerySet[Idea], term: str) -> QuerySet[Idea]:
         )
         .order_by("-rank", "-similarity", "-created_at")
     )
+
+
+# Statuses an idea can be neglected in. Something already finished or in
+# progress is not being forgotten.
+NEGLECTABLE_STATUSES = [IdeaStatus.IDEA, IdeaStatus.PLANNED]
+
+
+def stale_condition(*, threshold_days: int) -> Q:
+    """The single definition of a stale idea.
+
+    Used by the dashboard's filter and by the periodic digest, so the list a
+    user sees and the alert they receive can never disagree.
+    """
+    return Q(
+        status__in=NEGLECTABLE_STATUSES,
+        updated_at__lt=timezone.now() - timedelta(days=threshold_days),
+    )
+
+
+def stale_idea_queryset(*, owner: User) -> QuerySet[Idea]:
+    """The owner's neglected ideas, by their own threshold."""
+    return idea_queryset(owner=owner).filter(stale_condition(threshold_days=owner.stale_after_days))
 
 
 def active_idea_queryset(*, owner: User) -> QuerySet[Idea]:

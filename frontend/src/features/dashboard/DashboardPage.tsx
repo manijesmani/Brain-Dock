@@ -25,7 +25,7 @@ import {
   ProgressBar,
   StatusPill,
 } from "@/shared/ui/indicators";
-import type { IdeaSummary, Reminder } from "@/types/domain";
+import type { IdeaStatus, IdeaSummary, Reminder } from "@/types/domain";
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -42,6 +42,11 @@ export function DashboardPage() {
   const staleRows = stale?.results ?? [];
   const doingRows = doing?.results ?? [];
 
+  // Each section's bar is "how many of these are finished", which is what
+  // prog() computes in the design file.
+  const doneAmong = <T,>(rows: T[], status: (row: T) => IdeaStatus) =>
+    rows.filter((row) => status(row) === "done").length;
+
   return (
     <main className="min-w-0 flex-1 px-[38px] pt-[30px] pb-[110px]">
       <header className="mb-[26px]">
@@ -54,7 +59,7 @@ export function DashboardPage() {
       <Section
         title="یادآوری‌های امروز"
         count={today.length}
-        done={0}
+        done={doneAmong(today, (row) => row.idea_status)}
         total={today.length}
         empty={
           <EmptyState icon={<BellSlashIcon size={22} />}>برای امروز یادآوری‌ای ثبت نشده</EmptyState>
@@ -74,7 +79,7 @@ export function DashboardPage() {
       <Section
         title="این هفته"
         count={week.length}
-        done={0}
+        done={doneAmong(week, (row) => row.idea_status)}
         total={week.length}
         empty={
           <EmptyState icon={<CalendarBlankIcon size={22} />}>
@@ -95,7 +100,7 @@ export function DashboardPage() {
       <Section
         title="ایده‌های راکد"
         count={staleRows.length}
-        done={0}
+        done={doneAmong(staleRows, (row) => row.status)}
         total={staleRows.length}
         empty={<EmptyState icon={<CheckCircleIcon size={22} />}>ایدهٔ راکدی نداری</EmptyState>}
       >
@@ -130,7 +135,7 @@ export function DashboardPage() {
       <Section
         title="در حال انجام"
         count={doingRows.length}
-        done={0}
+        done={doneAmong(doingRows, (row) => row.status)}
         total={doingRows.length}
         last
         empty={
