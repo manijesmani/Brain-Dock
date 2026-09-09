@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A new push to the same branch makes the previous run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+
+    services:
+      # Redis is deliberately absent. config.settings.test swaps the cache for
+      # local memory and runs Celery tasks eagerly, so the suite needs nothing
+      # but PostgreSQL -- and a test run that needs less is a test run that
+      # fails for fewer reasons that are not the code's fault.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: braindock
+          POSTGRES_USER: braindock
+          POSTGRES_PASSWORD: braindock
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U braindock"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DJANGO_SECRET_KEY: ci-only-key-not-used-to-protect-anything
+      DATABASE_URL: postgres://braindock:braindock@127.0.0.1:5432/braindock
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/requirements/*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Check formatting
+        run: ruff format --check .
+
+      # pytest creates its own database, which is why the user above needs
+      # CREATEDB and why core/migrations/0001_extensions.py has to install
+      # pg_trgm as a migration rather than by hand.
+      - name: Test
+        run: pytest
+
+      # Runs against the production settings module, so a change that would
+      # weaken the deployed configuration fails here rather than on the
+      # server.
+      - name: Deployment checks
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          DJANGO_ALLOWED_HOSTS: braindock.example.com
+          DJANGO_CSRF_TRUSTED_ORIGINS: https://braindock.example.com
+        run: python manage.py check --deploy --fail-level WARNING
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # `ci`, not `install`: it installs exactly what the lockfile pins and
+      # fails if package.json and the lockfile disagree.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      # `npm run build` is `tsc -b && vite build`, so this covers type
+      # checking and the production bundle in one step.
+      - name: Type-check and build
+        run: npm run build
+
+  images:
+    name: Images
+    runs-on: ubuntu-latest
+    # No point building images from a revision that does not pass its tests.
+    needs: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Built but not pushed: this proves the Dockerfiles still work. There is
+      # no registry to publish to, and a deploy builds on the host.
+      - name: Build the backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build the web image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

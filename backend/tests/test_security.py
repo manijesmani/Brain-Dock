@@ -7,7 +7,8 @@ should not.
 """
 
 import pytest
-from django.test import Client
+from django.conf import settings
+from django.test import Client, override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -80,6 +81,51 @@ class TestProductionSettings:
         assert not any(
             str(getattr(pattern, "pattern", "")).startswith("media") for pattern in urls.urlpatterns
         )
+
+    def test_exactly_one_proxy_is_trusted(self, prod) -> None:
+        """Behind Nginx, REMOTE_ADDR is the proxy, so DRF reads X-Forwarded-For.
+
+        The count has to match deploy/nginx, which puts exactly one proxy in
+        front and overwrites the header rather than appending to it.
+        """
+        assert prod.REST_FRAMEWORK["NUM_PROXIES"] == 1
+
+
+class TestThrottleIdentity:
+    """Which address the rate limiter counts against.
+
+    This is the difference between a login throttle that works and one that a
+    caller can step around by writing its own X-Forwarded-For.
+    """
+
+    def _request_with_forged_header(self):
+        from rest_framework.test import APIRequestFactory
+
+        # The first address is what an attacker put there; the second is what
+        # the trusted proxy appended.
+        return APIRequestFactory().get("/api/ideas/", HTTP_X_FORWARDED_FOR="10.0.0.1, 203.0.113.9")
+
+    def test_only_the_address_the_proxy_appended_is_counted(self) -> None:
+        from rest_framework.throttling import BaseThrottle
+
+        request = self._request_with_forged_header()
+
+        with override_settings(REST_FRAMEWORK={**settings.REST_FRAMEWORK, "NUM_PROXIES": 1}):
+            assert BaseThrottle().get_ident(request) == "203.0.113.9"
+
+    def test_without_the_setting_the_whole_forged_chain_would_be_the_identity(self) -> None:
+        """The failure this guards against, spelled out.
+
+        With no proxy count configured, DRF uses the entire header. Anyone
+        could then vary it per request and start every request in a fresh
+        rate-limit bucket.
+        """
+        from rest_framework.throttling import BaseThrottle
+
+        request = self._request_with_forged_header()
+
+        with override_settings(REST_FRAMEWORK={**settings.REST_FRAMEWORK, "NUM_PROXIES": None}):
+            assert BaseThrottle().get_ident(request) == "10.0.0.1,203.0.113.9"
 
 
 class TestPasswordPolicy:

@@ -1,0 +1,196 @@
+# BrainDock -- site configuration.
+#
+# The nginx image runs every file in /etc/nginx/templates through envsubst at
+# startup. NGINX_ENVSUBST_FILTER is set to ^BD_ in compose, so only the two
+# BD_ variables below are replaced and nginx's own $host, $scheme and
+# $request_uri survive untouched.
+#
+# This file is mounted rather than baked into the image: it names the server
+# and the certificate files, and certbot rewrites certificates in place. A
+# renewal must not require an image rebuild.
+
+server_tokens off;
+
+# Docker's embedded DNS. A container that is restarted on its own comes back
+# with a different address, and an `upstream` block would go on proxying to
+# the old one until nginx itself restarted. Resolving through a variable
+# defers the lookup to request time, which costs the keepalive pool and buys
+# a stack that survives `docker compose restart web`.
+resolver 127.0.0.11 valid=10s ipv6=off;
+
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_proxied any;
+gzip_types
+    text/plain
+    text/css
+    application/javascript
+    application/json
+    image/svg+xml
+    font/woff2;
+
+# The audio ceiling in the Django settings is 25 MB. Nginx has to allow at
+# least that, or an oversized upload is cut off by the proxy and the user
+# never sees the Persian validation message the API would have returned.
+client_max_body_size 26m;
+
+# --------------------------------------------------------------------------
+# Plain HTTP: redirect, with two exceptions
+# --------------------------------------------------------------------------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${BD_SERVER_NAME};
+
+    # The container health check. It has to answer here rather than being
+    # redirected, and it must not fill the access log.
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain always;
+        return 200 "ok\n";
+    }
+
+    # Certbot's challenge files are the one thing that must stay reachable
+    # without TLS -- they are how the certificate gets issued in the first
+    # place.
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# --------------------------------------------------------------------------
+# HTTPS
+# --------------------------------------------------------------------------
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${BD_SERVER_NAME};
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+
+    # TLS 1.2 is kept only because some corporate middleboxes still terminate
+    # at it. Everything older is off.
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    # Off because they weaken forward secrecy on TLS 1.2 unless keys are
+    # rotated, which nothing here does.
+    ssl_session_tickets off;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    set $braindock_api http://web:8000;
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain always;
+        return 200 "ok\n";
+    }
+
+    # ----------------------------------------------------------------------
+    # The API
+    # ----------------------------------------------------------------------
+    # No add_header here on purpose. Nginx only inherits headers into a
+    # location that sets none of its own, and the API sets its own CSP and
+    # Permissions-Policy in core.middleware. Adding any header at this level
+    # would silently drop those.
+    location /api/ {
+        proxy_pass $braindock_api$request_uri;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        # Overwritten, never appended. $proxy_add_x_forwarded_for would keep
+        # whatever the client sent in front of the real address, and DRF
+        # identifies a client for rate limiting by reading this header -- a
+        # forged value would hand every request a fresh login-throttle bucket.
+        proxy_set_header X-Forwarded-For   $remote_addr;
+        # Django trusts this to decide a request was HTTPS. It is only
+        # trustworthy because this line sets it unconditionally.
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_redirect off;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 60s;
+    }
+
+    # ----------------------------------------------------------------------
+    # The Django admin, wherever it has been moved to
+    # ----------------------------------------------------------------------
+    location ${BD_ADMIN_PATH} {
+        proxy_pass $braindock_api$request_uri;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_redirect off;
+    }
+
+    # The admin's own CSS and JavaScript, written by collectstatic onto the
+    # volume this reads. Filenames are not fingerprinted, so the expiry is
+    # days rather than a year.
+    location /static/ {
+        alias /var/www/static/;
+        expires 7d;
+        access_log off;
+    }
+
+    # ----------------------------------------------------------------------
+    # Attachments
+    # ----------------------------------------------------------------------
+    # `internal` means this location can only be entered through an
+    # X-Accel-Redirect header from the application, never by a browser asking
+    # for the path directly. That is what keeps a private file private while
+    # still letting Nginx do the sending: apps.ideas.attachment_views checks
+    # ownership first and only then names the file here.
+    location /internal-media/ {
+        internal;
+        alias /var/www/media/;
+    }
+
+    # ----------------------------------------------------------------------
+    # The SPA
+    # ----------------------------------------------------------------------
+    # Vite fingerprints everything it writes into /assets/, so these can be
+    # cached indefinitely and are the reason the no-store below is harmless.
+    location ^~ /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable" always;
+        access_log off;
+    }
+
+    location / {
+        # Client-side routes are not files. Anything that does not exist on
+        # disk is answered with the shell, and React Router takes it from
+        # there.
+        try_files $uri $uri/ /index.html;
+
+        # index.html names the current hashed bundles, so a cached copy would
+        # point at files that a deploy has already replaced.
+        add_header Cache-Control "no-store" always;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-Frame-Options DENY always;
+        add_header Referrer-Policy same-origin always;
+        add_header Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()" always;
+
+        # 'unsafe-inline' is present for styles and only for styles: the
+        # interface sets element `style` attributes in ~60 places, which this
+        # directive governs. Scripts get no such exemption -- the build emits
+        # no inline script and the code uses no dangerouslySetInnerHTML.
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always;
+    }
+}

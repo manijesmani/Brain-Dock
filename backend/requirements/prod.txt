@@ -1,0 +1,8 @@
+-r base.txt
+
+# Phase 9 -- the production WSGI server.
+#
+# Sync workers, not async ones: every view is synchronous, ATOMIC_REQUESTS
+# holds a database connection open for the length of a request, and the
+# Telegram library's async calls are already bridged with async_to_sync.
+gunicorn==26.2.0

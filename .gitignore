@@ -26,6 +26,15 @@ npm-debug.log*
 .coverage
 htmlcov/
 
+# Deployment artefacts
+# TLS keys and database dumps. Neither belongs in a repository, and the
+# backups directory holds copies of every idea and attachment.
+# The directory itself is kept so a fresh clone has somewhere for the bind
+# mount to land; only its contents are ignored.
+/deploy/certs/*
+!/deploy/certs/.gitkeep
+/backups/
+
 # Editors
 .idea/
 .vscode/

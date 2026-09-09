@@ -14,7 +14,7 @@ forgotten the way notes in a private channel do.
 | Queue | Celery, Celery Beat, Redis |
 | Frontend | React 19, Vite, TypeScript, Tailwind CSS v4, TanStack Query |
 | Bot | python-telegram-bot, served by Django via webhook |
-| Deployment | Docker, Nginx, Gunicorn |
+| Deployment | Docker Compose, Nginx, Gunicorn |
 
 The interface is fully right-to-left and Persian, and all dates are shown in
 the Jalali calendar. Timestamps are stored in UTC and converted only for
@@ -127,6 +127,32 @@ pre-commit install
 | `npm run format` | Format |
 | `npm run typecheck` | Type-check only |
 
+## Deployment
+
+Six containers on one host, built and run with `docker compose`. `deploy/`
+holds the Nginx configuration, the backup and restore scripts, and the full
+instructions, including issuing a certificate.
+
+```bash
+cp .env.example .env     # fill in the secrets; the stack will not start without them
+./deploy/make-dev-cert.sh localhost
+docker compose up -d --build
+docker compose exec web python manage.py createsuperuser
+```
+
+See [deploy/README.md](deploy/README.md).
+
+Note that `.env` in the repository root configures the Docker deployment,
+while `backend/.env` configures Django when it is run directly on the host for
+development. They are separate files with separate purposes.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs three jobs on every push and pull request:
+the backend suite with a PostgreSQL service plus `ruff` and `check --deploy`,
+the frontend's lint, formatting, type-check and build, and a build of both
+container images.
+
 ## Layout
 
 ```
@@ -147,6 +173,8 @@ frontend/
     shared/     ui, api, lib, hooks
     styles/     Design tokens
     types/
+deploy/         Nginx configuration, TLS helper, backup and restore
+.github/        CI workflow
 BrainDock.dc.html   Authoritative UI design reference
 ```
 
@@ -163,9 +191,11 @@ to `config.settings.prod` via `wsgi.py` and `asgi.py`.
 
 ## Status
 
-Phases 0 to 6 complete: project skeleton, the idea API with session
-authentication, attachments, Persian search, the reminder engine and
-notification centre, the interface, and the Telegram bot.
+Complete. The project skeleton, the idea API with session authentication,
+attachments, Persian search, the reminder engine and notification centre, the
+interface, the Telegram bot, stale-idea alerts and the dashboard, security
+hardening, and the containerised deployment.
 
-Remaining: stale-idea alerts and the dashboard (7), security hardening and
-tests (8), deployment (9).
+The Telegram bot is the one part not proven against the real service: it needs
+a token from @BotFather and a public HTTPS address, and is covered by tests
+against a stubbed client instead.

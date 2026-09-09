@@ -1,0 +1,185 @@
+# BrainDock -- single-host deployment.
+#
+# Six services on one machine. Only Nginx publishes ports; Postgres and Redis
+# are reachable on the internal network and nowhere else, which is why neither
+# needs to defend itself against the internet.
+#
+# Configuration comes from the .env file next to this one. Variables written
+# as ${NAME:?...} have no default on purpose: a missing secret has to stop the
+# stack rather than start it with a fallback.
+
+# --------------------------------------------------------------------------
+# Shared by the three backend containers. They run the same image and the same
+# settings; only the command differs.
+# --------------------------------------------------------------------------
+x-backend-environment: &backend-environment
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set DJANGO_SECRET_KEY in .env}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:?set DJANGO_ALLOWED_HOSTS in .env}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:?set DJANGO_CSRF_TRUSTED_ORIGINS in .env}
+  DJANGO_ADMIN_URL_PATH: ${DJANGO_ADMIN_URL_PATH:-admin/}
+  # Built from the Postgres credentials rather than repeated, so the two can
+  # never drift apart.
+  DATABASE_URL: postgres://${POSTGRES_USER:-braindock}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-braindock}
+  REDIS_URL: redis://redis:6379/0
+  SITE_URL: ${SITE_URL:?set SITE_URL in .env}
+  TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-BrainDockBot}
+  TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+  TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+  LOGIN_THROTTLE_RATE: ${LOGIN_THROTTLE_RATE:-10/min}
+  WEBHOOK_THROTTLE_RATE: ${WEBHOOK_THROTTLE_RATE:-120/min}
+  USER_THROTTLE_RATE: ${USER_THROTTLE_RATE:-2000/hour}
+  ANON_THROTTLE_RATE: ${ANON_THROTTLE_RATE:-120/hour}
+
+x-backend-build: &backend-build
+  build:
+    context: ./backend
+  image: braindock-backend:${BRAINDOCK_TAG:-latest}
+  restart: unless-stopped
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  # ------------------------------------------------------------------------
+  # Data
+  # ------------------------------------------------------------------------
+  db:
+    # The Debian image, not the Alpine one. Alpine's musl provides only the C
+    # collation, while development runs on glibc with en_US.UTF-8; ordering
+    # Persian category and tag names would then differ between the two. For a
+    # project whose whole subject is Persian text that is not a difference
+    # worth saving 100 MB over.
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-braindock}
+      POSTGRES_USER: ${POSTGRES_USER:-braindock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # $$ escapes compose's own interpolation so the shell inside the
+      # container expands these.
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-braindock} -d $${POSTGRES_DB:-braindock}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    # Persistence is on because Redis is the Celery broker: a restart with an
+    # empty queue would drop reminders that had been handed over but not yet
+    # delivered. Throttle counters are expendable; queued work is not.
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "no"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ------------------------------------------------------------------------
+  # Application
+  # ------------------------------------------------------------------------
+  web:
+    <<: *backend-build
+    environment:
+      <<: *backend-environment
+      # This container, and only this one, applies migrations and writes the
+      # static files. Two of them racing `migrate` is the failure this avoids.
+      BRAINDOCK_RUN_MIGRATIONS: "1"
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-3}
+    volumes:
+      - media:/app/media
+      - static:/app/staticfiles
+
+  worker:
+    <<: *backend-build
+    environment: *backend-environment
+    command:
+      - celery
+      - -A
+      - config
+      - worker
+      - --loglevel=info
+      - --concurrency=${CELERY_CONCURRENCY:-2}
+    # No media volume: nothing the worker runs touches an attachment. Files
+    # are written during the request that uploads them.
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping --destination celery@$$HOSTNAME --timeout 10"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+
+  beat:
+    <<: *backend-build
+    environment: *backend-environment
+    # The schedule file records when each entry last ran. On a volume, because
+    # losing it on redeploy would make Beat treat every entry as new and fire
+    # the daily stale digest again.
+    #
+    # --pidfile= is empty deliberately: a stale pid file from an unclean stop
+    # would keep the container from ever starting again.
+    command:
+      - celery
+      - -A
+      - config
+      - beat
+      - --loglevel=info
+      - --schedule=/app/run/celerybeat-schedule
+      - --pidfile=
+    volumes:
+      - beatstate:/app/run
+    # The image's health check asks Gunicorn whether it is alive, and this
+    # container does not run Gunicorn -- inherited, it would report every
+    # healthy scheduler as unhealthy. Beat exposes nothing to ask, so there is
+    # no honest check to put in its place; `restart: unless-stopped` and the
+    # fact that a stopped scheduler stops delivering reminders are what cover
+    # it.
+    healthcheck:
+      disable: true
+
+  # ------------------------------------------------------------------------
+  # Web tier
+  # ------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ./frontend
+    image: braindock-web:${BRAINDOCK_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      # Only names matching this filter are substituted into the templates, so
+      # nginx's own $host and $request_uri are left alone.
+      NGINX_ENVSUBST_FILTER: "^BD_"
+      BD_SERVER_NAME: ${BD_SERVER_NAME:?set BD_SERVER_NAME in .env}
+      # Derived from the Django setting so the proxied path and the routed
+      # path cannot disagree.
+      BD_ADMIN_PATH: /${DJANGO_ADMIN_URL_PATH:-admin/}
+    volumes:
+      - ./deploy/nginx/templates:/etc/nginx/templates:ro
+      - ./deploy/certs:/etc/nginx/certs:ro
+      - static:/var/www/static:ro
+      - media:/var/www/media:ro
+      - certbot:/var/www/certbot
+
+volumes:
+  pgdata:
+  redisdata:
+  media:
+  static:
+  beatstate:
+  certbot:
