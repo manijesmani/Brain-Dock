@@ -58,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core.middleware.SecurityHeadersMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -98,7 +99,12 @@ AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        # Django's default is eight. This is the only account there is, and it
+        # owns every idea, attachment and Telegram link in the system.
+        "OPTIONS": {"min_length": 12},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -171,9 +177,17 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
     "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",
-    # Throttles are opt-in per view rather than global; the login endpoint is
-    # the one that needs a cap in this phase.
+    # A ceiling on the whole API, generous enough that ordinary use never
+    # reaches it. Login and the Telegram webhook carry their own, much tighter
+    # limits on top of these -- those are the two endpoints reachable without
+    # a session.
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
     "DEFAULT_THROTTLE_RATES": {
+        "user": env("USER_THROTTLE_RATE", default="2000/hour"),
+        "anon": env("ANON_THROTTLE_RATE", default="120/hour"),
         "login": env("LOGIN_THROTTLE_RATE", default="10/min"),
         "telegram_webhook": env("WEBHOOK_THROTTLE_RATE", default="120/min"),
     },
@@ -248,6 +262,19 @@ TELEGRAM_WEBHOOK_SECRET = env("TELEGRAM_WEBHOOK_SECRET", default="")
 
 # Where the bot's links point. Also used by the stale digest in phase 7.
 SITE_URL = env("SITE_URL", default="http://localhost:5173")
+
+# --------------------------------------------------------------------------
+# Request limits
+# --------------------------------------------------------------------------
+
+# A Tiptap document is JSON, and apps.ideas.content caps its node and text
+# counts. This caps the request body before any of that is parsed.
+DATA_UPLOAD_MAX_MEMORY_SIZE = env.int("DATA_UPLOAD_MAX_MEMORY_SIZE", default=5 * 1024 * 1024)
+# Nothing in this API posts a form with hundreds of fields.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 200
+
+# Overridden in production. Kept here so config.urls can read it either way.
+ADMIN_URL_PATH = "admin/"
 
 # --------------------------------------------------------------------------
 # Application metadata

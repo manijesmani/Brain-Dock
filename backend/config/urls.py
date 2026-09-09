@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
@@ -7,7 +8,9 @@ from django.urls import include, path
 # behave differently from production on exactly the point that matters, so a
 # leak would never show up locally.
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    # Configurable so production can move it off the address every scanner
+    # tries first. See ADMIN_URL_PATH in config.settings.prod.
+    path(settings.ADMIN_URL_PATH, admin.site.urls),
     path("api/", include("core.urls")),
     path("api/auth/", include("apps.users.urls")),
     path("api/", include("apps.ideas.urls")),
