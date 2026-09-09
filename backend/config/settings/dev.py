@@ -5,7 +5,13 @@ from .base import env
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+# Overridable so a tunnel's hostname can be added when testing the Telegram
+# webhook, which Telegram will only deliver to a public HTTPS address. The
+# default is the local set, so nothing has to be configured to run normally.
+ALLOWED_HOSTS = env.list(
+    "DJANGO_ALLOWED_HOSTS",
+    default=["localhost", "127.0.0.1", "[::1]"],
+)
 
 # The Vite dev server runs on its own origin and talks to Django through a
 # proxy, but direct cross-origin calls are allowed here so the frontend can be
