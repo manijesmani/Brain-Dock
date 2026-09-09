@@ -33,6 +33,8 @@ htmlcov/
 # mount to land; only its contents are ignored.
 /deploy/certs/*
 !/deploy/certs/.gitkeep
+# Certbot's account key and the full certificate history live here.
+/deploy/letsencrypt/
 /backups/
 
 # Editors

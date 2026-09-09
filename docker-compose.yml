@@ -8,6 +8,12 @@
 # as ${NAME:?...} have no default on purpose: a missing secret has to stop the
 # stack rather than start it with a fallback.
 
+# Pinned rather than taken from the directory name. Volume names are built
+# from it, so a clone into a differently named directory would otherwise come
+# up with an empty database and no attachments, and the backup and certificate
+# instructions would name volumes that do not exist.
+name: braindock
+
 # --------------------------------------------------------------------------
 # Shared by the three backend containers. They run the same image and the same
 # settings; only the command differs.

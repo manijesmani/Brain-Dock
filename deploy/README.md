@@ -42,23 +42,25 @@ brought up and tested without a domain. Browsers will warn about it. For a
 real address, replace it with one from Let's Encrypt:
 
 ```bash
-rm deploy/certs/*.pem
-
-docker run --rm \
-  -v "$PWD/deploy/certs:/etc/letsencrypt/live-out" \
-  -v braindock_certbot:/var/www/certbot \
-  certbot/certbot certonly --webroot -w /var/www/certbot \
-  -d your.domain --email you@example.com --agree-tos --no-eff-email
-
-# Nginx reads exactly these two names.
-cp /etc/letsencrypt/live/your.domain/fullchain.pem deploy/certs/
-cp /etc/letsencrypt/live/your.domain/privkey.pem  deploy/certs/
-docker compose exec nginx nginx -s reload
+./deploy/cert.sh issue your.domain you@example.com
 ```
 
+That runs certbot against the challenge Nginx is already serving, copies the
+result into the two filenames the configuration names, and reloads. The stack
+has to be up first -- the self-signed certificate is what lets it start, and
+this replaces it.
+
 The HTTP server block keeps `/.well-known/acme-challenge/` reachable without
-TLS, which is what makes renewal work without downtime. Renew from cron and
-reload Nginx afterwards; a certificate is only re-read on reload.
+TLS, which is what makes renewal work without downtime. A certificate is only
+re-read when the configuration is loaded, so renewal has to reload Nginx;
+`cert.sh renew` does both. From the host's crontab:
+
+```cron
+15 3 * * 1 cd /srv/braindock && ./deploy/cert.sh renew >> /var/log/braindock-cert.log 2>&1
+```
+
+Let's Encrypt certificates last 90 days and renew inside the last 30, so a
+weekly run leaves several chances to recover from a failed one.
 
 ## Telegram
 
