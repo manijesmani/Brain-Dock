@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "@/app/routes";
+import { PageHeader } from "@/features/shell/PageHeader";
 import { useApp } from "@/features/shell/appContext";
 import { useIdeas, useReminders } from "@/shared/api/queries";
 import {
@@ -48,13 +49,12 @@ export function DashboardPage() {
     rows.filter((row) => status(row) === "done").length;
 
   return (
-    <main className="min-w-0 flex-1 px-[38px] pt-[30px] pb-[110px]">
-      <header className="mb-[26px]">
-        <h1 className="m-0 mb-1 text-[26px] font-bold tracking-tight">سلام {user.display_name}</h1>
-        <div className="text-[13.5px] text-bd-text-2">
-          {formatJalaliDateWithWeekday(new Date())}
-        </div>
-      </header>
+    <main className="min-w-0 flex-1 px-[47.5px] pt-[32.5px] pb-[137.5px]">
+      <PageHeader
+        large
+        title={`سلام ${user.display_name}`}
+        subtitle={formatJalaliDateWithWeekday(new Date())}
+      />
 
       <Section
         title="یادآوری‌های امروز"
@@ -62,7 +62,9 @@ export function DashboardPage() {
         done={doneAmong(today, (row) => row.idea_status)}
         total={today.length}
         empty={
-          <EmptyState icon={<BellSlashIcon size={22} />}>برای امروز یادآوری‌ای ثبت نشده</EmptyState>
+          <EmptyState icon={<BellSlashIcon size={27.5} />}>
+            برای امروز یادآوری‌ای ثبت نشده
+          </EmptyState>
         }
       >
         {today.map((reminder, index) => (
@@ -82,7 +84,7 @@ export function DashboardPage() {
         done={doneAmong(week, (row) => row.idea_status)}
         total={week.length}
         empty={
-          <EmptyState icon={<CalendarBlankIcon size={22} />}>
+          <EmptyState icon={<CalendarBlankIcon size={27.5} />}>
             این هفته یادآوری‌ای در پیش نیست
           </EmptyState>
         }
@@ -102,30 +104,30 @@ export function DashboardPage() {
         count={staleRows.length}
         done={doneAmong(staleRows, (row) => row.status)}
         total={staleRows.length}
-        empty={<EmptyState icon={<CheckCircleIcon size={22} />}>ایدهٔ راکدی نداری</EmptyState>}
+        empty={<EmptyState icon={<CheckCircleIcon size={27.5} />}>ایدهٔ راکدی نداری</EmptyState>}
       >
         {staleRows.map((idea, index) => (
           <div
             key={idea.id}
             onClick={() => openIdea(idea.id)}
-            className="flex cursor-pointer items-center gap-3 px-[15px] py-3 hover:bg-bd-surface-2"
+            className="flex cursor-pointer items-center gap-3 px-[19px] py-3 hover:bg-bd-surface-2"
             style={{ borderTop: index === 0 ? "0" : "1px solid var(--color-bd-border)" }}
           >
             <CategoryDot color={categoryOf(idea.category)?.color ?? null} />
-            <span className="min-w-0 flex-1 overflow-hidden text-[13.5px] font-medium text-ellipsis whitespace-nowrap">
+            <span className="min-w-0 flex-1 overflow-hidden text-[17px] font-medium text-ellipsis whitespace-nowrap">
               {idea.title}
             </span>
-            <span className="text-[12px] text-bd-text-3">
+            <span className="text-[15px] text-bd-text-3">
               {categoryOf(idea.category)?.name ?? "بدون دسته"}
             </span>
             <span
-              className="inline-flex items-center gap-1.5 rounded-full px-[9px] py-[3px] text-[12px] font-medium"
+              className="inline-flex items-center gap-1.5 rounded-full px-[11px] py-[4px] text-[15px] font-medium"
               style={{
                 background: "var(--color-bd-warn-bg)",
                 color: "var(--color-bd-warn)",
               }}
             >
-              <WarningCircleIcon size={13} />
+              <WarningCircleIcon size={16} />
               {toPersianDigits(daysSince(idea.updated_at))} روز بدون تغییر
             </span>
           </div>
@@ -139,7 +141,7 @@ export function DashboardPage() {
         total={doingRows.length}
         last
         empty={
-          <EmptyState icon={<PlayCircleIcon size={22} />}>ایده‌ای در حال انجام نیست</EmptyState>
+          <EmptyState icon={<PlayCircleIcon size={27.5} />}>ایده‌ای در حال انجام نیست</EmptyState>
         }
       >
         {doingRows.map((idea, index) => (
@@ -174,10 +176,10 @@ function Section({
   last?: boolean;
 }) {
   return (
-    <section className={`max-w-[1000px] ${last ? "" : "mb-6"}`}>
+    <section className={`max-w-[1250px] ${last ? "" : "mb-6"}`}>
       <div className="mb-2.5 flex items-center gap-2">
-        <h2 className="m-0 text-[14px] font-semibold">{title}</h2>
-        <span className="text-[11.5px] text-bd-text-3">{toPersianDigits(count)}</span>
+        <h2 className="m-0 text-[17.5px] font-semibold">{title}</h2>
+        <span className="text-[14.5px] text-bd-text-3">{toPersianDigits(count)}</span>
         <div className="flex-1" />
         <ProgressBar done={done} total={total} />
       </div>
@@ -202,24 +204,24 @@ function ReminderRow({
   return (
     <div
       onClick={onOpen}
-      className="flex cursor-pointer items-center gap-3 px-[15px] py-3 hover:bg-bd-surface-2"
+      className="flex cursor-pointer items-center gap-3 px-[19px] py-3 hover:bg-bd-surface-2"
       style={{ borderTop: first ? "0" : "1px solid var(--color-bd-border)" }}
     >
       <CategoryDot color={reminder.idea_category_color} />
-      <span className="min-w-0 flex-1 overflow-hidden text-[13.5px] font-medium text-ellipsis whitespace-nowrap">
+      <span className="min-w-0 flex-1 overflow-hidden text-[17px] font-medium text-ellipsis whitespace-nowrap">
         {reminder.idea_title}
       </span>
-      <span className="text-[12px] text-bd-text-3">
+      <span className="text-[15px] text-bd-text-3">
         {reminder.idea_category_name ?? "بدون دسته"}
       </span>
       <span
-        className="inline-flex items-center gap-[5px] text-[12.5px]"
+        className="inline-flex items-center gap-[6px] text-[15.5px]"
         style={{
           color: accent ? "var(--color-bd-accent)" : "var(--color-bd-text-2)",
           fontWeight: accent ? 500 : 400,
         }}
       >
-        <BellIcon size={14} />
+        <BellIcon size={17.5} />
         {accent
           ? reminder.next_run_at
             ? formatTimeOfDay(reminder.next_run_at)
@@ -244,11 +246,11 @@ function DoingRow({
   return (
     <div
       onClick={onOpen}
-      className="flex cursor-pointer items-center gap-3 px-[15px] py-3 hover:bg-bd-surface-2"
+      className="flex cursor-pointer items-center gap-3 px-[19px] py-3 hover:bg-bd-surface-2"
       style={{ borderTop: first ? "0" : "1px solid var(--color-bd-border)" }}
     >
       <CategoryDot color={color} />
-      <span className="min-w-0 flex-1 overflow-hidden text-[13.5px] font-medium text-ellipsis whitespace-nowrap">
+      <span className="min-w-0 flex-1 overflow-hidden text-[17px] font-medium text-ellipsis whitespace-nowrap">
         {idea.title}
       </span>
       <PriorityDots priority={idea.priority} />

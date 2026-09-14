@@ -7,10 +7,28 @@ import type { IdeaPriority, IdeaStatus } from "@/types/domain";
 export function StatusPill({ status }: { status: IdeaStatus }) {
   return (
     <span
-      className="flex-none rounded-full px-[10px] py-[3px] text-[12px] font-medium"
+      className="flex-none rounded-full px-[12.5px] py-[4px] text-[15px] font-medium"
       style={{ background: statusBackground(status), color: statusColor(status) }}
     >
       {STATUS_LABELS[status]}
+    </span>
+  );
+}
+
+/**
+ * Status as a coloured dot and label, the form the idea table uses. Inside a
+ * lifted table row both follow the row's ink instead of the status colour.
+ */
+export function StatusDot({ status }: { status: IdeaStatus }) {
+  return (
+    <span
+      className="flex min-w-0 items-center gap-[9px] text-[15.5px] font-medium"
+      style={{ color: `var(--row-ink, ${statusColor(status)})` }}
+    >
+      <span className="size-[9px] flex-none rounded-full bg-current" />
+      <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+        {STATUS_LABELS[status]}
+      </span>
     </span>
   );
 }
@@ -24,11 +42,12 @@ export function PriorityDots({ priority }: { priority: IdeaPriority }) {
   const lit = { low: 1, mid: 2, high: 3 }[priority];
 
   return (
-    <span title="اولویت" className="inline-flex flex-none items-center gap-[3px]">
+    <span title="اولویت" className="inline-flex flex-none items-center gap-[4px]">
       {[1, 2, 3].map((step) => (
         <span
           key={step}
-          className="block size-[5px] rounded-full bg-bd-text-2"
+          // A table row supplies --row-fg-2; everywhere else the fallback applies.
+          className="block size-[6px] rounded-full bg-[var(--row-fg-2,var(--color-bd-text-2))]"
           style={{ opacity: step <= lit ? 1 : 0.22 }}
         />
       ))}
@@ -36,7 +55,7 @@ export function PriorityDots({ priority }: { priority: IdeaPriority }) {
   );
 }
 
-export function CategoryDot({ color, size = 7 }: { color: string | null; size?: number }) {
+export function CategoryDot({ color, size = 9 }: { color: string | null; size?: number }) {
   return (
     <span
       className="block flex-none rounded-full"
@@ -48,8 +67,11 @@ export function CategoryDot({ color, size = 7 }: { color: string | null; size?: 
 export function StaleBadge() {
   return (
     <span
-      className="flex-none rounded-full px-[7px] py-px text-[11px] font-medium"
-      style={{ background: "var(--color-bd-warn-bg)", color: "var(--color-bd-warn)" }}
+      className="flex-none rounded-full px-[9px] py-px text-[14px] font-medium"
+      style={{
+        background: "var(--color-bd-warn-bg)",
+        color: "var(--row-ink, var(--color-bd-warn))",
+      }}
     >
       راکد
     </span>
@@ -62,10 +84,10 @@ export function ProgressBar({ done, total }: { done: number; total: number }) {
 
   return (
     <>
-      <span className="text-[11px] text-bd-text-3">
+      <span className="text-[14px] text-bd-text-3">
         {toPersianDigits(done)} از {toPersianDigits(total)}
       </span>
-      <span className="block h-1 w-[74px] overflow-hidden rounded-full bg-bd-surface-3">
+      <span className="block h-1 w-[92.5px] overflow-hidden rounded-full bg-bd-surface-3">
         <span
           className="block h-1 rounded-full bg-bd-accent transition-[width] duration-300"
           style={{ width: `${percent}%` }}
@@ -87,10 +109,10 @@ export function EmptyState({
   return (
     <div
       className="flex flex-col items-center gap-2 px-4 text-bd-text-3"
-      style={{ paddingBlock: padded ? 56 : 24 }}
+      style={{ paddingBlock: padded ? 70 : 30 }}
     >
       <span style={{ opacity: 0.65 }}>{icon}</span>
-      <div className="text-[13.5px]">{children}</div>
+      <div className="text-[17px]">{children}</div>
     </div>
   );
 }

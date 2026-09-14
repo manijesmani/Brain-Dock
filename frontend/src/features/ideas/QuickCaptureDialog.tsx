@@ -33,10 +33,10 @@ export function QuickCaptureDialog({ open, onClose, categoryId }: QuickCaptureDi
   };
 
   return (
-    <Dialog open={open} onClose={close} width={430}>
+    <Dialog open={open} onClose={close} width={537.5}>
       <div className="p-5">
-        <div className="mb-[13px] text-[14px] font-semibold">ثبت سریع ایده</div>
-        <div className="flex gap-[9px]">
+        <div className="mb-[16px] text-[17.5px] font-semibold">ثبت سریع ایده</div>
+        <div className="flex gap-[11px]">
           <input
             autoFocus
             value={title}
@@ -45,13 +45,13 @@ export function QuickCaptureDialog({ open, onClose, categoryId }: QuickCaptureDi
               if (event.key === "Enter") void submit(false);
             }}
             placeholder="ایده‌ات چیست؟"
-            className="h-[42px] flex-1 rounded-[9px] border border-bd-border-2 bg-bd-bg px-[13px] text-[14px] text-bd-text outline-none"
+            className="h-[52.5px] flex-1 rounded-[11px] border border-bd-border-2 bg-bd-bg px-[16px] text-[17.5px] text-bd-text outline-none"
           />
           <button
             type="button"
             onClick={() => void submit(false)}
             disabled={createIdea.isPending}
-            className="h-[42px] cursor-pointer rounded-[9px] border-0 bg-bd-accent px-5 text-[13.5px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
+            className="h-[52.5px] cursor-pointer rounded-[11px] border-0 bg-bd-accent px-5 text-[17px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
           >
             ثبت
           </button>
@@ -59,7 +59,7 @@ export function QuickCaptureDialog({ open, onClose, categoryId }: QuickCaptureDi
         <button
           type="button"
           onClick={() => void submit(true)}
-          className="mt-3 cursor-pointer border-0 bg-transparent p-0 text-[12.5px] text-bd-text-3 underline underline-offset-[3px] hover:text-bd-accent"
+          className="mt-3 cursor-pointer border-0 bg-transparent p-0 text-[15.5px] text-bd-text-3 underline underline-offset-[4px] hover:text-bd-accent"
         >
           باز کردن ادیتور کامل
         </button>

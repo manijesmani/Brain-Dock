@@ -40,13 +40,13 @@ export function LoginPage() {
   return (
     <div
       dir="rtl"
-      className="flex min-h-screen flex-1 flex-col items-center justify-center gap-[26px] bg-bd-bg p-10 text-bd-text"
+      className="flex min-h-screen flex-1 flex-col items-center justify-center gap-[32.5px] bg-bd-bg p-10 text-bd-text"
     >
       <div className="flex flex-col items-center gap-3">
-        <div className="grid size-[46px] place-items-center rounded-[13px] bg-bd-accent text-bd-accent-ink">
-          <BrainIcon size={26} />
+        <div className="grid size-[57.5px] place-items-center rounded-[16px] bg-bd-accent text-bd-accent-ink">
+          <BrainIcon size={32.5} />
         </div>
-        <span className="font-wordmark text-[22px] font-bold tracking-tight">BrainDock</span>
+        <span className="font-wordmark text-[27.5px] font-bold tracking-tight">BrainDock</span>
       </div>
 
       <form
@@ -54,10 +54,10 @@ export function LoginPage() {
           event.preventDefault();
           void submit();
         }}
-        className="flex w-[360px] flex-col gap-3.5 rounded-dialog border border-bd-border bg-bd-surface p-6 shadow-bd-lg"
+        className="flex w-[450px] flex-col gap-3.5 rounded-dialog border border-bd-border bg-bd-surface p-6 shadow-bd-lg"
       >
-        <div className="flex flex-col gap-[7px]">
-          <label htmlFor="username" className="text-[12.5px] text-bd-text-2">
+        <div className="flex flex-col gap-[9px]">
+          <label htmlFor="username" className="text-[15.5px] text-bd-text-2">
             نام کاربری
           </label>
           <input
@@ -66,12 +66,12 @@ export function LoginPage() {
             onChange={(event) => setUsername(event.target.value)}
             placeholder="mani"
             autoComplete="username"
-            className="h-10 rounded-button border border-bd-border-2 bg-bd-bg px-3 text-[13.5px] text-bd-text outline-none focus:border-bd-accent"
+            className="h-10 rounded-button border border-bd-border-2 bg-bd-bg px-3 text-[17px] text-bd-text outline-none focus:border-bd-accent"
           />
         </div>
 
-        <div className="flex flex-col gap-[7px]">
-          <label htmlFor="password" className="text-[12.5px] text-bd-text-2">
+        <div className="flex flex-col gap-[9px]">
+          <label htmlFor="password" className="text-[15.5px] text-bd-text-2">
             رمز عبور
           </label>
           <input
@@ -81,16 +81,16 @@ export function LoginPage() {
             onChange={(event) => setPassword(event.target.value)}
             placeholder="••••••••"
             autoComplete="current-password"
-            className="h-10 rounded-button border border-bd-border-2 bg-bd-bg px-3 text-[13.5px] text-bd-text outline-none focus:border-bd-accent"
+            className="h-10 rounded-button border border-bd-border-2 bg-bd-bg px-3 text-[17px] text-bd-text outline-none focus:border-bd-accent"
           />
         </div>
 
-        {error ? <div className="text-[12.5px] text-bd-danger">{error}</div> : null}
+        {error ? <div className="text-[15.5px] text-bd-danger">{error}</div> : null}
 
         <button
           type="submit"
           disabled={login.isPending}
-          className="mt-1 h-[42px] cursor-pointer rounded-button border-0 bg-bd-accent text-[14px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
+          className="mt-1 h-[52.5px] cursor-pointer rounded-button border-0 bg-bd-accent text-[17.5px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
         >
           ورود
         </button>

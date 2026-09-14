@@ -6,7 +6,13 @@
  * have changed.
  */
 
-import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 
 import { apiClient } from "@/shared/api/client";
 import type {
@@ -112,6 +118,7 @@ export interface IdeaListParams {
   sort?: string;
   archived?: boolean;
   stale?: boolean;
+  page?: number;
   page_size?: number;
 }
 
@@ -122,6 +129,9 @@ export function useIdeas(params: IdeaListParams = {}) {
     queryKey: keys.ideas(query),
     queryFn: async () =>
       (await apiClient.get<Paginated<IdeaSummary>>("/ideas/", { params: query })).data,
+    // Moving between pages or filters keeps the current rows on screen until
+    // the next set arrives, instead of flashing the loading state.
+    placeholderData: keepPreviousData,
   });
 }
 

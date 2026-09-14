@@ -21,7 +21,7 @@ export function Switch({ checked, onChange, label, disabled = false }: SwitchPro
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="relative h-[22px] w-10 flex-none rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      className="relative h-[27.5px] w-10 flex-none rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       style={{
         background: checked ? "var(--color-bd-accent)" : "var(--color-bd-surface-3)",
         border: `1px solid ${checked ? "var(--color-bd-accent)" : "var(--color-bd-border-2)"}`,
@@ -32,7 +32,7 @@ export function Switch({ checked, onChange, label, disabled = false }: SwitchPro
         className="absolute top-1/2 block size-4 -translate-y-1/2 rounded-full transition-[inset-inline-start] duration-200 ease-out"
         style={{
           // Right-to-left: the knob sits at the start edge when off.
-          insetInlineStart: checked ? "2px" : "18px",
+          insetInlineStart: checked ? "2.5px" : "22.5px",
           background: checked ? "var(--color-bd-accent-ink)" : "var(--color-bd-text-3)",
         }}
       />

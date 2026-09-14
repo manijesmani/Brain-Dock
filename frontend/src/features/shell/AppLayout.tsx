@@ -22,11 +22,13 @@ export function AppLayout() {
     // to go stale until something else happens to refetch it.
     refetchInterval: 60_000,
   });
+  const unreadCount = unread?.count ?? 0;
 
   const { theme, setTheme } = useTheme();
   const { collapsed, toggle, setCollapsed } = useSidebar();
 
   const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [quickOpen, setQuickOpen] = useState(false);
   const [categoryDialog, setCategoryDialog] = useState<{
@@ -52,6 +54,11 @@ export function AppLayout() {
             categories,
             search,
             setSearch,
+            searchOpen,
+            setSearchOpen,
+            theme,
+            setTheme,
+            unreadCount,
             selectedCategory,
             setSelectedCategory,
             openQuickCapture,
@@ -63,6 +70,10 @@ export function AppLayout() {
       user,
       categories,
       search,
+      searchOpen,
+      theme,
+      setTheme,
+      unreadCount,
       selectedCategory,
       openQuickCapture,
       openCategoryDialog,
@@ -86,15 +97,10 @@ export function AppLayout() {
         <Sidebar
           collapsed={collapsed}
           onToggleCollapse={toggle}
-          theme={theme}
-          onThemeChange={setTheme}
-          user={user}
           categories={categories}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
-          unreadCount={unread?.count ?? 0}
-          search={search}
-          onSearchChange={setSearch}
+          unreadCount={unreadCount}
           onAddCategory={() => openCategoryDialog()}
           onEditCategory={openCategoryDialog}
           onDeleteCategory={(category) => openCategoryDialog(category)}
@@ -106,14 +112,14 @@ export function AppLayout() {
           type="button"
           onClick={openQuickCapture}
           title="ثبت سریع ایده"
-          className="fixed z-[1150] grid size-[54px] cursor-pointer place-items-center rounded-full border-0 bg-bd-accent text-bd-accent-ink hover:bg-bd-accent-hover"
+          className="fixed z-[1150] grid size-[67.5px] cursor-pointer place-items-center rounded-full border-0 bg-bd-accent text-bd-accent-ink hover:bg-bd-accent-hover"
           style={{
-            left: 28,
-            bottom: isNote ? 86 : 28,
-            boxShadow: "0 10px 24px -8px rgba(16,185,129,.5)",
+            left: 35,
+            bottom: isNote ? 107.5 : 35,
+            boxShadow: "0 12.5px 30px -10px rgba(16,185,129,.5)",
           }}
         >
-          <PlusIcon size={24} />
+          <PlusIcon size={30} />
         </button>
 
         <QuickCaptureDialog

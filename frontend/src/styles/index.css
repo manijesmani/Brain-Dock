@@ -16,14 +16,24 @@
  * `--color-bd-accent` yields `bg-bd-accent`, `text-bd-accent`, and so on.
  */
 
-/* Dark is the default theme. Light is opted into by adding `.bd-light`
-   to the root element, exactly as the design file does. */
+/* The base tokens are the dark palette and `.bd-light` on the root element
+   switches to light, exactly as the design file does. Light is the default:
+   index.html stamps the class before React runs. */
 @custom-variant light (&:where(.bd-light, .bd-light *));
 
-@theme {
+/* `static` makes every token below a CSS variable even when no utility class
+   uses it. Components also read tokens through inline var() -- the status and
+   warning colours -- which Tailwind cannot see, and without `static` those are
+   dropped from the dark base palette and the colours silently disappear. */
+@theme static {
   --font-sans: "Vazirmatn Variable", "Vazirmatn", system-ui, sans-serif;
   --font-wordmark: "Outfit", "Vazirmatn Variable", system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* The interface is drawn at 125% of the original mock, as the design file
+     now is. Every length below is scaled, and so is the spacing unit behind
+     Tailwind's numeric utilities (p-3, gap-2, size-7 and the rest). */
+  --spacing: calc(0.25rem * 1.25);
 
   /* Surfaces */
   --color-bd-bg: #0f1113;
@@ -64,15 +74,24 @@
   --color-bd-warn-bg: rgba(245, 158, 11, 0.12);
   --color-bd-danger: #f87171;
 
+  /* Sidebar: a deep emerald fill with white ink at three strengths */
+  --color-bd-sb-bg: #064e3b;
+  --color-bd-sb-fg: #ecfdf5;
+  --color-bd-sb-fg-2: rgba(236, 253, 245, 0.74);
+  --color-bd-sb-fg-3: rgba(236, 253, 245, 0.52);
+  --color-bd-sb-hover: rgba(255, 255, 255, 0.07);
+  --color-bd-sb-active: rgba(255, 255, 255, 0.13);
+  --color-bd-sb-line: rgba(255, 255, 255, 0.12);
+
   /* Radii */
-  --radius-button: 8px;
-  --radius-input: 8px;
-  --radius-card: 10px;
-  --radius-dialog: 12px;
+  --radius-button: 10px;
+  --radius-input: 10px;
+  --radius-card: 12.5px;
+  --radius-dialog: 15px;
 
   /* Shadows */
-  --shadow-bd: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-bd-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+  --shadow-bd: 0 1px 2.5px rgba(0, 0, 0, 0.35);
+  --shadow-bd-lg: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
 
   /* Entrance animations */
   --animate-bd-in: bd-in 200ms ease-out;
@@ -128,14 +147,22 @@
   --color-bd-warn-bg: rgba(180, 83, 9, 0.09);
   --color-bd-danger: #dc2626;
 
-  --shadow-bd: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --shadow-bd-lg: 0 16px 36px -16px rgba(16, 24, 40, 0.22);
+  --color-bd-sb-bg: #047857;
+  --color-bd-sb-fg: #ffffff;
+  --color-bd-sb-fg-2: rgba(255, 255, 255, 0.8);
+  --color-bd-sb-fg-3: rgba(255, 255, 255, 0.6);
+  --color-bd-sb-hover: rgba(255, 255, 255, 0.1);
+  --color-bd-sb-active: rgba(255, 255, 255, 0.17);
+  --color-bd-sb-line: rgba(255, 255, 255, 0.16);
+
+  --shadow-bd: 0 1px 2.5px rgba(16, 24, 40, 0.06);
+  --shadow-bd-lg: 0 20px 45px -20px rgba(16, 24, 40, 0.22);
 }
 
 @keyframes bd-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(7.5px);
   }
   to {
     opacity: 1;
@@ -146,12 +173,66 @@
 @keyframes bd-pop {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-5px);
   }
   to {
     opacity: 1;
     transform: none;
   }
+}
+
+/*
+ * Idea table rows, as the design's `.bd-trow`.
+ *
+ * Each row is its own card, painted by ::before so the card can grow past the
+ * row on hover without moving its content. Children read their colours from
+ * the --row-* variables, which the hover state swaps for the accent ink all
+ * at once; --row-ink exists only while lifted, so `var(--row-ink, <colour>)`
+ * keeps each child's own colour the rest of the time.
+ */
+.bd-trow {
+  --row-fg: var(--color-bd-text);
+  --row-fg-2: var(--color-bd-text-2);
+  --row-fg-3: var(--color-bd-text-3);
+  --row-btn: var(--color-bd-surface-2);
+  --row-btn-fg: var(--color-bd-text-2);
+  position: relative;
+  isolation: isolate;
+  color: var(--row-fg);
+}
+
+.bd-trow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 12.5px;
+  background: var(--color-bd-surface);
+  border: 1px solid var(--color-bd-border);
+  box-shadow: var(--shadow-bd);
+  transition:
+    inset 150ms ease-out,
+    background 150ms ease-out,
+    border-color 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+
+.bd-trow:hover {
+  --row-fg: var(--color-bd-accent-ink);
+  --row-fg-2: var(--color-bd-accent-ink);
+  --row-fg-3: var(--color-bd-accent-ink);
+  --row-ink: var(--color-bd-accent-ink);
+  --row-btn: color-mix(in srgb, var(--color-bd-accent-ink) 16%, transparent);
+  --row-btn-fg: var(--color-bd-accent-ink);
+  /* Done and archived rows are dimmed inline; the lifted row is not. */
+  opacity: 1 !important;
+}
+
+.bd-trow:hover::before {
+  inset: -4px -12.5px;
+  background: var(--color-bd-accent);
+  border-color: var(--color-bd-accent);
+  box-shadow: 0 17.5px 37.5px -15px color-mix(in srgb, var(--color-bd-accent) 60%, transparent);
 }
 
 /* Base element styling, mirroring the `[data-bd]` rules in the design file. */
@@ -166,7 +247,7 @@
     background: var(--color-bd-bg);
     color: var(--color-bd-text);
     font-family: var(--font-sans);
-    font-size: 14px;
+    font-size: 17.5px;
     line-height: 1.6;
   }
 
@@ -183,14 +264,14 @@
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 12.5px;
+    height: 12.5px;
   }
 
   ::-webkit-scrollbar-thumb {
     background: var(--color-bd-border-2);
-    border-radius: 8px;
-    border: 3px solid transparent;
+    border-radius: 10px;
+    border: 4px solid transparent;
     background-clip: content-box;
   }
 }
@@ -203,40 +284,40 @@
  * mock -- which drew the same markup by hand.
  */
 .bd-prose {
-  font-size: 16.5px;
+  font-size: 20.5px;
   line-height: 2.05;
   color: var(--color-bd-text);
 }
 
 .bd-prose p {
-  margin: 0 0 20px;
+  margin: 0 0 25px;
 }
 
 .bd-prose h1 {
-  font-size: 25px;
+  font-size: 31px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 32px 0 14px;
+  margin: 40px 0 17.5px;
 }
 
 .bd-prose h2 {
-  font-size: 21px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 30px 0 12px;
+  margin: 37.5px 0 15px;
 }
 
 .bd-prose h3 {
-  font-size: 18px;
+  font-size: 22.5px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 26px 0 10px;
+  margin: 32.5px 0 12.5px;
 }
 
 .bd-prose ul,
 .bd-prose ol {
-  margin: 0 0 20px;
-  padding-inline-start: 22px;
+  margin: 0 0 25px;
+  padding-inline-start: 27.5px;
 }
 
 .bd-prose ul {
@@ -248,7 +329,7 @@
 }
 
 .bd-prose li {
-  margin-bottom: 6px;
+  margin-bottom: 7.5px;
 }
 
 .bd-prose li:last-child {
@@ -256,20 +337,20 @@
 }
 
 .bd-prose blockquote {
-  margin: 0 0 20px;
-  padding: 2px 16px 2px 0;
-  border-inline-start: 2px solid var(--color-bd-border-2);
+  margin: 0 0 25px;
+  padding: 2.5px 20px 2.5px 0;
+  border-inline-start: 2.5px solid var(--color-bd-border-2);
   color: var(--color-bd-text-2);
 }
 
 .bd-prose pre {
-  margin: 0 0 20px;
-  padding: 14px 16px;
-  border-radius: 10px;
+  margin: 0 0 25px;
+  padding: 17.5px 20px;
+  border-radius: 12.5px;
   background: var(--color-bd-surface-2);
   border: 1px solid var(--color-bd-border);
   font-family: var(--font-mono);
-  font-size: 13.5px;
+  font-size: 17px;
   line-height: 1.8;
   overflow-x: auto;
   direction: ltr;
@@ -282,13 +363,13 @@
 }
 
 .bd-prose :not(pre) > code {
-  padding: 1px 6px;
-  border-radius: 5px;
+  padding: 1px 7.5px;
+  border-radius: 6px;
   background: var(--color-bd-surface-2);
 }
 
 .bd-prose hr {
-  margin: 26px 0;
+  margin: 32.5px 0;
   border: 0;
   border-top: 1px solid var(--color-bd-border);
 }
@@ -296,11 +377,11 @@
 .bd-prose mark {
   background: rgba(245, 158, 11, 0.35);
   color: inherit;
-  padding: 0 2px;
-  border-radius: 3px;
+  padding: 0 2.5px;
+  border-radius: 4px;
 }
 
-/* Task lists: the design draws a 13px square with a 1.5px border, filled with
+/* Task lists: the design draws a 16px square with a 1.5px border, filled with
    the accent when ticked. The mock hard-codes that border colour, which would
    not adapt to the light theme; the token is used here instead. */
 .bd-prose ul[data-type="taskList"] {
@@ -311,13 +392,13 @@
 .bd-prose ul[data-type="taskList"] li {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  margin-bottom: 8px;
+  gap: 11px;
+  margin-bottom: 10px;
 }
 
 .bd-prose ul[data-type="taskList"] li > label {
   flex: none;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .bd-prose ul[data-type="taskList"] li > div {
@@ -327,12 +408,12 @@
 
 .bd-prose input[type="checkbox"] {
   appearance: none;
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   border: 1.5px solid var(--color-bd-text-3);
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  vertical-align: -2px;
+  vertical-align: -2.5px;
 }
 
 .bd-prose input[type="checkbox"]:checked {

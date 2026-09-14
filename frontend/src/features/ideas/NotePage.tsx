@@ -84,7 +84,7 @@ function NoteEditor({ idea }: { idea: Idea }) {
     content: idea.content,
     editorProps: {
       attributes: {
-        class: "bd-prose outline-none min-h-[280px]",
+        class: "bd-prose outline-none min-h-[350px]",
         dir: "rtl",
       },
     },
@@ -138,7 +138,7 @@ function NoteEditor({ idea }: { idea: Idea }) {
 
   return (
     <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-      <div className="sticky top-0 z-[1100] flex items-center gap-2 border-b border-bd-border bg-bd-bg px-[26px] py-[11px]">
+      <div className="sticky top-0 z-[1100] flex items-center gap-2 border-b border-bd-border bg-bd-bg px-[32.5px] py-[14px]">
         <div className="flex-1" />
 
         <button
@@ -149,9 +149,9 @@ function NoteEditor({ idea }: { idea: Idea }) {
               void navigate(-1);
             })();
           }}
-          className="inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-button border border-bd-border-2 bg-transparent px-3 text-[13px] text-bd-text hover:bg-bd-surface-2"
+          className="inline-flex h-[42.5px] cursor-pointer items-center gap-[9px] rounded-button border border-bd-border-2 bg-transparent px-3 text-[16px] text-bd-text hover:bg-bd-surface-2"
         >
-          <ArrowRightIcon size={15} />
+          <ArrowRightIcon size={19} />
           برگشت
         </button>
 
@@ -166,9 +166,9 @@ function NoteEditor({ idea }: { idea: Idea }) {
               void navigate(ROUTES.archive);
             })();
           }}
-          className="inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-button border-0 bg-transparent px-3 text-[13px] text-bd-text-2 hover:bg-bd-surface-2 hover:text-bd-text"
+          className="inline-flex h-[42.5px] cursor-pointer items-center gap-[9px] rounded-button border-0 bg-transparent px-3 text-[16px] text-bd-text-2 hover:bg-bd-surface-2 hover:text-bd-text"
         >
-          <ArchiveIcon size={16} />
+          <ArchiveIcon size={20} />
           آرشیو
         </button>
 
@@ -181,15 +181,15 @@ function NoteEditor({ idea }: { idea: Idea }) {
               void navigate(ROUTES.ideas);
             })();
           }}
-          className="inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-button border-0 bg-transparent px-3 text-[13px] text-bd-danger hover:bg-bd-surface-2"
+          className="inline-flex h-[42.5px] cursor-pointer items-center gap-[9px] rounded-button border-0 bg-transparent px-3 text-[16px] text-bd-danger hover:bg-bd-surface-2"
         >
-          <TrashIcon size={16} />
+          <TrashIcon size={20} />
           حذف
         </button>
       </div>
 
-      <div className="flex-1 pt-16 pb-[150px]">
-        <div className="mx-auto max-w-[680px] px-6">
+      <div className="flex-1 pt-16 pb-[187.5px]">
+        <div className="mx-auto max-w-[850px] px-6">
           <input
             value={title}
             onChange={(event) => {
@@ -197,19 +197,19 @@ function NoteEditor({ idea }: { idea: Idea }) {
               scheduleSave();
             }}
             placeholder="عنوان"
-            className="m-0 mb-[18px] w-full border-0 bg-transparent py-0.5 text-[34px] leading-[1.45] font-bold tracking-tight text-bd-text outline-none"
+            className="m-0 mb-[22.5px] w-full border-0 bg-transparent py-0.5 text-[42.5px] leading-[1.45] font-bold tracking-tight text-bd-text outline-none"
           />
 
-          <div className="mb-[30px] flex flex-wrap items-center gap-2 border-b border-bd-border pb-[22px]">
+          <div className="mb-[37.5px] flex flex-wrap items-center gap-2 border-b border-bd-border pb-[27.5px]">
             <Dropdown
               variant="pill"
               value={idea.status}
               options={STATUS_OPTIONS}
               onChange={(status) => patch({ status })}
-              minWidth={180}
+              minWidth={225}
               adornment={
                 <span
-                  className="size-[7px] rounded-full"
+                  className="size-[9px] rounded-full"
                   style={{ background: statusColor(idea.status) }}
                 />
               }
@@ -220,7 +220,7 @@ function NoteEditor({ idea }: { idea: Idea }) {
               value={idea.priority}
               options={PRIORITY_OPTIONS}
               onChange={(priority) => patch({ priority })}
-              minWidth={150}
+              minWidth={187.5}
               label={`اولویت ${PRIORITY_LABELS[idea.priority]}`}
               adornment={<PriorityDots priority={idea.priority} />}
             />
@@ -230,7 +230,7 @@ function NoteEditor({ idea }: { idea: Idea }) {
               value={idea.category}
               options={categoryOptions}
               onChange={(category) => patch({ category })}
-              minWidth={180}
+              minWidth={225}
             />
 
             <TagPicker selected={idea.tags} onChange={(tags) => patch({ tags })} />
@@ -238,12 +238,12 @@ function NoteEditor({ idea }: { idea: Idea }) {
             <button
               type="button"
               onClick={() => openReminderDialog(idea.id)}
-              className="inline-flex h-[30px] cursor-pointer items-center gap-[7px] rounded-full border border-bd-border bg-transparent px-[11px] text-[12.5px] hover:bg-bd-surface-2"
+              className="inline-flex h-[37.5px] cursor-pointer items-center gap-[9px] rounded-full border border-bd-border bg-transparent px-[14px] text-[15.5px] hover:bg-bd-surface-2"
               style={{
                 color: reminder?.is_active ? "var(--color-bd-accent)" : "var(--color-bd-text-2)",
               }}
             >
-              <BellIcon size={14} />
+              <BellIcon size={17.5} />
               {reminder?.is_active ? reminder.description : "بدون یادآوری"}
             </button>
           </div>
@@ -252,7 +252,7 @@ function NoteEditor({ idea }: { idea: Idea }) {
 
           {images.length > 0 ? (
             <div className="mt-10">
-              <div className="mb-3 text-[12.5px] font-semibold text-bd-text-3">پیوست‌ها</div>
+              <div className="mb-3 text-[15.5px] font-semibold text-bd-text-3">پیوست‌ها</div>
               <div className="grid grid-cols-3 gap-3">
                 {images.map((image, index) => (
                   <ImageTile key={image.id} attachment={image} index={index} />
@@ -305,12 +305,12 @@ function SaveIndicator({ state }: { state: SaveState }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-1.5 text-[12.5px]"
+      className="inline-flex items-center gap-1.5 px-1.5 text-[15.5px]"
       style={{
         color: saving ? "var(--color-bd-text-3)" : "var(--color-bd-accent)",
       }}
     >
-      {saving ? <CircleNotchIcon size={15} className="animate-spin" /> : <CheckIcon size={15} />}
+      {saving ? <CircleNotchIcon size={19} className="animate-spin" /> : <CheckIcon size={19} />}
       {saving ? "در حال ذخیره" : "ذخیره شد"}
     </span>
   );
@@ -334,9 +334,9 @@ function TagPicker({
           event.stopPropagation();
           setOpen((current) => !current);
         }}
-        className="inline-flex h-[30px] cursor-pointer items-center gap-[7px] rounded-full border border-bd-border bg-transparent px-[11px] text-[12.5px] text-bd-text-2 hover:bg-bd-surface-2"
+        className="inline-flex h-[37.5px] cursor-pointer items-center gap-[9px] rounded-full border border-bd-border bg-transparent px-[14px] text-[15.5px] text-bd-text-2 hover:bg-bd-surface-2"
       >
-        <HashIcon size={14} />
+        <HashIcon size={17.5} />
         {selected.length > 0 ? selected.map((tag) => `#${tag}`).join(" ") : "بدون تگ"}
       </button>
 
@@ -344,7 +344,7 @@ function TagPicker({
         <>
           <div className="fixed inset-0 z-[1200]" onClick={() => setOpen(false)} />
           <div
-            className="absolute top-9 z-[1300] min-w-[210px] rounded-card border border-bd-border-2 bg-bd-surface-2 p-[5px] shadow-bd-lg"
+            className="absolute top-9 z-[1300] min-w-[262.5px] rounded-card border border-bd-border-2 bg-bd-surface-2 p-[6px] shadow-bd-lg"
             style={{ insetInlineStart: 0, animation: "bd-pop 150ms ease-out" }}
           >
             {selected.map((tag) => (
@@ -352,10 +352,10 @@ function TagPicker({
                 key={tag}
                 type="button"
                 onClick={() => onChange(selected.filter((item) => item !== tag))}
-                className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-[7px] border-0 bg-transparent px-[9px] text-right text-[13px] text-bd-text hover:bg-bd-surface-3"
+                className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-[9px] border-0 bg-transparent px-[11px] text-right text-[16px] text-bd-text hover:bg-bd-surface-3"
               >
                 <span className="flex-1 text-right">#{tag}</span>
-                <CheckIcon size={14} className="text-bd-accent" />
+                <CheckIcon size={17.5} className="text-bd-accent" />
               </button>
             ))}
 
@@ -369,7 +369,7 @@ function TagPicker({
                 setDraft("");
               }}
               placeholder="تگ تازه و اینتر"
-              className="mt-1 h-8 w-full rounded-[7px] border border-bd-border-2 bg-bd-bg px-2 text-[12.5px] text-bd-text outline-none"
+              className="mt-1 h-8 w-full rounded-[9px] border border-bd-border-2 bg-bd-bg px-2 text-[15.5px] text-bd-text outline-none"
             />
           </div>
         </>
@@ -384,8 +384,8 @@ function ImageTile({ attachment, index }: { attachment: Attachment; index: numbe
 
   if (failed) {
     return (
-      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-[7px] rounded-card border border-dashed border-bd-border-2 bg-bd-surface text-[12px] text-bd-text-3">
-        <ImageIcon size={20} />
+      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-[9px] rounded-card border border-dashed border-bd-border-2 bg-bd-surface text-[15px] text-bd-text-3">
+        <ImageIcon size={25} />
         عکس {toPersianDigits(index + 1)}
       </div>
     );
@@ -419,13 +419,13 @@ function AudioPlayer({ attachment }: { attachment: Attachment }) {
     () =>
       Array.from({ length: 40 }, (_, index) => {
         const seed = Math.sin(attachment.id * 12.9898 + index * 78.233) * 43758.5453;
-        return 6 + Math.abs(seed - Math.floor(seed)) * 22;
+        return 7.5 + Math.abs(seed - Math.floor(seed)) * 27.5;
       }),
     [attachment.id],
   );
 
   return (
-    <div className="mt-4 flex max-w-[520px] items-center gap-3.5 rounded-card border border-bd-border bg-bd-surface px-4 py-[13px]">
+    <div className="mt-4 flex max-w-[650px] items-center gap-3.5 rounded-card border border-bd-border bg-bd-surface px-4 py-[16px]">
       <button
         type="button"
         title={playing ? "توقف" : "پخش"}
@@ -437,10 +437,10 @@ function AudioPlayer({ attachment }: { attachment: Attachment }) {
         }}
         className="grid size-9 flex-none cursor-pointer place-items-center rounded-full border-0 bg-bd-accent text-bd-accent-ink"
       >
-        {playing ? <PauseIcon size={17} weight="fill" /> : <PlayIcon size={17} weight="fill" />}
+        {playing ? <PauseIcon size={21} weight="fill" /> : <PlayIcon size={21} weight="fill" />}
       </button>
 
-      <div className="flex h-[30px] flex-1 items-center gap-0.5">
+      <div className="flex h-[37.5px] flex-1 items-center gap-0.5">
         {bars.map((height, index) => (
           <span
             key={index}
@@ -450,7 +450,7 @@ function AudioPlayer({ attachment }: { attachment: Attachment }) {
         ))}
       </div>
 
-      <span className="flex-none text-[12.5px] text-bd-text-2">{label}</span>
+      <span className="flex-none text-[15.5px] text-bd-text-2">{label}</span>
 
       <audio
         ref={audioRef}

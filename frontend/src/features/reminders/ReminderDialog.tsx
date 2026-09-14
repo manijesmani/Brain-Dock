@@ -170,23 +170,23 @@ function ReminderForm({
   const canSave = draft.kind !== "weekly" || draft.weekdays.length > 0;
 
   return (
-    <Dialog open onClose={onClose} width={472} scrollable>
-      <div className="flex items-center gap-2.5 border-b border-bd-border px-5 pt-[17px] pb-[14px]">
+    <Dialog open onClose={onClose} width={590} scrollable>
+      <div className="flex items-center gap-2.5 border-b border-bd-border px-5 pt-[21px] pb-[17.5px]">
         {step === 2 ? (
           <button
             type="button"
             onClick={() => setStep(1)}
             title="مرحلهٔ قبل"
-            className="grid size-7 cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent text-bd-text-2 hover:bg-bd-surface-2"
+            className="grid size-7 cursor-pointer place-items-center rounded-[9px] border-0 bg-transparent text-bd-text-2 hover:bg-bd-surface-2"
           >
-            <ArrowRightIcon size={15} />
+            <ArrowRightIcon size={19} />
           </button>
         ) : null}
-        <span className="flex-1 text-[14px] font-semibold">یادآوری</span>
-        <span className="text-[12.5px] text-bd-text-3">{TYPE_LABELS[draft.kind]}</span>
+        <span className="flex-1 text-[17.5px] font-semibold">یادآوری</span>
+        <span className="text-[15.5px] text-bd-text-3">{TYPE_LABELS[draft.kind]}</span>
       </div>
 
-      <div className="px-5 py-[18px]">
+      <div className="px-5 py-[22.5px]">
         {step === 1 ? (
           <div className="flex flex-col gap-2">
             {TYPES.map(({ kind, label, Icon }) => {
@@ -199,26 +199,26 @@ function ReminderForm({
                     patch({ kind });
                     setStep(kind === "none" ? 1 : 2);
                   }}
-                  className="flex h-11 cursor-pointer items-center gap-[11px] rounded-[9px] px-[14px] text-right text-[13.5px] text-bd-text"
+                  className="flex h-11 cursor-pointer items-center gap-[14px] rounded-[11px] px-[17.5px] text-right text-[17px] text-bd-text"
                   style={{
                     border: `1px solid ${selected ? "var(--color-bd-accent)" : "var(--color-bd-border)"}`,
                     background: selected ? "var(--color-bd-accent-soft)" : "transparent",
                   }}
                 >
-                  <Icon size={17} className="text-bd-text-2" />
+                  <Icon size={21} className="text-bd-text-2" />
                   <span className="flex-1 text-right">{label}</span>
                   {selected ? (
-                    <CheckCircleIcon size={17} weight="fill" className="text-bd-accent" />
+                    <CheckCircleIcon size={21} weight="fill" className="text-bd-accent" />
                   ) : null}
                 </button>
               );
             })}
           </div>
         ) : (
-          <div className="flex flex-col gap-[18px]">
+          <div className="flex flex-col gap-[22.5px]">
             {draft.kind === "weekly" ? (
               <div>
-                <div className="mb-[9px] text-[12.5px] text-bd-text-2">روزهای هفته</div>
+                <div className="mb-[11px] text-[15.5px] text-bd-text-2">روزهای هفته</div>
                 <div className="flex flex-wrap gap-1.5">
                   {JALALI_WEEKDAYS.map((label, index) => {
                     const selected = draft.weekdays.includes(index);
@@ -233,7 +233,7 @@ function ReminderForm({
                               : [...draft.weekdays, index],
                           })
                         }
-                        className="h-[34px] cursor-pointer rounded-button px-3 text-[12.5px]"
+                        className="h-[42.5px] cursor-pointer rounded-button px-3 text-[15.5px]"
                         style={{
                           border: `1px solid ${selected ? "var(--color-bd-accent)" : "var(--color-bd-border)"}`,
                           background: selected ? "var(--color-bd-accent-soft)" : "transparent",
@@ -250,8 +250,8 @@ function ReminderForm({
 
             {draft.kind === "monthly" ? (
               <div>
-                <div className="mb-[9px] text-[12.5px] text-bd-text-2">روز ماه</div>
-                <div className="grid grid-cols-7 gap-[5px]">
+                <div className="mb-[11px] text-[15.5px] text-bd-text-2">روز ماه</div>
+                <div className="grid grid-cols-7 gap-[6px]">
                   {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => {
                     const selected = draft.dayOfMonth === day;
                     return (
@@ -259,7 +259,7 @@ function ReminderForm({
                         key={day}
                         type="button"
                         onClick={() => patch({ dayOfMonth: day })}
-                        className="h-8 cursor-pointer rounded-[7px] border border-bd-border text-[12.5px]"
+                        className="h-8 cursor-pointer rounded-[9px] border border-bd-border text-[15.5px]"
                         style={{
                           background: selected ? "var(--color-bd-accent)" : "transparent",
                           color: selected ? "var(--color-bd-accent-ink)" : "var(--color-bd-text-2)",
@@ -270,7 +270,7 @@ function ReminderForm({
                     );
                   })}
                 </div>
-                <p className="mt-2.5 text-[11.5px] leading-relaxed text-bd-text-3">
+                <p className="mt-2.5 text-[14.5px] leading-relaxed text-bd-text-3">
                   اگر ماهی این روز را نداشته باشد، یادآوری روی آخرین روز همان ماه اجرا می‌شود.
                 </p>
               </div>
@@ -287,11 +287,11 @@ function ReminderForm({
                         month === 12 ? [year + 1, 1] : [year, month + 1],
                       )
                     }
-                    className="grid size-7 cursor-pointer place-items-center rounded-[7px] border border-bd-border bg-transparent text-bd-text-2"
+                    className="grid size-7 cursor-pointer place-items-center rounded-[9px] border border-bd-border bg-transparent text-bd-text-2"
                   >
-                    <CaretLeftIcon size={14} />
+                    <CaretLeftIcon size={17.5} />
                   </button>
-                  <span className="flex-1 text-center text-[13.5px] font-semibold">
+                  <span className="flex-1 text-center text-[17px] font-semibold">
                     {JALALI_MONTHS[calendar[1] - 1]} {toPersianDigits(calendar[0])}
                   </span>
                   <button
@@ -302,13 +302,13 @@ function ReminderForm({
                         month === 1 ? [year - 1, 12] : [year, month - 1],
                       )
                     }
-                    className="grid size-7 cursor-pointer place-items-center rounded-[7px] border border-bd-border bg-transparent text-bd-text-2"
+                    className="grid size-7 cursor-pointer place-items-center rounded-[9px] border border-bd-border bg-transparent text-bd-text-2"
                   >
-                    <CaretRightIcon size={14} />
+                    <CaretRightIcon size={17.5} />
                   </button>
                 </div>
 
-                <div className="mb-1.5 grid grid-cols-7 gap-1 text-center text-[11px] text-bd-text-3">
+                <div className="mb-1.5 grid grid-cols-7 gap-1 text-center text-[14px] text-bd-text-3">
                   {["ش", "ی", "د", "س", "چ", "پ", "ج"].map((letter) => (
                     <span key={letter}>{letter}</span>
                   ))}
@@ -332,7 +332,7 @@ function ReminderForm({
                         key={day}
                         type="button"
                         onClick={() => patch({ date: [calendar[0], calendar[1], day] })}
-                        className="h-8 cursor-pointer rounded-button border-0 text-[12.5px]"
+                        className="h-8 cursor-pointer rounded-button border-0 text-[15.5px]"
                         style={{
                           background: selected
                             ? "var(--color-bd-accent)"
@@ -351,7 +351,7 @@ function ReminderForm({
             ) : null}
 
             <div>
-              <div className="mb-[9px] text-[12.5px] text-bd-text-2">ساعت</div>
+              <div className="mb-[11px] text-[15.5px] text-bd-text-2">ساعت</div>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <button
@@ -360,17 +360,17 @@ function ReminderForm({
                       event.stopPropagation();
                       setMenu(menu === "hour" ? null : "hour");
                     }}
-                    className="inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-button border border-bd-border-2 bg-bd-bg px-[14px] text-[14px] text-bd-text"
+                    className="inline-flex h-[47.5px] cursor-pointer items-center gap-2 rounded-button border border-bd-border-2 bg-bd-bg px-[17.5px] text-[17.5px] text-bd-text"
                   >
-                    <ClockIcon size={15} className="text-bd-text-3" />
+                    <ClockIcon size={19} className="text-bd-text-3" />
                     {formatClock(draft.hour, draft.minute)}
-                    <CaretDownIcon size={12} className="text-bd-text-3" />
+                    <CaretDownIcon size={15} className="text-bd-text-3" />
                   </button>
                   {menu === "hour" ? (
                     <>
                       <div className="fixed inset-0 z-[1450]" onClick={() => setMenu(null)} />
                       <div
-                        className="absolute top-11 z-[1500] grid w-[230px] grid-cols-6 gap-1 rounded-card border border-bd-border-2 bg-bd-surface-2 p-2 shadow-bd-lg"
+                        className="absolute top-11 z-[1500] grid w-[287.5px] grid-cols-6 gap-1 rounded-card border border-bd-border-2 bg-bd-surface-2 p-2 shadow-bd-lg"
                         style={{ insetInlineStart: 0, animation: "bd-pop 150ms ease-out" }}
                       >
                         {Array.from({ length: 24 }, (_, hour) => (
@@ -381,7 +381,7 @@ function ReminderForm({
                               patch({ hour });
                               setMenu(null);
                             }}
-                            className="h-7 cursor-pointer rounded-md border-0 text-[12px]"
+                            className="h-7 cursor-pointer rounded-[7.5px] border-0 text-[15px]"
                             style={{
                               background:
                                 hour === draft.hour
@@ -408,7 +408,7 @@ function ReminderForm({
                       event.stopPropagation();
                       setMenu(menu === "minute" ? null : "minute");
                     }}
-                    className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-bd-bg px-[14px] text-[13px] text-bd-text-2"
+                    className="h-[47.5px] cursor-pointer rounded-button border border-bd-border-2 bg-bd-bg px-[17.5px] text-[16px] text-bd-text-2"
                   >
                     دقیقه
                   </button>
@@ -427,7 +427,7 @@ function ReminderForm({
                               patch({ minute });
                               setMenu(null);
                             }}
-                            className="h-7 w-[38px] cursor-pointer rounded-md border-0 text-[12px]"
+                            className="h-7 w-[47.5px] cursor-pointer rounded-[7.5px] border-0 text-[15px]"
                             style={{
                               background:
                                 minute === draft.minute
@@ -452,20 +452,20 @@ function ReminderForm({
         )}
       </div>
 
-      <div className="flex flex-col gap-[13px] border-t border-bd-border px-5 py-[15px]">
+      <div className="flex flex-col gap-[16px] border-t border-bd-border px-5 py-[19px]">
         <div className="flex items-center gap-3">
           <Switch
             checked={draft.active}
             onChange={(active) => patch({ active })}
             label="فعال بودن یادآوری"
           />
-          <span className="flex-1 text-[12.5px] text-bd-text-2">
+          <span className="flex-1 text-[15.5px] text-bd-text-2">
             {preview && draft.active
               ? `یادآوری بعدی: ${preview}، ساعت ${formatClock(draft.hour, draft.minute)}`
               : "یادآوری‌ای تنظیم نشده"}
           </span>
         </div>
-        <div className="flex gap-[9px]">
+        <div className="flex gap-[11px]">
           <button
             type="button"
             onClick={() => {
@@ -474,7 +474,7 @@ function ReminderForm({
                 onClose();
               })();
             }}
-            className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[14px] text-[13px] text-bd-danger hover:bg-bd-surface-2"
+            className="h-[47.5px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[17.5px] text-[16px] text-bd-danger hover:bg-bd-surface-2"
           >
             حذف یادآوری
           </button>
@@ -482,7 +482,7 @@ function ReminderForm({
           <button
             type="button"
             onClick={onClose}
-            className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[15px] text-[13px] text-bd-text hover:bg-bd-surface-2"
+            className="h-[47.5px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[19px] text-[16px] text-bd-text hover:bg-bd-surface-2"
           >
             انصراف
           </button>
@@ -490,7 +490,7 @@ function ReminderForm({
             type="button"
             onClick={() => void commit()}
             disabled={!canSave || save.isPending}
-            className="h-[38px] cursor-pointer rounded-button border-0 bg-bd-accent px-[18px] text-[13px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-50"
+            className="h-[47.5px] cursor-pointer rounded-button border-0 bg-bd-accent px-[22.5px] text-[16px] font-semibold text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-50"
           >
             ذخیره
           </button>

@@ -46,39 +46,39 @@ export function EditorToolbar({
 
   return (
     <div
-      className="fixed bottom-0 z-[1140] flex items-center gap-1.5 border-t border-bd-border bg-bd-surface px-[26px] py-[9px]"
+      className="fixed bottom-0 z-[1140] flex items-center gap-1.5 border-t border-bd-border bg-bd-surface px-[32.5px] py-[11px]"
       style={{ insetInline: 0 }}
     >
       <Tool title="ضخیم" active={editor.isActive("bold")} onRun={() => chain().toggleBold().run()}>
-        <TextBIcon size={17} />
+        <TextBIcon size={21} />
       </Tool>
       <Tool
         title="مورب"
         active={editor.isActive("italic")}
         onRun={() => chain().toggleItalic().run()}
       >
-        <TextItalicIcon size={17} />
+        <TextItalicIcon size={21} />
       </Tool>
       <Tool
         title="زیرخط"
         active={editor.isActive("underline")}
         onRun={() => chain().toggleUnderline().run()}
       >
-        <TextUnderlineIcon size={17} />
+        <TextUnderlineIcon size={21} />
       </Tool>
       <Tool
         title="خط‌خورده"
         active={editor.isActive("strike")}
         onRun={() => chain().toggleStrike().run()}
       >
-        <TextStrikethroughIcon size={17} />
+        <TextStrikethroughIcon size={21} />
       </Tool>
       <Tool
         title="هایلایت"
         active={editor.isActive("highlight")}
         onRun={() => chain().toggleHighlight().run()}
       >
-        <HighlighterIcon size={17} />
+        <HighlighterIcon size={21} />
       </Tool>
 
       <Divider />
@@ -88,21 +88,21 @@ export function EditorToolbar({
         active={editor.isActive("heading", { level: 1 })}
         onRun={() => chain().toggleHeading({ level: 1 }).run()}
       >
-        <TextHOneIcon size={17} />
+        <TextHOneIcon size={21} />
       </Tool>
       <Tool
         title="عنوان متوسط"
         active={editor.isActive("heading", { level: 2 })}
         onRun={() => chain().toggleHeading({ level: 2 }).run()}
       >
-        <TextHTwoIcon size={17} />
+        <TextHTwoIcon size={21} />
       </Tool>
       <Tool
         title="عنوان کوچک"
         active={editor.isActive("heading", { level: 3 })}
         onRun={() => chain().toggleHeading({ level: 3 }).run()}
       >
-        <TextHThreeIcon size={17} />
+        <TextHThreeIcon size={21} />
       </Tool>
 
       <Divider />
@@ -112,21 +112,21 @@ export function EditorToolbar({
         active={editor.isActive("bulletList")}
         onRun={() => chain().toggleBulletList().run()}
       >
-        <ListBulletsIcon size={17} />
+        <ListBulletsIcon size={21} />
       </Tool>
       <Tool
         title="لیست شماره‌دار"
         active={editor.isActive("orderedList")}
         onRun={() => chain().toggleOrderedList().run()}
       >
-        <ListNumbersIcon size={17} />
+        <ListNumbersIcon size={21} />
       </Tool>
       <Tool
         title="چک‌لیست"
         active={editor.isActive("taskList")}
         onRun={() => chain().toggleTaskList().run()}
       >
-        <CheckSquareIcon size={17} />
+        <CheckSquareIcon size={21} />
       </Tool>
 
       <Divider />
@@ -136,29 +136,29 @@ export function EditorToolbar({
         active={editor.isActive("blockquote")}
         onRun={() => chain().toggleBlockquote().run()}
       >
-        <QuotesIcon size={17} />
+        <QuotesIcon size={21} />
       </Tool>
       <Tool
         title="کد"
         active={editor.isActive("codeBlock")}
         onRun={() => chain().toggleCodeBlock().run()}
       >
-        <CodeIcon size={17} />
+        <CodeIcon size={21} />
       </Tool>
       <Tool title="جداکننده" onRun={() => chain().setHorizontalRule().run()}>
-        <MinusIcon size={17} />
+        <MinusIcon size={21} />
       </Tool>
 
       <Divider />
 
       <Tool title="افزودن عکس" onRun={onPickImage}>
-        <ImageIcon size={17} />
+        <ImageIcon size={21} />
       </Tool>
       <Tool title="ضبط صدا" onRun={onRecordAudio}>
-        <MicrophoneIcon size={17} />
+        <MicrophoneIcon size={21} />
       </Tool>
       <Tool title="آپلود صدا" onRun={onPickAudio}>
-        <UploadSimpleIcon size={17} />
+        <UploadSimpleIcon size={21} />
       </Tool>
 
       <div className="flex-1" />
@@ -187,7 +187,7 @@ function Tool({
         event.preventDefault();
         onRun();
       }}
-      className="grid size-[34px] cursor-pointer place-items-center rounded-button border-0 hover:bg-bd-surface-3 hover:text-bd-text"
+      className="grid size-[42.5px] cursor-pointer place-items-center rounded-button border-0 hover:bg-bd-surface-3 hover:text-bd-text"
       style={{
         background: active ? "var(--color-bd-surface-3)" : "transparent",
         color: active ? "var(--color-bd-accent)" : "var(--color-bd-text-2)",
@@ -199,5 +199,5 @@ function Tool({
 }
 
 function Divider() {
-  return <span className="mx-[5px] h-[22px] w-px bg-bd-border" />;
+  return <span className="mx-[6px] h-[27.5px] w-px bg-bd-border" />;
 }
