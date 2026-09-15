@@ -48,7 +48,7 @@ SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
-# Behind Nginx, every request reaches Gunicorn from the same container
+# Behind a reverse proxy, every request reaches Gunicorn from the proxy's
 # address, so REMOTE_ADDR identifies the proxy rather than the caller. DRF
 # falls back to X-Forwarded-For to tell clients apart for rate limiting, and
 # without this setting it would trust the whole header -- including anything
@@ -56,8 +56,9 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 # login-throttle bucket. Setting the proxy count makes DRF read only the
 # entry the trusted proxy appended.
 #
-# It must stay in step with deploy/nginx: exactly one proxy, and that proxy
-# overwrites X-Forwarded-For rather than appending to it.
+# It must stay in step with whatever proxy sits in front of Django: exactly
+# one proxy, and that proxy overwrites X-Forwarded-For rather than appending
+# to it.
 REST_FRAMEWORK = {**REST_FRAMEWORK, "NUM_PROXIES": 1}
 
 # The admin is the one path that can change anything about any account. Moving

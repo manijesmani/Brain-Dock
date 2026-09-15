@@ -83,10 +83,10 @@ class TestProductionSettings:
         )
 
     def test_exactly_one_proxy_is_trusted(self, prod) -> None:
-        """Behind Nginx, REMOTE_ADDR is the proxy, so DRF reads X-Forwarded-For.
+        """Behind a reverse proxy, REMOTE_ADDR is the proxy, so DRF reads X-Forwarded-For.
 
-        The count has to match deploy/nginx, which puts exactly one proxy in
-        front and overwrites the header rather than appending to it.
+        The count has to match the proxy in front of Django: exactly one, and it
+        must overwrite the header rather than append to it.
         """
         assert prod.REST_FRAMEWORK["NUM_PROXIES"] == 1
 
