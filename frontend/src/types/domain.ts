@@ -20,6 +20,13 @@ export const CATEGORY_COLORS = [
 
 export type CategoryColor = (typeof CATEGORY_COLORS)[number];
 
+/**
+ * The kind of account, which is all that decides what it may do: guest,
+ * regular ("free"), special ("premium") or the site's owner. The server
+ * decides it; see apps.users.plans.
+ */
+export type Plan = "guest" | "free" | "premium" | "owner";
+
 export interface CurrentUser {
   id: number;
   username: string;
@@ -29,6 +36,57 @@ export interface CurrentUser {
   stale_after_days: number;
   is_telegram_linked: boolean;
   telegram_linked_at: string | null;
+  /** Changes with every new picture, so it can be cached against. */
+  avatar_url: string | null;
+  plan: Plan;
+  /** How many ideas the account may hold, archived ones included; null is no limit. */
+  idea_limit: number | null;
+  idea_count: number;
+  can_attach_media: boolean;
+  can_use_telegram: boolean;
+  /** The owner's user panel. */
+  can_manage_users: boolean;
+}
+
+/** A browser signed in to the account; see apps.users.devices. */
+export interface Device {
+  id: number;
+  /** «Chrome روی Android», or «دستگاه نامشخص» for one signed in before the list existed. */
+  name: string;
+  kind: "mobile" | "tablet" | "desktop" | "unknown";
+  user_agent: string;
+  ip_address: string | null;
+  signed_in_at: string | null;
+  last_seen_at: string | null;
+  /** The device this page is open on. */
+  current: boolean;
+}
+
+/** An account as the owner's user panel lists it. */
+export interface PanelUser {
+  id: number;
+  username: string;
+  first_name: string;
+  display_name: string;
+  plan: Plan;
+  idea_count: number;
+  date_joined: string;
+}
+
+/** What one kind of upload may be; see core.views.SiteView. */
+export interface UploadLimit {
+  max_bytes: number;
+  /** The accepted formats, already written out in Persian. */
+  formats: string;
+  /** MIME types to check before sending; absent where the server decides. */
+  types?: string[];
+}
+
+/** What the site tells visitors before any session exists. */
+export interface SiteInfo {
+  /** The owner's Telegram username, without the @; null when not set. */
+  owner_telegram: string | null;
+  uploads: { image: UploadLimit; audio: UploadLimit; avatar: UploadLimit };
 }
 
 export interface Category {
@@ -97,6 +155,11 @@ export interface IdeaSummary extends IdeaBase {
 export interface Idea extends IdeaBase {
   content: TiptapDocument;
   attachments: Attachment[];
+}
+
+/** An idea in the trash, with when it was put there. */
+export interface TrashedIdea extends IdeaSummary {
+  deleted_at: string;
 }
 
 export interface Reminder {

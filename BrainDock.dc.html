@@ -26,7 +26,7 @@
 --bd-border:#24282C;--bd-border-2:#2F3439;
 --bd-text:#E9EBED;--bd-text-2:#9BA1A7;--bd-text-3:#6E747A;
 --bd-accent:#10B981;--bd-accent-hover:#34D399;--bd-accent-ink:#06251B;--bd-accent-soft:rgba(16,185,129,.14);
---bd-shadow:0 1px 2.5px rgba(0,0,0,.35);--bd-shadow-lg:0 20px 50px -20px rgba(0,0,0,.7);
+--bd-shadow:0 1px 2px rgba(0,0,0,.35);--bd-shadow-lg:0 16px 40px -16px rgba(0,0,0,.7);
 --st-idea:#9BA1A7;--st-idea-bg:rgba(155,161,167,.13);
 --st-plan:#60A5FA;--st-plan-bg:rgba(59,130,246,.14);
 --st-doing:#FBBF24;--st-doing-bg:rgba(245,158,11,.14);
@@ -39,7 +39,7 @@
 --color-secondary:var(--bd-surface-2);--color-secondary-hover:var(--bd-surface-3);--color-secondary-foreground:var(--bd-text);
 --color-primary:var(--bd-accent);--color-primary-hover:var(--bd-accent-hover);--color-primary-active:#0E9C74;--color-primary-foreground:var(--bd-accent-ink);
 --color-ring:var(--bd-accent);--input-focus-ring:rgba(16,185,129,.18);--input-hover-border:var(--bd-border-2);--color-gray-300:var(--bd-border-2);
---button-radius:10px;--input-radius:10px;--card-radius:12.5px;--dialog-radius:15px;--dialog-bg:var(--bd-surface);--dialog-border:var(--bd-border);--dialog-shadow:var(--bd-shadow-lg);--dialog-overlay-bg:rgba(0,0,0,.55);
+--button-radius:8px;--input-radius:8px;--card-radius:10px;--dialog-radius:12px;--dialog-bg:var(--bd-surface);--dialog-border:var(--bd-border);--dialog-shadow:var(--bd-shadow-lg);--dialog-overlay-bg:rgba(0,0,0,.55);
 --bd-sb-bg:#064E3B;--bd-sb-fg:#ECFDF5;--bd-sb-fg-2:rgba(236,253,245,.74);--bd-sb-fg-3:rgba(236,253,245,.52);--bd-sb-hover:rgba(255,255,255,.07);--bd-sb-active:rgba(255,255,255,.13);--bd-sb-line:rgba(255,255,255,.12);
 }
 [data-bd].bd-light{
@@ -47,7 +47,7 @@
 --bd-border:#E4E6E9;--bd-border-2:#D2D6DA;
 --bd-text:#16181A;--bd-text-2:#5C6167;--bd-text-3:#8A9096;
 --bd-accent:#047857;--bd-accent-hover:#036049;--bd-accent-ink:#FFFFFF;--bd-accent-soft:rgba(4,120,87,.10);
---bd-shadow:0 1px 2.5px rgba(16,24,40,.06);--bd-shadow-lg:0 20px 45px -20px rgba(16,24,40,.22);
+--bd-shadow:0 1px 2px rgba(16,24,40,.06);--bd-shadow-lg:0 16px 36px -16px rgba(16,24,40,.22);
 --st-idea:#6B7280;--st-idea-bg:rgba(107,114,128,.10);
 --st-plan:#2563EB;--st-plan-bg:rgba(37,99,235,.10);
 --st-doing:#B45309;--st-doing-bg:rgba(180,83,9,.10);
@@ -60,296 +60,296 @@
 [data-bd] ::placeholder{color:var(--bd-text-3)}
 [data-bd] [contenteditable]{outline:none}
 [data-bd] button{font-family:var(--bd-font)}
-[data-bd] ::-webkit-scrollbar{width:12.5px;height:12.5px}
-[data-bd] ::-webkit-scrollbar-thumb{background:var(--bd-border-2);border-radius:10px;border:4px solid transparent;background-clip:content-box}
-@keyframes bd-in{from{opacity:0;transform:translateY(7.5px)}to{opacity:1;transform:none}}
-@keyframes bd-pop{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+[data-bd] ::-webkit-scrollbar{width:10px;height:10px}
+[data-bd] ::-webkit-scrollbar-thumb{background:var(--bd-border-2);border-radius:8px;border:3px solid transparent;background-clip:content-box}
+@keyframes bd-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes bd-pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 [data-bd] .bd-trow{--row-fg:var(--bd-text);--row-fg-2:var(--bd-text-2);--row-fg-3:var(--bd-text-3);--row-btn:var(--bd-surface-2);--row-btn-fg:var(--bd-text-2);position:relative;isolation:isolate;color:var(--row-fg)}
-[data-bd] .bd-trow::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:12.5px;background:var(--bd-surface);border:1px solid var(--bd-border);box-shadow:var(--bd-shadow);transition:inset 150ms ease-out,background 150ms ease-out,border-color 150ms ease-out,box-shadow 150ms ease-out}
+[data-bd] .bd-trow::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:10px;background:var(--bd-surface);border:1px solid var(--bd-border);box-shadow:var(--bd-shadow);transition:inset 150ms ease-out,background 150ms ease-out,border-color 150ms ease-out,box-shadow 150ms ease-out}
 [data-bd] .bd-trow:hover{--row-fg:var(--bd-accent-ink);--row-fg-2:var(--bd-accent-ink);--row-fg-3:var(--bd-accent-ink);--row-ink:var(--bd-accent-ink);--row-btn:color-mix(in srgb,var(--bd-accent-ink) 16%,transparent);--row-btn-fg:var(--bd-accent-ink);opacity:1!important}
-[data-bd] .bd-trow:hover::before{inset:-4px -12.5px;background:var(--bd-accent);border-color:var(--bd-accent);box-shadow:0 17.5px 37.5px -15px color-mix(in srgb,var(--bd-accent) 60%,transparent)}
+[data-bd] .bd-trow:hover::before{inset:-3px -10px;background:var(--bd-accent);border-color:var(--bd-accent);box-shadow:0 14px 30px -12px color-mix(in srgb,var(--bd-accent) 60%,transparent)}
 </style>
 </helmet>
 <template id="__bundler_thumbnail"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" rx="28" fill="#0F1113"/><rect x="60" y="60" width="80" height="80" rx="22" fill="#10B981"/><path d="M100 84a16 16 0 00-16 16v10a6 6 0 006 6h20a6 6 0 006-6v-10a16 16 0 00-16-16z" fill="#06251B"/></svg></template>
-<div dir="rtl" data-bd class="{{ light }}" style="min-height:100vh;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17.5px;line-height:1.6;display:flex;flex-direction:row;align-items:stretch">
+<div dir="rtl" data-bd class="{{ light }}" style="min-height:100vh;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11.25px;line-height:1.6;display:flex;flex-direction:row;align-items:stretch">
 
 <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
 <aside style="flex:none;width:{{ sbw }}px;height:100vh;position:sticky;top:0;background:var(--bd-sb-bg);color:var(--bd-sb-fg);display:flex;flex-direction:column;overflow:hidden;transition:width 200ms cubic-bezier(.4,0,.2,1)">
-  <div style="display:flex;align-items:center;gap:12.5px;padding:22.5px 16px 20px">
-    <button type="button" onClick="{{ logoClick }}" title="{{ logoTitle }}" style="width:37.5px;height:37.5px;flex:none;padding:0;border:0;border-radius:11px;background:var(--bd-sb-fg);color:var(--bd-sb-bg);cursor:{{ logoCursor }};display:grid;place-items:center"><i class="ph ph-brain" style="font-size:22.5px"></i></button>
-    <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:1;font-family:Outfit,var(--bd-font);font-size:20.5px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;color:var(--bd-sb-fg)">BrainDock</span></sc-if>
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 13px 16px">
+    <button type="button" onClick="{{ logoClick }}" title="{{ logoTitle }}" style="width:30px;height:30px;flex:none;padding:0;border:0;border-radius:9px;background:var(--bd-sb-fg);color:var(--bd-sb-bg);cursor:{{ logoCursor }};display:grid;place-items:center"><i class="ph ph-brain" style="font-size:14.5px"></i></button>
+    <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:1;font-family:Outfit,var(--bd-font);font-size:13.25px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;color:var(--bd-sb-fg)">BrainDock</span></sc-if>
     <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
-      <button type="button" onClick="{{ toggleCollapse }}" title="جمع کردن نوار" style="flex:none;width:35px;height:35px;border:0;border-radius:10px;background:transparent;color:var(--bd-sb-fg-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-sb-hover);color:var(--bd-sb-fg)"><i class="ph ph-sidebar-simple" style="font-size:20px"></i></button>
+      <button type="button" onClick="{{ toggleCollapse }}" title="جمع کردن نوار" style="flex:none;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--bd-sb-fg-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-sb-hover);color:var(--bd-sb-fg)"><i class="ph ph-sidebar-simple" style="font-size:13px"></i></button>
     </sc-if>
   </div>
 
-  <nav style="display:flex;flex-direction:column;gap:5px;padding-inline-start:10px">
+  <nav style="display:flex;flex-direction:column;gap:4px;padding-inline-start:8px">
     <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
-      <button type="button" onClick="{{ n.go }}" title="{{ n.label }}" style="position:relative;display:flex;align-items:center;gap:14px;height:47.5px;padding:0 14px;margin-inline-end:{{ n.me }};border:0;border-radius:{{ n.radius }};cursor:pointer;font-size:17px;color:{{ n.fg }};background:{{ n.bg }};font-weight:{{ n.fw }};transition:background 150ms ease-in-out,color 150ms ease-in-out" style-hover="background:{{ n.hbg }};color:{{ n.hfg }}">
+      <button type="button" onClick="{{ n.go }}" title="{{ n.label }}" style="position:relative;display:flex;align-items:center;gap:11px;height:38px;padding:0 11px;margin-inline-end:{{ n.me }};border:0;border-radius:{{ n.radius }};cursor:pointer;font-size:11px;color:{{ n.fg }};background:{{ n.bg }};font-weight:{{ n.fw }};transition:background 150ms ease-in-out,color 150ms ease-in-out" style-hover="background:{{ n.hbg }};color:{{ n.hfg }}">
         <sc-if value="{{ n.active }}" hint-placeholder-val="{{ false }}">
-          <span style="position:absolute;inset-inline-end:0;top:-20px;width:20px;height:20px;pointer-events:none;background:radial-gradient(circle at top right,transparent 20px,var(--bd-bg) 20.5px)"></span>
-          <span style="position:absolute;inset-inline-end:0;bottom:-20px;width:20px;height:20px;pointer-events:none;background:radial-gradient(circle at bottom right,transparent 20px,var(--bd-bg) 20.5px)"></span>
+          <span style="position:absolute;inset-inline-end:0;top:-16px;width:16px;height:16px;pointer-events:none;background:radial-gradient(circle at top right,transparent 16px,var(--bd-bg) 16.5px)"></span>
+          <span style="position:absolute;inset-inline-end:0;bottom:-16px;width:16px;height:16px;pointer-events:none;background:radial-gradient(circle at bottom right,transparent 16px,var(--bd-bg) 16.5px)"></span>
         </sc-if>
-        <i class="ph ph-{{ n.icon }}" style="font-size:24px;flex:none"></i>
+        <i class="ph ph-{{ n.icon }}" style="font-size:15px;flex:none"></i>
         <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:1;text-align:right;white-space:nowrap">{{ n.label }}</span></sc-if>
-        <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="flex:none;min-width:22.5px;height:22.5px;padding:0 6px;border-radius:124px;background:{{ n.badgeBg }};color:{{ n.badgeFg }};font-size:14px;font-weight:600;display:grid;place-items:center">{{ n.badgeTxt }}</span></sc-if>
+        <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="flex:none;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:{{ n.badgeBg }};color:{{ n.badgeFg }};font-size:9px;font-weight:600;display:grid;place-items:center">{{ n.badgeTxt }}</span></sc-if>
       </button>
     </sc-for>
   </nav>
 
-  <div style="height:1px;background:var(--bd-sb-line);margin:17.5px 15px 15px"></div>
+  <div style="height:1px;background:var(--bd-sb-line);margin:14px 12px 12px"></div>
 
-  <div style="flex:1;min-height:0;overflow-y:auto;padding:20px 0;margin-top:-20px;padding-inline-start:10px">
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 0;margin-top:-16px;padding-inline-start:8px">
     <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
-      <div style="padding:2.5px 14px 10px;font-size:14.5px;font-weight:600;color:var(--bd-sb-fg-3);letter-spacing:.01em">دسته‌بندی‌ها</div>
+      <div style="padding:2px 11px 8px;font-size:9.25px;font-weight:600;color:var(--bd-sb-fg-3);letter-spacing:.01em">دسته‌بندی‌ها</div>
     </sc-if>
     <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
-      <div style="position:relative;margin-inline-end:{{ c.me }};margin-bottom:2.5px">
-        <button type="button" onClick="{{ c.pick }}" title="{{ c.name }}" style="position:relative;width:100%;display:flex;align-items:center;gap:14px;height:42.5px;padding:0 14px;border:0;border-radius:{{ c.radius }};cursor:pointer;font-size:16px;font-weight:{{ c.fw }};color:{{ c.fg }};background:{{ c.bg }};transition:background 150ms,color 150ms" style-hover="background:{{ c.hbg }};color:{{ c.hfg }}">
+      <div style="position:relative;margin-inline-end:{{ c.me }};margin-bottom:2px">
+        <button type="button" onClick="{{ c.pick }}" title="{{ c.name }}" style="position:relative;width:100%;display:flex;align-items:center;gap:11px;height:34px;padding:0 11px;border:0;border-radius:{{ c.radius }};cursor:pointer;font-size:10.25px;font-weight:{{ c.fw }};color:{{ c.fg }};background:{{ c.bg }};transition:background 150ms,color 150ms" style-hover="background:{{ c.hbg }};color:{{ c.hfg }}">
           <sc-if value="{{ c.tab }}" hint-placeholder-val="{{ false }}">
-            <span style="position:absolute;inset-inline-end:0;top:-20px;width:20px;height:20px;pointer-events:none;background:radial-gradient(circle at top right,transparent 20px,var(--bd-bg) 20.5px)"></span>
-            <span style="position:absolute;inset-inline-end:0;bottom:-20px;width:20px;height:20px;pointer-events:none;background:radial-gradient(circle at bottom right,transparent 20px,var(--bd-bg) 20.5px)"></span>
+            <span style="position:absolute;inset-inline-end:0;top:-16px;width:16px;height:16px;pointer-events:none;background:radial-gradient(circle at top right,transparent 16px,var(--bd-bg) 16.5px)"></span>
+            <span style="position:absolute;inset-inline-end:0;bottom:-16px;width:16px;height:16px;pointer-events:none;background:radial-gradient(circle at bottom right,transparent 16px,var(--bd-bg) 16.5px)"></span>
           </sc-if>
-          <span style="flex:none;width:10px;height:10px;border-radius:124px;background:{{ c.color }};box-shadow:{{ c.dotShadow }}"></span>
+          <span style="flex:none;width:8px;height:8px;border-radius:99px;background:{{ c.color }};box-shadow:{{ c.dotShadow }}"></span>
           <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span></sc-if>
-          <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:none;font-size:14.5px;font-weight:400;color:{{ c.countFg }};padding-inline-end:27.5px">{{ c.countTxt }}</span></sc-if>
+          <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="flex:none;font-size:9.25px;font-weight:400;color:{{ c.countFg }};padding-inline-end:22px">{{ c.countTxt }}</span></sc-if>
         </button>
         <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
-          <button type="button" onClick="{{ c.menu }}" title="گزینه‌های دسته" style="position:absolute;inset-inline-end:7.5px;top:7.5px;width:27.5px;height:27.5px;border:0;border-radius:7.5px;background:transparent;color:{{ c.menuFg }};cursor:pointer;display:grid;place-items:center" style-hover="background:{{ c.menuHbg }};color:{{ c.menuHfg }}"><i class="ph ph-dots-three" style="font-size:20px"></i></button>
+          <button type="button" onClick="{{ c.menu }}" title="گزینه‌های دسته" style="position:absolute;inset-inline-end:6px;top:6px;width:22px;height:22px;border:0;border-radius:6px;background:transparent;color:{{ c.menuFg }};cursor:pointer;display:grid;place-items:center" style-hover="background:{{ c.menuHbg }};color:{{ c.menuHfg }}"><i class="ph ph-dots-three" style="font-size:13px"></i></button>
         </sc-if>
         <sc-if value="{{ c.open }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;inset-inline-end:7.5px;top:40px;z-index:1300;min-width:197.5px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
-            <button type="button" onClick="{{ c.rename }}" style="width:100%;display:flex;align-items:center;gap:11px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-pencil-simple" style="font-size:19px"></i>ویرایش نام</button>
-            <button type="button" onClick="{{ c.recolor }}" style="width:100%;display:flex;align-items:center;gap:11px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-palette" style="font-size:19px"></i>تغییر رنگ</button>
-            <span style="display:block;height:1px;background:var(--bd-border);margin:6px 5px"></span>
-            <button type="button" onClick="{{ c.remove }}" style="width:100%;display:flex;align-items:center;gap:11px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-danger);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-trash" style="font-size:19px"></i>حذف دسته</button>
+          <div style="position:absolute;inset-inline-end:6px;top:32px;z-index:1300;min-width:158px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
+            <button type="button" onClick="{{ c.rename }}" style="width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-pencil-simple" style="font-size:12px"></i>ویرایش نام</button>
+            <button type="button" onClick="{{ c.recolor }}" style="width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-palette" style="font-size:12px"></i>تغییر رنگ</button>
+            <span style="display:block;height:1px;background:var(--bd-border);margin:5px 4px"></span>
+            <button type="button" onClick="{{ c.remove }}" style="width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-danger);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-trash" style="font-size:12px"></i>حذف دسته</button>
           </div>
         </sc-if>
       </div>
     </sc-for>
-    <button type="button" onClick="{{ addCat }}" title="دستهٔ جدید" style="width:calc(100% - 10px);display:flex;align-items:center;gap:14px;height:42.5px;padding:0 14px;margin-top:5px;border:0;border-radius:10px;background:transparent;color:var(--bd-sb-fg-3);font-size:16px;cursor:pointer" style-hover="background:var(--bd-sb-hover);color:var(--bd-sb-fg)">
-      <i class="ph ph-plus" style="font-size:20px;flex:none;width:10px;text-align:center"></i>
+    <button type="button" onClick="{{ addCat }}" title="دستهٔ جدید" style="width:calc(100% - 8px);display:flex;align-items:center;gap:11px;height:34px;padding:0 11px;margin-top:4px;border:0;border-radius:8px;background:transparent;color:var(--bd-sb-fg-3);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-sb-hover);color:var(--bd-sb-fg)">
+      <i class="ph ph-plus" style="font-size:13px;flex:none;width:8px;text-align:center"></i>
       <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="white-space:nowrap">دستهٔ جدید</span></sc-if>
     </button>
   </div>
 </aside>
 
 <sc-if value="{{ notNote }}" hint-placeholder-val="{{ true }}">
-<main style="flex:1;min-width:0;padding:32.5px 47.5px 137.5px">
-  <header style="display:flex;align-items:center;gap:12.5px;min-height:65px;margin-bottom:30px">
-    <sc-if value="{{ hdrDot }}" hint-placeholder-val="{{ false }}"><span style="width:12.5px;height:12.5px;border-radius:124px;flex:none;background:{{ pageDot }}"></span></sc-if>
+<main style="flex:1;min-width:0;padding:26px 38px 110px">
+  <header style="display:flex;align-items:center;gap:10px;min-height:52px;margin-bottom:24px">
+    <sc-if value="{{ hdrDot }}" hint-placeholder-val="{{ false }}"><span style="width:10px;height:10px;border-radius:99px;flex:none;background:{{ pageDot }}"></span></sc-if>
     <div style="flex:1;min-width:0">
       <h1 style="font-size:{{ hdrSize }};font-weight:700;letter-spacing:-.02em;line-height:1.35;margin:0">{{ hdrTitle }}</h1>
-      <sc-if value="{{ hasHdrSub }}" hint-placeholder-val="{{ true }}"><div style="margin-top:4px;font-size:16px;color:var(--bd-text-3)">{{ hdrSub }}</div></sc-if>
+      <sc-if value="{{ hasHdrSub }}" hint-placeholder-val="{{ true }}"><div style="margin-top:3px;font-size:10.25px;color:var(--bd-text-3)">{{ hdrSub }}</div></sc-if>
     </div>
     <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="flex:none;display:flex;align-items:center;gap:10px;width:325px;height:47.5px;padding:0 15px;background:var(--bd-surface);border:1px solid var(--bd-accent);border-radius:124px;box-shadow:0 0 0 4px var(--bd-accent-soft);animation:bd-pop 150ms ease-out">
-        <i class="ph ph-magnifying-glass" style="flex:none;font-size:20px;color:var(--bd-text-3)"></i>
-        <input autoFocus="{{ true }}" value="{{ q }}" onChange="{{ setQ }}" onFocus="{{ goSearch }}" onBlur="{{ blurSearch }}" placeholder="جستجو در ایده‌ها…" style="flex:1;min-width:0;border:0;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:16px;outline:none">
-        <span title="میان‌بر جستجو" style="flex:none;padding:0 7.5px;border:1px solid var(--bd-border-2);border-radius:6px;font-size:14px;color:var(--bd-text-3);font-family:ui-monospace,monospace">/</span>
-        <button type="button" onClick="{{ closeSearch }}" title="بستن جستجو" style="flex:none;width:27.5px;height:27.5px;border:0;border-radius:124px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-x" style="font-size:16px"></i></button>
+      <div style="flex:none;display:flex;align-items:center;gap:8px;width:260px;height:38px;padding:0 12px;background:var(--bd-surface);border:1px solid var(--bd-accent);border-radius:99px;box-shadow:0 0 0 3px var(--bd-accent-soft);animation:bd-pop 150ms ease-out">
+        <i class="ph ph-magnifying-glass" style="flex:none;font-size:13px;color:var(--bd-text-3)"></i>
+        <input autoFocus="{{ true }}" value="{{ q }}" onChange="{{ setQ }}" onFocus="{{ goSearch }}" onBlur="{{ blurSearch }}" placeholder="جستجو در ایده‌ها…" style="flex:1;min-width:0;border:0;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:10.25px;outline:none">
+        <span title="میان‌بر جستجو" style="flex:none;padding:0 6px;border:1px solid var(--bd-border-2);border-radius:5px;font-size:9px;color:var(--bd-text-3);font-family:ui-monospace,monospace">/</span>
+        <button type="button" onClick="{{ closeSearch }}" title="بستن جستجو" style="flex:none;width:22px;height:22px;border:0;border-radius:99px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-x" style="font-size:10.25px"></i></button>
       </div>
     </sc-if>
     <sc-if value="{{ searchClosed }}" hint-placeholder-val="{{ true }}">
-      <button type="button" onClick="{{ openSearch }}" title="جستجو" style="flex:none;width:47.5px;height:47.5px;border:0;border-radius:124px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-magnifying-glass" style="font-size:22.5px"></i></button>
+      <button type="button" onClick="{{ openSearch }}" title="جستجو" style="flex:none;width:38px;height:38px;border:0;border-radius:99px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-magnifying-glass" style="font-size:14.5px"></i></button>
     </sc-if>
-    <button type="button" onClick="{{ goNotifs }}" title="اعلان‌ها" style="position:relative;flex:none;width:47.5px;height:47.5px;border:0;border-radius:124px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)">
-      <i class="ph ph-bell" style="font-size:22.5px"></i>
-      <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:5px;inset-inline-end:4px;min-width:20px;height:20px;padding:0 5px;border-radius:124px;background:var(--bd-accent);color:var(--bd-accent-ink);font-size:12.5px;font-weight:600;line-height:1;display:grid;place-items:center;box-shadow:0 0 0 2.5px var(--bd-bg)">{{ unreadTxt }}</span></sc-if>
+    <button type="button" onClick="{{ goNotifs }}" title="اعلان‌ها" style="position:relative;flex:none;width:38px;height:38px;border:0;border-radius:99px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)">
+      <i class="ph ph-bell" style="font-size:14.5px"></i>
+      <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:4px;inset-inline-end:3px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--bd-accent);color:var(--bd-accent-ink);font-size:8px;font-weight:600;line-height:1;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bd-bg)">{{ unreadTxt }}</span></sc-if>
     </button>
     <div style="position:relative;flex:none">
-      <button type="button" onClick="{{ avatarToggle }}" title="حساب کاربری" style="display:inline-flex;align-items:center;gap:7.5px;height:47.5px;padding:0 4px 0 10px;border:0;border-radius:124px;background:{{ avatarBg }};color:var(--bd-text-3);cursor:pointer" style-hover="background:var(--bd-surface-2)">
-        <span style="width:40px;height:40px;border-radius:124px;background:var(--bd-accent-soft);color:var(--bd-accent);display:grid;place-items:center;font-size:16px;font-weight:600">م</span>
-        <i class="ph ph-caret-down" style="font-size:15px"></i>
+      <button type="button" onClick="{{ avatarToggle }}" title="حساب کاربری" style="display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 3px 0 8px;border:0;border-radius:99px;background:{{ avatarBg }};color:var(--bd-text-3);cursor:pointer" style-hover="background:var(--bd-surface-2)">
+        <span style="width:32px;height:32px;border-radius:99px;background:var(--bd-accent-soft);color:var(--bd-accent);display:grid;place-items:center;font-size:10.25px;font-weight:600">م</span>
+        <i class="ph ph-caret-down" style="font-size:9.75px"></i>
       </button>
       <sc-if value="{{ avatarOpen }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;inset-inline-end:0;top:57.5px;z-index:1300;width:290px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
-          <div style="display:flex;align-items:center;gap:12.5px;padding:10px 11px 14px">
-            <span style="flex:none;width:42.5px;height:42.5px;border-radius:124px;background:var(--bd-accent-soft);color:var(--bd-accent);display:grid;place-items:center;font-size:17px;font-weight:600">م</span>
-            <span style="flex:1;min-width:0"><span style="display:block;font-size:17px;font-weight:600">مانی</span><span dir="ltr" style="display:block;font-size:14.5px;color:var(--bd-text-3);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">mani@braindock.app</span></span>
+        <div style="position:absolute;inset-inline-end:0;top:46px;z-index:1300;width:232px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 9px 11px">
+            <span style="flex:none;width:34px;height:34px;border-radius:99px;background:var(--bd-accent-soft);color:var(--bd-accent);display:grid;place-items:center;font-size:11px;font-weight:600">م</span>
+            <span style="flex:1;min-width:0"><span style="display:block;font-size:11px;font-weight:600">مانی</span><span dir="ltr" style="display:block;font-size:9.25px;color:var(--bd-text-3);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">mani@braindock.app</span></span>
           </div>
-          <div style="display:flex;gap:4px;padding:4px;margin:0 5px 7.5px;background:var(--bd-bg);border-radius:11px">
-            <button type="button" onClick="{{ setDark }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7.5px;height:37.5px;border:0;border-radius:9px;cursor:pointer;font-family:var(--bd-font);font-size:15.5px;background:{{ darkBg }};color:{{ darkFg }}"><i class="ph ph-moon" style="font-size:17.5px"></i>شب</button>
-            <button type="button" onClick="{{ setLight }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7.5px;height:37.5px;border:0;border-radius:9px;cursor:pointer;font-family:var(--bd-font);font-size:15.5px;background:{{ lightBg }};color:{{ lightFg }}"><i class="ph ph-sun" style="font-size:17.5px"></i>روز</button>
+          <div style="display:flex;gap:3px;padding:3px;margin:0 4px 6px;background:var(--bd-bg);border-radius:9px">
+            <button type="button" onClick="{{ setDark }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;border:0;border-radius:7px;cursor:pointer;font-family:var(--bd-font);font-size:9.75px;background:{{ darkBg }};color:{{ darkFg }}"><i class="ph ph-moon" style="font-size:11.25px"></i>شب</button>
+            <button type="button" onClick="{{ setLight }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;border:0;border-radius:7px;cursor:pointer;font-family:var(--bd-font);font-size:9.75px;background:{{ lightBg }};color:{{ lightFg }}"><i class="ph ph-sun" style="font-size:11.25px"></i>روز</button>
           </div>
-          <span style="display:block;height:1px;background:var(--bd-border);margin:0 5px 6px"></span>
-          <button type="button" onClick="{{ goSettings }}" style="width:100%;display:flex;align-items:center;gap:11px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-gear" style="font-size:19px"></i>تنظیمات</button>
-          <button type="button" onClick="{{ logout }}" style="width:100%;display:flex;align-items:center;gap:11px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-sign-out" style="font-size:19px"></i>خروج</button>
+          <span style="display:block;height:1px;background:var(--bd-border);margin:0 4px 5px"></span>
+          <button type="button" onClick="{{ goSettings }}" style="width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-gear" style="font-size:12px"></i>تنظیمات</button>
+          <button type="button" onClick="{{ logout }}" style="width:100%;display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)"><i class="ph ph-sign-out" style="font-size:12px"></i>خروج</button>
         </div>
       </sc-if>
     </div>
   </header>
 <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
 
-  <section style="margin-bottom:30px;max-width:1250px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12.5px"><h2 style="font-size:17.5px;font-weight:600;margin:0">یادآوری‌های امروز</h2><span style="font-size:14.5px;color:var(--bd-text-3)">{{ nToday }}</span><div style="flex:1"></div><span style="font-size:14px;color:var(--bd-text-3)">{{ pToday.txt }}</span><span style="width:92.5px;height:5px;border-radius:124px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:5px;border-radius:124px;background:var(--bd-accent);width:{{ pToday.pct }}"></span></span></div>
-    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
+  <section style="margin-bottom:24px;max-width:1000px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 style="font-size:11.25px;font-weight:600;margin:0">یادآوری‌های امروز</h2><span style="font-size:9.25px;color:var(--bd-text-3)">{{ nToday }}</span><div style="flex:1"></div><span style="font-size:9px;color:var(--bd-text-3)">{{ pToday.txt }}</span><span style="width:74px;height:4px;border-radius:99px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:4px;border-radius:99px;background:var(--bd-accent);width:{{ pToday.pct }}"></span></span></div>
+    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
       <sc-for list="{{ today }}" as="i" hint-placeholder-count="1">
-        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:15px;padding:15px 19px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
-          <span style="flex:none;width:9px;height:9px;border-radius:124px;background:{{ i.catColor }}"></span>
-          <span style="flex:1;min-width:0;font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
-          <span style="font-size:15px;color:var(--bd-text-3)">{{ i.catName }}</span>
-          <span style="display:inline-flex;align-items:center;gap:6px;font-size:15.5px;color:var(--bd-accent);font-weight:500"><i class="ph ph-bell" style="font-size:17.5px"></i>{{ i.remTime }}</span>
+        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
+          <span style="flex:none;width:7px;height:7px;border-radius:99px;background:{{ i.catColor }}"></span>
+          <span style="flex:1;min-width:0;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
+          <span style="font-size:9.75px;color:var(--bd-text-3)">{{ i.catName }}</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:9.75px;color:var(--bd-accent);font-weight:500"><i class="ph ph-bell" style="font-size:11.25px"></i>{{ i.remTime }}</span>
         </div>
       </sc-for>
       <sc-if value="{{ noToday }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);font-size:16px"><i class="ph ph-bell-slash" style="font-size:27.5px;opacity:.7"></i>برای امروز یادآوری‌ای ثبت نشده</div>
+        <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--bd-text-3);font-size:10.25px"><i class="ph ph-bell-slash" style="font-size:17.5px;opacity:.7"></i>برای امروز یادآوری‌ای ثبت نشده</div>
       </sc-if>
     </div>
   </section>
 
-  <section style="margin-bottom:30px;max-width:1250px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12.5px"><h2 style="font-size:17.5px;font-weight:600;margin:0">این هفته</h2><span style="font-size:14.5px;color:var(--bd-text-3)">{{ nWeek }}</span><div style="flex:1"></div><span style="font-size:14px;color:var(--bd-text-3)">{{ pWeek.txt }}</span><span style="width:92.5px;height:5px;border-radius:124px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:5px;border-radius:124px;background:var(--bd-accent);width:{{ pWeek.pct }}"></span></span></div>
-    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
+  <section style="margin-bottom:24px;max-width:1000px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 style="font-size:11.25px;font-weight:600;margin:0">این هفته</h2><span style="font-size:9.25px;color:var(--bd-text-3)">{{ nWeek }}</span><div style="flex:1"></div><span style="font-size:9px;color:var(--bd-text-3)">{{ pWeek.txt }}</span><span style="width:74px;height:4px;border-radius:99px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:4px;border-radius:99px;background:var(--bd-accent);width:{{ pWeek.pct }}"></span></span></div>
+    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
       <sc-for list="{{ week }}" as="i" hint-placeholder-count="1">
-        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:15px;padding:15px 19px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
-          <span style="flex:none;width:9px;height:9px;border-radius:124px;background:{{ i.catColor }}"></span>
-          <span style="flex:1;min-width:0;font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
-          <span style="font-size:15px;color:var(--bd-text-3)">{{ i.catName }}</span>
-          <span style="display:inline-flex;align-items:center;gap:6px;font-size:15.5px;color:var(--bd-text-2)"><i class="ph ph-bell" style="font-size:17.5px"></i>{{ i.remLong }}</span>
+        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
+          <span style="flex:none;width:7px;height:7px;border-radius:99px;background:{{ i.catColor }}"></span>
+          <span style="flex:1;min-width:0;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
+          <span style="font-size:9.75px;color:var(--bd-text-3)">{{ i.catName }}</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:9.75px;color:var(--bd-text-2)"><i class="ph ph-bell" style="font-size:11.25px"></i>{{ i.remLong }}</span>
         </div>
       </sc-for>
       <sc-if value="{{ noWeek }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);font-size:16px"><i class="ph ph-calendar-blank" style="font-size:27.5px;opacity:.7"></i>این هفته یادآوری‌ای در پیش نیست</div>
+        <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--bd-text-3);font-size:10.25px"><i class="ph ph-calendar-blank" style="font-size:17.5px;opacity:.7"></i>این هفته یادآوری‌ای در پیش نیست</div>
       </sc-if>
     </div>
   </section>
 
-  <section style="margin-bottom:30px;max-width:1250px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12.5px"><h2 style="font-size:17.5px;font-weight:600;margin:0">ایده‌های راکد</h2><span style="font-size:14.5px;color:var(--bd-text-3)">{{ nStale }}</span><div style="flex:1"></div><span style="font-size:14px;color:var(--bd-text-3)">{{ pStale.txt }}</span><span style="width:92.5px;height:5px;border-radius:124px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:5px;border-radius:124px;background:var(--bd-accent);width:{{ pStale.pct }}"></span></span></div>
-    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
+  <section style="margin-bottom:24px;max-width:1000px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 style="font-size:11.25px;font-weight:600;margin:0">ایده‌های راکد</h2><span style="font-size:9.25px;color:var(--bd-text-3)">{{ nStale }}</span><div style="flex:1"></div><span style="font-size:9px;color:var(--bd-text-3)">{{ pStale.txt }}</span><span style="width:74px;height:4px;border-radius:99px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:4px;border-radius:99px;background:var(--bd-accent);width:{{ pStale.pct }}"></span></span></div>
+    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
       <sc-for list="{{ stale }}" as="i" hint-placeholder-count="1">
-        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:15px;padding:15px 19px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
-          <span style="flex:none;width:9px;height:9px;border-radius:124px;background:{{ i.catColor }}"></span>
-          <span style="flex:1;min-width:0;font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
-          <span style="font-size:15px;color:var(--bd-text-3)">{{ i.catName }}</span>
-          <span style="display:inline-flex;align-items:center;gap:7.5px;padding:4px 11px;border-radius:124px;background:var(--bd-warn-bg);color:var(--bd-warn);font-size:15px;font-weight:500"><i class="ph ph-warning-circle" style="font-size:16px"></i>{{ i.idleTxt }}</span>
+        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
+          <span style="flex:none;width:7px;height:7px;border-radius:99px;background:{{ i.catColor }}"></span>
+          <span style="flex:1;min-width:0;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
+          <span style="font-size:9.75px;color:var(--bd-text-3)">{{ i.catName }}</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;background:var(--bd-warn-bg);color:var(--bd-warn);font-size:9.75px;font-weight:500"><i class="ph ph-warning-circle" style="font-size:10.25px"></i>{{ i.idleTxt }}</span>
         </div>
       </sc-for>
       <sc-if value="{{ noStale }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);font-size:16px"><i class="ph ph-check-circle" style="font-size:27.5px;opacity:.7"></i>ایدهٔ راکدی نداری</div>
+        <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--bd-text-3);font-size:10.25px"><i class="ph ph-check-circle" style="font-size:17.5px;opacity:.7"></i>ایدهٔ راکدی نداری</div>
       </sc-if>
     </div>
   </section>
 
-  <section style="max-width:1250px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12.5px"><h2 style="font-size:17.5px;font-weight:600;margin:0">در حال انجام</h2><span style="font-size:14.5px;color:var(--bd-text-3)">{{ nDoing }}</span><div style="flex:1"></div><span style="font-size:14px;color:var(--bd-text-3)">{{ pDoing.txt }}</span><span style="width:92.5px;height:5px;border-radius:124px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:5px;border-radius:124px;background:var(--bd-accent);width:{{ pDoing.pct }}"></span></span></div>
-    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
+  <section style="max-width:1000px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 style="font-size:11.25px;font-weight:600;margin:0">در حال انجام</h2><span style="font-size:9.25px;color:var(--bd-text-3)">{{ nDoing }}</span><div style="flex:1"></div><span style="font-size:9px;color:var(--bd-text-3)">{{ pDoing.txt }}</span><span style="width:74px;height:4px;border-radius:99px;background:var(--bd-surface-3);overflow:hidden;display:block"><span style="display:block;height:4px;border-radius:99px;background:var(--bd-accent);width:{{ pDoing.pct }}"></span></span></div>
+    <div style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
       <sc-for list="{{ doing }}" as="i" hint-placeholder-count="1">
-        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:15px;padding:15px 19px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
-          <span style="flex:none;width:9px;height:9px;border-radius:124px;background:{{ i.catColor }}"></span>
-          <span style="flex:1;min-width:0;font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
-          <span style="display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--bd-text-3)"><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o1 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o2 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o3 }}"></span></span>
-          <span style="padding:4px 12.5px;border-radius:124px;font-size:15px;font-weight:500;background:{{ i.stBg }};color:{{ i.stColor }}">{{ i.stLabel }}</span>
+        <div onClick="{{ i.open }}" style="display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;border-top:{{ i.bt }}" style-hover="background:var(--bd-surface-2)">
+          <span style="flex:none;width:7px;height:7px;border-radius:99px;background:{{ i.catColor }}"></span>
+          <span style="flex:1;min-width:0;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.title }}</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:9.75px;color:var(--bd-text-3)"><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o1 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o2 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o3 }}"></span></span>
+          <span style="padding:3px 10px;border-radius:99px;font-size:9.75px;font-weight:500;background:{{ i.stBg }};color:{{ i.stColor }}">{{ i.stLabel }}</span>
         </div>
       </sc-for>
       <sc-if value="{{ noDoing }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);font-size:16px"><i class="ph ph-play-circle" style="font-size:27.5px;opacity:.7"></i>ایده‌ای در حال انجام نیست</div>
+        <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--bd-text-3);font-size:10.25px"><i class="ph ph-play-circle" style="font-size:17.5px;opacity:.7"></i>ایده‌ای در حال انجام نیست</div>
       </sc-if>
     </div>
   </section>
 </sc-if>
 
 <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ false }}">
-  <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:20px">
+  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:16px">
     <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
-      <div style="display:flex;align-items:center;gap:27.5px">
+      <div style="display:flex;align-items:center;gap:22px">
         <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
-          <button type="button" onClick="{{ t.pick }}" style="position:relative;height:50px;padding:0 2.5px;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:17px;font-weight:{{ t.fw }};color:{{ t.fg }};transition:color 150ms" style-hover="color:var(--bd-text)">{{ t.label }}<sc-if value="{{ t.sel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset-inline:0;bottom:4px;height:2.5px;border-radius:124px;background:var(--bd-accent)"></span></sc-if></button>
+          <button type="button" onClick="{{ t.pick }}" style="position:relative;height:40px;padding:0 2px;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:11px;font-weight:{{ t.fw }};color:{{ t.fg }};transition:color 150ms" style-hover="color:var(--bd-text)">{{ t.label }}<sc-if value="{{ t.sel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset-inline:0;bottom:3px;height:2px;border-radius:99px;background:var(--bd-accent)"></span></sc-if></button>
         </sc-for>
       </div>
     </sc-if>
     <div style="flex:1"></div>
     <div style="position:relative">
-      <button type="button" onClick="{{ ddP.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:50px;padding:0 16px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-surface);color:var(--bd-text);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">{{ ddP.label }}<i class="ph ph-caret-down" style="font-size:16px;color:var(--bd-text-3)"></i></button>
+      <button type="button" onClick="{{ ddP.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 13px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-surface);color:var(--bd-text);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">{{ ddP.label }}<i class="ph ph-caret-down" style="font-size:10.25px;color:var(--bd-text-3)"></i></button>
       <sc-if value="{{ ddP.open }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;inset-inline-start:0;top:57.5px;z-index:1300;min-width:212.5px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+        <div style="position:absolute;inset-inline-start:0;top:46px;z-index:1300;min-width:170px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
           <sc-for list="{{ ddP.opts }}" as="o" hint-placeholder-count="4">
-            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
+            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
               <span style="flex:1;text-align:right">{{ o.label }}</span>
-              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if>
+              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if>
             </button>
           </sc-for>
         </div>
       </sc-if>
     </div>
     <div style="position:relative">
-      <button type="button" onClick="{{ ddT.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:50px;padding:0 16px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-surface);color:var(--bd-text);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">{{ ddT.label }}<i class="ph ph-caret-down" style="font-size:16px;color:var(--bd-text-3)"></i></button>
+      <button type="button" onClick="{{ ddT.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 13px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-surface);color:var(--bd-text);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">{{ ddT.label }}<i class="ph ph-caret-down" style="font-size:10.25px;color:var(--bd-text-3)"></i></button>
       <sc-if value="{{ ddT.open }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;inset-inline-start:0;top:57.5px;z-index:1300;min-width:200px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+        <div style="position:absolute;inset-inline-start:0;top:46px;z-index:1300;min-width:160px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
           <sc-for list="{{ ddT.opts }}" as="o" hint-placeholder-count="4">
-            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
+            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
               <span style="flex:1;text-align:right">{{ o.label }}</span>
-              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if>
+              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if>
             </button>
           </sc-for>
         </div>
       </sc-if>
     </div>
     <div style="position:relative">
-      <button type="button" onClick="{{ ddO.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:50px;padding:0 16px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-surface);color:var(--bd-text-2);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrows-down-up" style="font-size:17.5px"></i>{{ ddO.label }}</button>
+      <button type="button" onClick="{{ ddO.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 13px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-surface);color:var(--bd-text-2);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrows-down-up" style="font-size:11.25px"></i>{{ ddO.label }}</button>
       <sc-if value="{{ ddO.open }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;inset-inline-start:0;top:57.5px;z-index:1300;min-width:200px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+        <div style="position:absolute;inset-inline-start:0;top:46px;z-index:1300;min-width:160px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
           <sc-for list="{{ ddO.opts }}" as="o" hint-placeholder-count="4">
-            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
+            <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right" style-hover="background:var(--bd-surface-3)">
               <span style="flex:1;text-align:right">{{ o.label }}</span>
-              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if>
+              <sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if>
             </button>
           </sc-for>
         </div>
       </sc-if>
     </div>
-    <div style="display:flex;gap:4px;padding:4px;background:var(--bd-surface-2);border-radius:11px">
-      <button type="button" onClick="{{ setList }}" title="نمای لیست" style="width:42.5px;height:42.5px;border:0;border-radius:9px;cursor:pointer;display:grid;place-items:center;background:{{ listBg }};color:{{ listFg }}"><i class="ph ph-rows" style="font-size:20px"></i></button>
-      <button type="button" onClick="{{ setCard }}" title="نمای کارت" style="width:42.5px;height:42.5px;border:0;border-radius:9px;cursor:pointer;display:grid;place-items:center;background:{{ cardBg }};color:{{ cardFg }}"><i class="ph ph-squares-four" style="font-size:20px"></i></button>
+    <div style="display:flex;gap:3px;padding:3px;background:var(--bd-surface-2);border-radius:9px">
+      <button type="button" onClick="{{ setList }}" title="نمای لیست" style="width:34px;height:34px;border:0;border-radius:7px;cursor:pointer;display:grid;place-items:center;background:{{ listBg }};color:{{ listFg }}"><i class="ph ph-rows" style="font-size:13px"></i></button>
+      <button type="button" onClick="{{ setCard }}" title="نمای کارت" style="width:34px;height:34px;border:0;border-radius:7px;cursor:pointer;display:grid;place-items:center;background:{{ cardBg }};color:{{ cardFg }}"><i class="ph ph-squares-four" style="font-size:13px"></i></button>
     </div>
   </div>
 
   <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
     <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
-      <div style="display:flex;align-items:center;gap:20px;height:50px;padding:0 22.5px;margin-bottom:12.5px;background:var(--bd-surface-2);border-radius:12.5px;font-size:15px;font-weight:500;color:var(--bd-text-3)">
-        <span style="flex:1 1 0;min-width:300px">عنوان</span>
-        <span style="flex:0 1 137.5px;min-width:0">دسته</span>
-        <span style="flex:0 1 162.5px;min-width:0">وضعیت</span>
-        <button type="button" onClick="{{ sortPr }}" title="مرتب‌سازی بر اساس اولویت" style="flex:0 1 80px;min-width:0;display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:15px;font-weight:500;color:{{ prHeadFg }}" style-hover="color:var(--bd-text)">اولویت<i class="ph ph-caret-down" style="font-size:14px;opacity:{{ prCaretOp }}"></i></button>
-        <span style="flex:0 1 162.5px;min-width:0">یادآوری</span>
-        <button type="button" onClick="{{ sortDate }}" title="مرتب‌سازی بر اساس تاریخ" style="flex:0 1 140px;min-width:0;display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:15px;font-weight:500;color:{{ dateHeadFg }}" style-hover="color:var(--bd-text)">تاریخ<i class="ph ph-caret-{{ dateCaret }}" style="font-size:14px;opacity:{{ dateCaretOp }}"></i></button>
-        <span style="flex:none;width:85px;text-align:left">عملیات</span>
+      <div style="display:flex;align-items:center;gap:16px;height:40px;padding:0 18px;margin-bottom:10px;background:var(--bd-surface-2);border-radius:10px;font-size:9.75px;font-weight:500;color:var(--bd-text-3)">
+        <span style="flex:1 1 0;min-width:240px">عنوان</span>
+        <span style="flex:0 1 110px;min-width:0">دسته</span>
+        <span style="flex:0 1 130px;min-width:0">وضعیت</span>
+        <button type="button" onClick="{{ sortPr }}" title="مرتب‌سازی بر اساس اولویت" style="flex:0 1 64px;min-width:0;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:9.75px;font-weight:500;color:{{ prHeadFg }}" style-hover="color:var(--bd-text)">اولویت<i class="ph ph-caret-down" style="font-size:9px;opacity:{{ prCaretOp }}"></i></button>
+        <span style="flex:0 1 130px;min-width:0">یادآوری</span>
+        <button type="button" onClick="{{ sortDate }}" title="مرتب‌سازی بر اساس تاریخ" style="flex:0 1 112px;min-width:0;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;cursor:pointer;font-family:var(--bd-font);font-size:9.75px;font-weight:500;color:{{ dateHeadFg }}" style-hover="color:var(--bd-text)">تاریخ<i class="ph ph-caret-{{ dateCaret }}" style="font-size:9px;opacity:{{ dateCaretOp }}"></i></button>
+        <span style="flex:none;width:68px;text-align:left">عملیات</span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:column;gap:8px">
         <sc-for list="{{ pageRows }}" as="i" hint-placeholder-count="5">
-          <div class="bd-trow" onClick="{{ i.open }}" style="display:flex;align-items:center;gap:20px;padding:15px 22.5px;cursor:pointer;opacity:{{ i.rowOpacity }}">
-            <div style="flex:1 1 0;min-width:300px;display:flex;align-items:center;gap:15px">
-              <span style="flex:none;width:11px;height:11px;border-radius:124px;background:var(--row-ink,{{ i.catColor }})"></span>
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;align-items:center;gap:10px;min-width:0">
-                  <span style="min-width:0;font-size:17.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ i.titleLine }}">{{ i.title }}</span>
-                  <sc-if value="{{ i.stale }}" hint-placeholder-val="{{ false }}"><span style="flex:none;padding:1px 9px;border-radius:124px;background:var(--bd-warn-bg);color:var(--row-ink,var(--bd-warn));font-size:14px;font-weight:500">راکد</span></sc-if>
-                  <sc-if value="{{ i.hasAtt }}" hint-placeholder-val="{{ false }}"><i class="ph ph-paperclip" style="flex:none;font-size:17.5px;color:var(--row-fg-3)"></i></sc-if>
+          <div class="bd-trow" onClick="{{ i.open }}" style="display:flex;align-items:center;gap:16px;padding:12px 18px;cursor:pointer;opacity:{{ i.rowOpacity }}">
+            <div style="flex:1 1 0;min-width:240px;display:flex;align-items:center;gap:12px">
+              <span style="flex:none;width:9px;height:9px;border-radius:99px;background:var(--row-ink,{{ i.catColor }})"></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                  <span style="min-width:0;font-size:11.25px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ i.titleLine }}">{{ i.title }}</span>
+                  <sc-if value="{{ i.stale }}" hint-placeholder-val="{{ false }}"><span style="flex:none;padding:1px 7px;border-radius:99px;background:var(--bd-warn-bg);color:var(--row-ink,var(--bd-warn));font-size:9px;font-weight:500">راکد</span></sc-if>
+                  <sc-if value="{{ i.hasAtt }}" hint-placeholder-val="{{ false }}"><i class="ph ph-paperclip" style="flex:none;font-size:11.25px;color:var(--row-fg-3)"></i></sc-if>
                 </div>
-                <div style="display:flex;align-items:center;gap:7.5px;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;min-width:0">
                   <sc-for list="{{ i.tagChips }}" as="t" hint-placeholder-count="1">
-                    <span style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:1px 10px;border-radius:124px;background:var(--row-btn);color:var(--row-fg-3);font-size:14px"><span style="width:5px;height:5px;border-radius:124px;background:var(--row-ink,{{ t.dot }})"></span>{{ t.label }}</span>
+                    <span style="flex:none;display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:99px;background:var(--row-btn);color:var(--row-fg-3);font-size:9px"><span style="width:4px;height:4px;border-radius:99px;background:var(--row-ink,{{ t.dot }})"></span>{{ t.label }}</span>
                   </sc-for>
-                  <span style="flex:1;min-width:0;font-size:15.5px;color:var(--row-fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.snip }}</span>
+                  <span style="flex:1;min-width:0;font-size:9.75px;color:var(--row-fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.snip }}</span>
                 </div>
               </div>
             </div>
-            <span style="flex:0 1 137.5px;min-width:0;font-size:15.5px;color:var(--row-fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.catName }}</span>
-            <span style="flex:0 1 162.5px;min-width:0;display:flex;align-items:center;gap:9px;font-size:15.5px;font-weight:500;color:var(--row-ink,{{ i.stColor }})"><span style="flex:none;width:9px;height:9px;border-radius:124px;background:currentColor"></span><span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.stLabel }}</span></span>
-            <span title="{{ i.prTitle }}" style="flex:0 1 80px;min-width:0;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:124px;background:var(--row-fg-2);opacity:{{ i.o1 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--row-fg-2);opacity:{{ i.o2 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--row-fg-2);opacity:{{ i.o3 }}"></span></span>
-            <span style="flex:0 1 162.5px;min-width:0;display:flex;align-items:center;gap:6px;font-size:15.5px;color:var(--row-ink,var(--bd-accent))">
-              <sc-if value="{{ i.hasRem }}" hint-placeholder-val="{{ true }}"><i class="ph ph-bell" style="flex:none;font-size:16px"></i></sc-if>
+            <span style="flex:0 1 110px;min-width:0;font-size:9.75px;color:var(--row-fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.catName }}</span>
+            <span style="flex:0 1 130px;min-width:0;display:flex;align-items:center;gap:7px;font-size:9.75px;font-weight:500;color:var(--row-ink,{{ i.stColor }})"><span style="flex:none;width:7px;height:7px;border-radius:99px;background:currentColor"></span><span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.stLabel }}</span></span>
+            <span title="{{ i.prTitle }}" style="flex:0 1 64px;min-width:0;display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:99px;background:var(--row-fg-2);opacity:{{ i.o1 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--row-fg-2);opacity:{{ i.o2 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--row-fg-2);opacity:{{ i.o3 }}"></span></span>
+            <span style="flex:0 1 130px;min-width:0;display:flex;align-items:center;gap:5px;font-size:9.75px;color:var(--row-ink,var(--bd-accent))">
+              <sc-if value="{{ i.hasRem }}" hint-placeholder-val="{{ true }}"><i class="ph ph-bell" style="flex:none;font-size:10.25px"></i></sc-if>
               <span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.remShortTxt }}</span>
             </span>
-            <span style="flex:0 1 140px;min-width:0;font-size:15.5px;color:var(--row-fg-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.dateTxt }}</span>
-            <div style="flex:none;width:85px;display:flex;justify-content:flex-end;gap:7.5px">
-              <button type="button" onClick="{{ i.remind }}" title="یادآوری" style="width:37.5px;height:37.5px;border:0;border-radius:10px;background:var(--row-btn);color:{{ i.remBtnFg }};cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-bell" style="font-size:19px"></i></button>
+            <span style="flex:0 1 112px;min-width:0;font-size:9.75px;color:var(--row-fg-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.dateTxt }}</span>
+            <div style="flex:none;width:68px;display:flex;justify-content:flex-end;gap:6px">
+              <button type="button" onClick="{{ i.remind }}" title="یادآوری" style="width:30px;height:30px;border:0;border-radius:8px;background:var(--row-btn);color:{{ i.remBtnFg }};cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-bell" style="font-size:12px"></i></button>
               <sc-if value="{{ notArchive }}" hint-placeholder-val="{{ true }}">
-                <button type="button" onClick="{{ i.archive }}" title="آرشیو" style="width:37.5px;height:37.5px;border:0;border-radius:10px;background:var(--row-btn);color:var(--row-btn-fg);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-archive" style="font-size:19px"></i></button>
+                <button type="button" onClick="{{ i.archive }}" title="آرشیو" style="width:30px;height:30px;border:0;border-radius:8px;background:var(--row-btn);color:var(--row-btn-fg);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-archive" style="font-size:12px"></i></button>
               </sc-if>
               <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
-                <button type="button" onClick="{{ i.restore }}" title="بازگردانی" style="width:37.5px;height:37.5px;border:0;border-radius:10px;background:var(--row-btn);color:var(--row-btn-fg);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-arrow-counter-clockwise" style="font-size:19px"></i></button>
+                <button type="button" onClick="{{ i.restore }}" title="بازگردانی" style="width:30px;height:30px;border:0;border-radius:8px;background:var(--row-btn);color:var(--row-btn-fg);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--row-fg)"><i class="ph ph-arrow-counter-clockwise" style="font-size:12px"></i></button>
               </sc-if>
             </div>
           </div>
@@ -357,143 +357,143 @@
       </div>
     </sc-if>
     <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
-      <div style="padding:70px 20px;display:flex;flex-direction:column;align-items:center;gap:12.5px;color:var(--bd-text-3);background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
-        <i class="ph ph-{{ emptyIcon }}" style="font-size:37.5px;opacity:.6"></i>
-        <div style="font-size:17px">{{ emptyTxt }}</div>
+      <div style="padding:56px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
+        <i class="ph ph-{{ emptyIcon }}" style="font-size:24px;opacity:.6"></i>
+        <div style="font-size:11px">{{ emptyTxt }}</div>
       </div>
     </sc-if>
   </sc-if>
 
   <sc-if value="{{ isCard }}" hint-placeholder-val="{{ false }}">
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;opacity:{{ rowOp }}">
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;opacity:{{ rowOp }}">
       <sc-for list="{{ pageRows }}" as="i" hint-placeholder-count="3">
-        <div onClick="{{ i.open }}" style="position:relative;display:flex;flex-direction:column;gap:14px;padding:22.5px 27.5px 20px 22.5px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow);cursor:pointer;min-height:210px" style-hover="border-color:var(--bd-border-2)">
-          <span style="position:absolute;inset-inline-end:0;top:20px;bottom:20px;width:4px;border-radius:124px;background:{{ i.catColor }}"></span>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="padding:4px 12.5px;border-radius:124px;font-size:15px;font-weight:500;background:{{ i.stBg }};color:{{ i.stColor }}">{{ i.stLabel }}</span>
-            <span title="اولویت" style="display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o1 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o2 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ i.o3 }}"></span></span>
+        <div onClick="{{ i.open }}" style="position:relative;display:flex;flex-direction:column;gap:11px;padding:18px 22px 16px 18px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow);cursor:pointer;min-height:168px" style-hover="border-color:var(--bd-border-2)">
+          <span style="position:absolute;inset-inline-end:0;top:16px;bottom:16px;width:3px;border-radius:99px;background:{{ i.catColor }}"></span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="padding:3px 10px;border-radius:99px;font-size:9.75px;font-weight:500;background:{{ i.stBg }};color:{{ i.stColor }}">{{ i.stLabel }}</span>
+            <span title="اولویت" style="display:inline-flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o1 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o2 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ i.o3 }}"></span></span>
             <div style="flex:1"></div>
-            <sc-if value="{{ i.stale }}" hint-placeholder-val="{{ false }}"><span style="padding:1px 9px;border-radius:124px;background:var(--bd-warn-bg);color:var(--bd-warn);font-size:14px;font-weight:500">راکد</span></sc-if>
-            <sc-if value="{{ i.hasAtt }}" hint-placeholder-val="{{ false }}"><i class="ph ph-paperclip" style="font-size:17.5px;color:var(--bd-text-3)"></i></sc-if>
+            <sc-if value="{{ i.stale }}" hint-placeholder-val="{{ false }}"><span style="padding:1px 7px;border-radius:99px;background:var(--bd-warn-bg);color:var(--bd-warn);font-size:9px;font-weight:500">راکد</span></sc-if>
+            <sc-if value="{{ i.hasAtt }}" hint-placeholder-val="{{ false }}"><i class="ph ph-paperclip" style="font-size:11.25px;color:var(--bd-text-3)"></i></sc-if>
           </div>
-          <div style="font-size:18px;font-weight:600;line-height:1.5;max-height:55px;overflow:hidden">{{ i.title }}</div>
-          <div style="flex:1;font-size:15.5px;color:var(--bd-text-2);line-height:1.7;max-height:55px;overflow:hidden">{{ i.snip }}</div>
-          <div style="display:flex;align-items:center;gap:12.5px;font-size:15px;color:var(--bd-text-3);border-top:1px solid var(--bd-border);padding-top:12.5px">
+          <div style="font-size:11.5px;font-weight:600;line-height:1.5;max-height:44px;overflow:hidden">{{ i.title }}</div>
+          <div style="flex:1;font-size:9.75px;color:var(--bd-text-2);line-height:1.7;max-height:44px;overflow:hidden">{{ i.snip }}</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:9.75px;color:var(--bd-text-3);border-top:1px solid var(--bd-border);padding-top:10px">
             <span>{{ i.catName }}</span>
             <span style="opacity:.5">·</span>
             <span>{{ i.dateTxt }}</span>
             <div style="flex:1"></div>
-            <sc-if value="{{ i.hasRem }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--bd-accent)"><i class="ph ph-bell" style="font-size:16px"></i>{{ i.remShortTxt }}</span></sc-if>
+            <sc-if value="{{ i.hasRem }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;color:var(--bd-accent)"><i class="ph ph-bell" style="font-size:10.25px"></i>{{ i.remShortTxt }}</span></sc-if>
           </div>
           <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
-            <button type="button" onClick="{{ i.restore }}" style="display:inline-flex;align-items:center;justify-content:center;gap:7.5px;height:40px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-3)"><i class="ph ph-arrow-counter-clockwise" style="font-size:16px"></i>بازگردانی</button>
+            <button type="button" onClick="{{ i.restore }}" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-3)"><i class="ph ph-arrow-counter-clockwise" style="font-size:10.25px"></i>بازگردانی</button>
           </sc-if>
         </div>
       </sc-for>
     </div>
     <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
-      <div style="padding:70px 20px;display:flex;flex-direction:column;align-items:center;gap:12.5px;color:var(--bd-text-3);background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px">
-        <i class="ph ph-{{ emptyIcon }}" style="font-size:37.5px;opacity:.6"></i>
-        <div style="font-size:17px">{{ emptyTxt }}</div>
+      <div style="padding:56px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--bd-text-3);background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px">
+        <i class="ph ph-{{ emptyIcon }}" style="font-size:24px;opacity:.6"></i>
+        <div style="font-size:11px">{{ emptyTxt }}</div>
       </div>
     </sc-if>
   </sc-if>
 
   <sc-if value="{{ hasPages }}" hint-placeholder-val="{{ true }}">
-    <div style="display:flex;align-items:center;gap:5px;margin-top:25px;font-size:15.5px;color:var(--bd-text-3)">
+    <div style="display:flex;align-items:center;gap:4px;margin-top:20px;font-size:9.75px;color:var(--bd-text-3)">
       <span style="flex:1">{{ pageSummary }}</span>
-      <button type="button" onClick="{{ pgPrev }}" title="صفحهٔ قبل" style="width:37.5px;height:37.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:{{ prevCur }};opacity:{{ prevOp }};display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-caret-right" style="font-size:17.5px"></i></button>
+      <button type="button" onClick="{{ pgPrev }}" title="صفحهٔ قبل" style="width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:{{ prevCur }};opacity:{{ prevOp }};display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-caret-right" style="font-size:11.25px"></i></button>
       <sc-for list="{{ pages }}" as="p" hint-placeholder-count="3">
-        <button type="button" onClick="{{ p.pick }}" style="min-width:37.5px;height:37.5px;padding:0 7.5px;border:0;border-radius:10px;background:transparent;color:{{ p.fg }};font-family:var(--bd-font);font-size:16px;font-weight:{{ p.fw }};cursor:{{ p.cur }}" style-hover="background:{{ p.hbg }}">{{ p.txt }}</button>
+        <button type="button" onClick="{{ p.pick }}" style="min-width:30px;height:30px;padding:0 6px;border:0;border-radius:8px;background:transparent;color:{{ p.fg }};font-family:var(--bd-font);font-size:10.25px;font-weight:{{ p.fw }};cursor:{{ p.cur }}" style-hover="background:{{ p.hbg }}">{{ p.txt }}</button>
       </sc-for>
-      <button type="button" onClick="{{ pgNext }}" title="صفحهٔ بعد" style="width:37.5px;height:37.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:{{ nextCur }};opacity:{{ nextOp }};display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-caret-left" style="font-size:17.5px"></i></button>
+      <button type="button" onClick="{{ pgNext }}" title="صفحهٔ بعد" style="width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:{{ nextCur }};opacity:{{ nextOp }};display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-caret-left" style="font-size:11.25px"></i></button>
     </div>
   </sc-if>
 </sc-if>
 <sc-if value="{{ isNotif }}" hint-placeholder-val="{{ false }}">
-  <div style="display:flex;align-items:center;justify-content:flex-end;max-width:1075px;margin-bottom:17.5px">
-    <button type="button" onClick="{{ markAll }}" style="display:inline-flex;align-items:center;gap:9px;height:42.5px;padding:0 16px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-checks" style="font-size:19px"></i>همه را خوانده‌شده علامت بزن</button>
+  <div style="display:flex;align-items:center;justify-content:flex-end;max-width:860px;margin-bottom:14px">
+    <button type="button" onClick="{{ markAll }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-checks" style="font-size:12px"></i>همه را خوانده‌شده علامت بزن</button>
   </div>
-  <div style="max-width:1075px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;box-shadow:var(--bd-shadow)">
+  <div style="max-width:860px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;box-shadow:var(--bd-shadow)">
     <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
-      <div onClick="{{ n.open }}" style="display:flex;align-items:flex-start;gap:16px;padding:19px 21px;cursor:pointer;border-top:{{ n.bt }};background:{{ n.bg }}" style-hover="background:var(--bd-surface-2)">
-        <i class="ph ph-{{ n.icon }}" style="flex:none;font-size:22.5px;color:var(--bd-text-2);margin-top:2.5px"></i>
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
-          <span style="font-size:17px;color:{{ n.fg }};line-height:1.7">{{ n.txt }}</span>
-          <span style="font-size:15px;color:var(--bd-text-3)">{{ n.when }}</span>
+      <div onClick="{{ n.open }}" style="display:flex;align-items:flex-start;gap:13px;padding:15px 17px;cursor:pointer;border-top:{{ n.bt }};background:{{ n.bg }}" style-hover="background:var(--bd-surface-2)">
+        <i class="ph ph-{{ n.icon }}" style="flex:none;font-size:14.5px;color:var(--bd-text-2);margin-top:2px"></i>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+          <span style="font-size:11px;color:{{ n.fg }};line-height:1.7">{{ n.txt }}</span>
+          <span style="font-size:9.75px;color:var(--bd-text-3)">{{ n.when }}</span>
         </div>
-        <sc-if value="{{ n.unread }}" hint-placeholder-val="{{ true }}"><span style="flex:none;width:9px;height:9px;border-radius:124px;background:var(--bd-accent);margin-top:7.5px"></span></sc-if>
+        <sc-if value="{{ n.unread }}" hint-placeholder-val="{{ true }}"><span style="flex:none;width:7px;height:7px;border-radius:99px;background:var(--bd-accent);margin-top:6px"></span></sc-if>
       </div>
     </sc-for>
   </div>
 </sc-if>
 
 <sc-if value="{{ isSet }}" hint-placeholder-val="{{ false }}">
-  <div style="max-width:925px;display:flex;flex-direction:column;gap:20px">
+  <div style="max-width:740px;display:flex;flex-direction:column;gap:16px">
 
-    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;padding:25px 27.5px;box-shadow:var(--bd-shadow)">
-      <div style="display:flex;align-items:center;gap:12.5px;margin-bottom:7.5px">
-        <h2 style="font-size:19px;font-weight:600;margin:0">اتصال ربات تلگرام</h2>
-        <span style="display:inline-flex;align-items:center;gap:7.5px;font-size:15.5px;color:{{ tgColor }}"><span style="width:9px;height:9px;border-radius:124px;background:{{ tgColor }}"></span>{{ tgStatus }}</span>
+    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;padding:20px 22px;box-shadow:var(--bd-shadow)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <h2 style="font-size:12px;font-weight:600;margin:0">اتصال ربات تلگرام</h2>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:9.75px;color:{{ tgColor }}"><span style="width:7px;height:7px;border-radius:99px;background:{{ tgColor }}"></span>{{ tgStatus }}</span>
       </div>
-      <p style="margin:0 0 19px;font-size:16px;color:var(--bd-text-2);line-height:1.8">ایده‌ها را در تلگرام بفرست تا مستقیم در BrainDock ثبت شوند.</p>
+      <p style="margin:0 0 15px;font-size:10.25px;color:var(--bd-text-2);line-height:1.8">ایده‌ها را در تلگرام بفرست تا مستقیم در BrainDock ثبت شوند.</p>
       <sc-if value="{{ tgHasLink }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:12.5px;padding:14px 17.5px;background:var(--bd-surface-2);border:1px solid var(--bd-border);border-radius:11px;margin-bottom:16px">
-          <i class="ph ph-link" style="font-size:20px;color:var(--bd-text-3)"></i>
-          <span dir="ltr" style="flex:1;font-size:15.5px;font-family:ui-monospace,monospace;color:var(--bd-text)">{{ tgLink }}</span>
-          <span style="font-size:14.5px;color:var(--bd-text-3)">یک‌بارمصرف</span>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bd-surface-2);border:1px solid var(--bd-border);border-radius:9px;margin-bottom:13px">
+          <i class="ph ph-link" style="font-size:13px;color:var(--bd-text-3)"></i>
+          <span dir="ltr" style="flex:1;font-size:9.75px;font-family:ui-monospace,monospace;color:var(--bd-text)">{{ tgLink }}</span>
+          <span style="font-size:9.25px;color:var(--bd-text-3)">یک‌بارمصرف</span>
         </div>
       </sc-if>
-      <div style="display:flex;gap:11px">
+      <div style="display:flex;gap:9px">
         <sc-if value="{{ tgOn }}" hint-placeholder-val="{{ false }}">
-          <button type="button" onClick="{{ tgOff }}" style="height:47.5px;padding:0 19px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-danger);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">قطع اتصال</button>
+          <button type="button" onClick="{{ tgOff }}" style="height:38px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-danger);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">قطع اتصال</button>
         </sc-if>
-        <button type="button" onClick="{{ tgMake }}" style="height:47.5px;padding:0 19px;border:0;border-radius:10px;background:var(--bd-accent);color:var(--bd-accent-ink);font-size:16px;font-weight:500;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ساخت لینک اتصال</button>
+        <button type="button" onClick="{{ tgMake }}" style="height:38px;padding:0 15px;border:0;border-radius:8px;background:var(--bd-accent);color:var(--bd-accent-ink);font-size:10.25px;font-weight:500;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ساخت لینک اتصال</button>
         <sc-if value="{{ tgHasLink }}" hint-placeholder-val="{{ false }}">
-          <button type="button" onClick="{{ tgConnect }}" style="height:47.5px;padding:0 19px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">اتصال را تأیید کن</button>
+          <button type="button" onClick="{{ tgConnect }}" style="height:38px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">اتصال را تأیید کن</button>
         </sc-if>
       </div>
     </section>
 
-    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;padding:25px 27.5px;box-shadow:var(--bd-shadow)">
-      <div style="display:flex;align-items:center;margin-bottom:17.5px">
-        <h2 style="font-size:19px;font-weight:600;margin:0;flex:1">مدیریت دسته‌بندی‌ها</h2>
-        <button type="button" onClick="{{ addCat }}" style="display:inline-flex;align-items:center;gap:7.5px;height:40px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-plus" style="font-size:17.5px"></i>دستهٔ جدید</button>
+    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;padding:20px 22px;box-shadow:var(--bd-shadow)">
+      <div style="display:flex;align-items:center;margin-bottom:14px">
+        <h2 style="font-size:12px;font-weight:600;margin:0;flex:1">مدیریت دسته‌بندی‌ها</h2>
+        <button type="button" onClick="{{ addCat }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-plus" style="font-size:11.25px"></i>دستهٔ جدید</button>
       </div>
-      <div style="border:1px solid var(--bd-border);border-radius:11px;overflow:hidden">
+      <div style="border:1px solid var(--bd-border);border-radius:9px;overflow:hidden">
         <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
-          <div style="display:flex;align-items:center;gap:14px;padding:14px 17.5px;border-top:1px solid var(--bd-border)">
-            <span style="flex:none;width:11px;height:11px;border-radius:124px;background:{{ c.color }}"></span>
-            <span style="flex:1;font-size:17px">{{ c.name }}</span>
-            <span style="font-size:15px;color:var(--bd-text-3)">{{ c.countTxt }} ایده</span>
-            <button type="button" onClick="{{ c.rename }}" title="ویرایش" style="width:37.5px;height:37.5px;border:0;border-radius:9px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-pencil-simple" style="font-size:19px"></i></button>
-            <button type="button" onClick="{{ c.remove }}" title="حذف" style="width:37.5px;height:37.5px;border:0;border-radius:9px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-danger)"><i class="ph ph-trash" style="font-size:19px"></i></button>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-top:1px solid var(--bd-border)">
+            <span style="flex:none;width:9px;height:9px;border-radius:99px;background:{{ c.color }}"></span>
+            <span style="flex:1;font-size:11px">{{ c.name }}</span>
+            <span style="font-size:9.75px;color:var(--bd-text-3)">{{ c.countTxt }} ایده</span>
+            <button type="button" onClick="{{ c.rename }}" title="ویرایش" style="width:30px;height:30px;border:0;border-radius:7px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-pencil-simple" style="font-size:12px"></i></button>
+            <button type="button" onClick="{{ c.remove }}" title="حذف" style="width:30px;height:30px;border:0;border-radius:7px;background:transparent;color:var(--bd-text-3);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-danger)"><i class="ph ph-trash" style="font-size:12px"></i></button>
           </div>
         </sc-for>
       </div>
     </section>
 
-    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;padding:25px 27.5px;box-shadow:var(--bd-shadow)">
-      <h2 style="font-size:19px;font-weight:600;margin:0 0 7.5px">تعریف ایدهٔ راکد</h2>
-      <p style="margin:0 0 19px;font-size:16px;color:var(--bd-text-2);line-height:1.8">بعد از چند روز بدون تغییر، ایده راکد شمرده شود.</p>
-      <div style="display:inline-flex;align-items:center;gap:2.5px;border:1px solid var(--bd-border-2);border-radius:11px;padding:4px">
-        <button type="button" onClick="{{ staleDown }}" style="width:40px;height:40px;border:0;border-radius:9px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-minus" style="font-size:17.5px"></i></button>
-        <span style="min-width:90px;text-align:center;font-size:17.5px;font-weight:600">{{ staleTxt }} روز</span>
-        <button type="button" onClick="{{ staleUp }}" style="width:40px;height:40px;border:0;border-radius:9px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-plus" style="font-size:17.5px"></i></button>
+    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;padding:20px 22px;box-shadow:var(--bd-shadow)">
+      <h2 style="font-size:12px;font-weight:600;margin:0 0 6px">تعریف ایدهٔ راکد</h2>
+      <p style="margin:0 0 15px;font-size:10.25px;color:var(--bd-text-2);line-height:1.8">بعد از چند روز بدون تغییر، ایده راکد شمرده شود.</p>
+      <div style="display:inline-flex;align-items:center;gap:2px;border:1px solid var(--bd-border-2);border-radius:9px;padding:3px">
+        <button type="button" onClick="{{ staleDown }}" style="width:32px;height:32px;border:0;border-radius:7px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-minus" style="font-size:11.25px"></i></button>
+        <span style="min-width:72px;text-align:center;font-size:11.25px;font-weight:600">{{ staleTxt }} روز</span>
+        <button type="button" onClick="{{ staleUp }}" style="width:32px;height:32px;border:0;border-radius:7px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-plus" style="font-size:11.25px"></i></button>
       </div>
     </section>
 
-    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;padding:25px 27.5px;box-shadow:var(--bd-shadow)">
-      <h2 style="font-size:19px;font-weight:600;margin:0 0 17.5px">حالت نمایش</h2>
-      <div style="display:inline-flex;gap:4px;padding:4px;background:var(--bd-surface-2);border-radius:11px">
-        <button type="button" onClick="{{ setDark }}" style="display:inline-flex;align-items:center;gap:10px;height:42.5px;padding:0 20px;border:0;border-radius:9px;cursor:pointer;font-size:16px;background:{{ darkBg }};color:{{ darkFg }}"><i class="ph ph-moon" style="font-size:19px"></i>شب</button>
-        <button type="button" onClick="{{ setLight }}" style="display:inline-flex;align-items:center;gap:10px;height:42.5px;padding:0 20px;border:0;border-radius:9px;cursor:pointer;font-size:16px;background:{{ lightBg }};color:{{ lightFg }}"><i class="ph ph-sun" style="font-size:19px"></i>روز</button>
+    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;padding:20px 22px;box-shadow:var(--bd-shadow)">
+      <h2 style="font-size:12px;font-weight:600;margin:0 0 14px">حالت نمایش</h2>
+      <div style="display:inline-flex;gap:3px;padding:3px;background:var(--bd-surface-2);border-radius:9px">
+        <button type="button" onClick="{{ setDark }}" style="display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 16px;border:0;border-radius:7px;cursor:pointer;font-size:10.25px;background:{{ darkBg }};color:{{ darkFg }}"><i class="ph ph-moon" style="font-size:12px"></i>شب</button>
+        <button type="button" onClick="{{ setLight }}" style="display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 16px;border:0;border-radius:7px;cursor:pointer;font-size:10.25px;background:{{ lightBg }};color:{{ lightFg }}"><i class="ph ph-sun" style="font-size:12px"></i>روز</button>
       </div>
     </section>
 
-    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;padding:22.5px 27.5px;box-shadow:var(--bd-shadow);display:flex;align-items:center;gap:17.5px">
-      <div style="flex:1"><div style="font-size:17.5px;font-weight:600">خروج از حساب</div><div style="font-size:15.5px;color:var(--bd-text-2);margin-top:2.5px">مانی · حساب شخصی</div></div>
-      <button type="button" onClick="{{ logout }}" style="display:inline-flex;align-items:center;gap:9px;height:47.5px;padding:0 19px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-danger);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-sign-out" style="font-size:20px"></i>خروج</button>
+    <section style="background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;padding:18px 22px;box-shadow:var(--bd-shadow);display:flex;align-items:center;gap:14px">
+      <div style="flex:1"><div style="font-size:11.25px;font-weight:600">خروج از حساب</div><div style="font-size:9.75px;color:var(--bd-text-2);margin-top:2px">مانی · حساب شخصی</div></div>
+      <button type="button" onClick="{{ logout }}" style="display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-danger);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-sign-out" style="font-size:13px"></i>خروج</button>
     </section>
   </div>
 </sc-if>
@@ -502,141 +502,141 @@
 </sc-if>
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
-  <div style="flex:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32.5px;padding:50px">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:15px">
-      <div style="width:57.5px;height:57.5px;border-radius:16px;background:var(--bd-accent);color:var(--bd-accent-ink);display:grid;place-items:center"><i class="ph ph-brain" style="font-size:32.5px"></i></div>
-      <span style="font-family:Outfit,var(--bd-font);font-size:27.5px;font-weight:700;letter-spacing:-.02em">BrainDock</span>
+  <div style="flex:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:40px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:46px;height:46px;border-radius:13px;background:var(--bd-accent);color:var(--bd-accent-ink);display:grid;place-items:center"><i class="ph ph-brain" style="font-size:20.75px"></i></div>
+      <span style="font-family:Outfit,var(--bd-font);font-size:17.5px;font-weight:700;letter-spacing:-.02em">BrainDock</span>
     </div>
-    <div style="width:450px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:15px;padding:30px;box-shadow:var(--bd-shadow-lg);display:flex;flex-direction:column;gap:17.5px">
-      <div style="display:flex;flex-direction:column;gap:9px"><label style="font-size:15.5px;color:var(--bd-text-2)">نام کاربری</label>
-        <input placeholder="mani" style="height:50px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17px;outline:none">
+    <div style="width:360px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12px;padding:24px;box-shadow:var(--bd-shadow-lg);display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font-size:9.75px;color:var(--bd-text-2)">نام کاربری</label>
+        <input style="height:40px;padding:0 12px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11px;outline:none">
       </div>
-      <div style="display:flex;flex-direction:column;gap:9px"><label style="font-size:15.5px;color:var(--bd-text-2)">رمز عبور</label>
-        <input type="password" placeholder="••••••••" style="height:50px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17px;outline:none">
+      <div style="display:flex;flex-direction:column;gap:7px"><label style="font-size:9.75px;color:var(--bd-text-2)">رمز عبور</label>
+        <input type="password" style="height:40px;padding:0 12px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11px;outline:none">
       </div>
-      <button type="button" onClick="{{ login }}" style="height:52.5px;margin-top:5px;border:0;border-radius:10px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:17.5px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ورود</button>
+      <button type="button" onClick="{{ login }}" style="height:42px;margin-top:4px;border:0;border-radius:8px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:11.25px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ورود</button>
     </div>
   </div>
 </sc-if>
 
 <sc-if value="{{ isNote }}" hint-placeholder-val="{{ false }}">
 <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh">
-  <div style="position:sticky;top:0;z-index:1100;background:var(--bd-bg);border-bottom:1px solid var(--bd-border);display:flex;align-items:center;gap:10px;padding:14px 32.5px">
+  <div style="position:sticky;top:0;z-index:1100;background:var(--bd-bg);border-bottom:1px solid var(--bd-border);display:flex;align-items:center;gap:8px;padding:11px 26px">
     <div style="flex:1"></div>
-    <button type="button" onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:9px;height:42.5px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrow-right" style="font-size:19px"></i>برگشت</button>
-    <span style="display:inline-flex;align-items:center;gap:7.5px;font-size:15.5px;color:{{ savedColor }};padding:0 7.5px"><i class="ph ph-{{ savedIcon }}" style="font-size:19px"></i>{{ savedTxt }}</span>
-    <button type="button" onClick="{{ archiveNote }}" title="آرشیو" style="display:inline-flex;align-items:center;gap:9px;height:42.5px;padding:0 15px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-archive" style="font-size:20px"></i>آرشیو</button>
-    <button type="button" onClick="{{ deleteNote }}" title="حذف" style="display:inline-flex;align-items:center;gap:9px;height:42.5px;padding:0 15px;border:0;border-radius:10px;background:transparent;color:var(--bd-danger);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-trash" style="font-size:20px"></i>حذف</button>
+    <button type="button" onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrow-right" style="font-size:12px"></i>برگشت</button>
+    <span style="display:inline-flex;align-items:center;gap:6px;font-size:9.75px;color:{{ savedColor }};padding:0 6px"><i class="ph ph-{{ savedIcon }}" style="font-size:12px"></i>{{ savedTxt }}</span>
+    <button type="button" onClick="{{ archiveNote }}" title="آرشیو" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2);color:var(--bd-text)"><i class="ph ph-archive" style="font-size:13px"></i>آرشیو</button>
+    <button type="button" onClick="{{ deleteNote }}" title="حذف" style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--bd-danger);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-trash" style="font-size:13px"></i>حذف</button>
   </div>
 
-  <div style="flex:1;padding:80px 0 187.5px">
-    <div style="max-width:850px;margin:0 auto;padding:0 30px">
-      <h1 ref="{{ titleRef }}" onInput="{{ onEdit }}" suppressContentEditableWarning="{{ true }}" style="font-size:42.5px;font-weight:700;line-height:1.45;letter-spacing:-.02em;margin:0 0 22.5px;padding:2.5px 0">{{ note.title }}</h1>
+  <div style="flex:1;padding:64px 0 150px">
+    <div style="max-width:680px;margin:0 auto;padding:0 24px">
+      <h1 ref="{{ titleRef }}" onInput="{{ onEdit }}" suppressContentEditableWarning="{{ true }}" style="font-size:27.25px;font-weight:700;line-height:1.45;letter-spacing:-.02em;margin:0 0 18px;padding:2px 0">{{ note.title }}</h1>
 
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-bottom:27.5px;border-bottom:1px solid var(--bd-border);margin-bottom:37.5px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--bd-border);margin-bottom:30px">
         <div style="position:relative">
-          <button type="button" onClick="{{ nSt.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:37.5px;padding:0 14px;border:1px solid var(--bd-border);border-radius:124px;background:transparent;color:var(--bd-text);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="width:9px;height:9px;border-radius:124px;background:{{ note.stColor }}"></span>{{ nSt.label }}</button>
+          <button type="button" onClick="{{ nSt.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--bd-border);border-radius:99px;background:transparent;color:var(--bd-text);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="width:7px;height:7px;border-radius:99px;background:{{ note.stColor }}"></span>{{ nSt.label }}</button>
           <sc-if value="{{ nSt.open }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;inset-inline-start:0;top:45px;z-index:1300;min-width:225px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+            <div style="position:absolute;inset-inline-start:0;top:36px;z-index:1300;min-width:180px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
               <sc-for list="{{ nSt.opts }}" as="o" hint-placeholder-count="4">
-                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if></button>
+                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if></button>
               </sc-for>
             </div>
           </sc-if>
         </div>
         <div style="position:relative">
-          <button type="button" onClick="{{ nPr.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:37.5px;padding:0 14px;border:1px solid var(--bd-border);border-radius:124px;background:transparent;color:var(--bd-text);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="display:inline-flex;gap:4px"><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ note.o1 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ note.o2 }}"></span><span style="width:6px;height:6px;border-radius:124px;background:var(--bd-text-2);opacity:{{ note.o3 }}"></span></span>اولویت {{ nPr.label }}</button>
+          <button type="button" onClick="{{ nPr.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--bd-border);border-radius:99px;background:transparent;color:var(--bd-text);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="display:inline-flex;gap:3px"><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ note.o1 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ note.o2 }}"></span><span style="width:5px;height:5px;border-radius:99px;background:var(--bd-text-2);opacity:{{ note.o3 }}"></span></span>اولویت {{ nPr.label }}</button>
           <sc-if value="{{ nPr.open }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;inset-inline-start:0;top:45px;z-index:1300;min-width:187.5px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+            <div style="position:absolute;inset-inline-start:0;top:36px;z-index:1300;min-width:150px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
               <sc-for list="{{ nPr.opts }}" as="o" hint-placeholder-count="3">
-                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if></button>
+                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if></button>
               </sc-for>
             </div>
           </sc-if>
         </div>
         <div style="position:relative">
-          <button type="button" onClick="{{ nCat.toggle }}" style="display:inline-flex;align-items:center;gap:9px;height:37.5px;padding:0 14px;border:1px solid var(--bd-border);border-radius:124px;background:transparent;color:var(--bd-text);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="width:9px;height:9px;border-radius:124px;background:{{ note.catColor }}"></span>{{ nCat.label }}</button>
+          <button type="button" onClick="{{ nCat.toggle }}" style="display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--bd-border);border-radius:99px;background:transparent;color:var(--bd-text);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><span style="width:7px;height:7px;border-radius:99px;background:{{ note.catColor }}"></span>{{ nCat.label }}</button>
           <sc-if value="{{ nCat.open }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;inset-inline-start:0;top:45px;z-index:1300;min-width:225px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+            <div style="position:absolute;inset-inline-start:0;top:36px;z-index:1300;min-width:180px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
               <sc-for list="{{ nCat.opts }}" as="o" hint-placeholder-count="4">
-                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if></button>
+                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if></button>
               </sc-for>
             </div>
           </sc-if>
         </div>
         <div style="position:relative">
-          <button type="button" onClick="{{ nTagToggle }}" style="display:inline-flex;align-items:center;gap:9px;height:37.5px;padding:0 14px;border:1px solid var(--bd-border);border-radius:124px;background:transparent;color:var(--bd-text-2);font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-hash" style="font-size:17.5px"></i>{{ nTagsTxt }}</button>
+          <button type="button" onClick="{{ nTagToggle }}" style="display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--bd-border);border-radius:99px;background:transparent;color:var(--bd-text-2);font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-hash" style="font-size:11.25px"></i>{{ nTagsTxt }}</button>
           <sc-if value="{{ nTagOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;inset-inline-start:0;top:45px;z-index:1300;min-width:212.5px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);padding:6px;animation:bd-pop 150ms ease-out">
+            <div style="position:absolute;inset-inline-start:0;top:36px;z-index:1300;min-width:170px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);padding:5px;animation:bd-pop 150ms ease-out">
               <sc-for list="{{ nTags }}" as="o" hint-placeholder-count="4">
-                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--bd-text);font-size:16px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:17.5px;color:var(--bd-accent)"></i></sc-if></button>
+                <button type="button" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--bd-text);font-size:10.25px;cursor:pointer;text-align:right"><span style="flex:1;text-align:right">{{ o.label }}</span><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:11.25px;color:var(--bd-accent)"></i></sc-if></button>
               </sc-for>
             </div>
           </sc-if>
         </div>
-        <button type="button" onClick="{{ openRemFor }}" style="display:inline-flex;align-items:center;gap:9px;height:37.5px;padding:0 14px;border:1px solid var(--bd-border);border-radius:124px;background:transparent;color:{{ remChipColor }};font-size:15.5px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-bell" style="font-size:17.5px"></i>{{ remChipTxt }}</button>
+        <button type="button" onClick="{{ openRemFor }}" style="display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:1px solid var(--bd-border);border-radius:99px;background:transparent;color:{{ remChipColor }};font-size:9.75px;cursor:pointer" style-hover="background:var(--bd-surface-2)"><i class="ph ph-bell" style="font-size:11.25px"></i>{{ remChipTxt }}</button>
       </div>
 
-      <div ref="{{ bodyRef }}" onInput="{{ onEdit }}" suppressContentEditableWarning="{{ true }}" style="font-size:20.5px;line-height:2.05;color:var(--bd-text);min-height:350px">
-        <p style="margin:0 0 25px">مخاطب استوری حوصلهٔ ویدئوی بلند ندارد، ولی یک ترفند کوچک را ذخیره می‌کند و به دوستش می‌فرستد. پس هر روز فقط یک ترفند، در سه فریم: مشکل، راه‌حل، نتیجه.</p>
-        <h2 style="font-size:26px;font-weight:700;letter-spacing:-.02em;margin:37.5px 0 15px">قاعده‌های سری</h2>
-        <ul style="margin:0 0 25px;padding-inline-start:27.5px">
-          <li style="margin-bottom:7.5px">هر استوری زیر بیست ثانیه.</li>
-          <li style="margin-bottom:7.5px">فریم اول بدون حرف اضافه، فقط مشکل.</li>
+      <div ref="{{ bodyRef }}" onInput="{{ onEdit }}" suppressContentEditableWarning="{{ true }}" style="font-size:13.25px;line-height:2.05;color:var(--bd-text);min-height:280px">
+        <p style="margin:0 0 20px">مخاطب استوری حوصلهٔ ویدئوی بلند ندارد، ولی یک ترفند کوچک را ذخیره می‌کند و به دوستش می‌فرستد. پس هر روز فقط یک ترفند، در سه فریم: مشکل، راه‌حل، نتیجه.</p>
+        <h2 style="font-size:17px;font-weight:700;letter-spacing:-.02em;margin:30px 0 12px">قاعده‌های سری</h2>
+        <ul style="margin:0 0 20px;padding-inline-start:22px">
+          <li style="margin-bottom:6px">هر استوری زیر بیست ثانیه.</li>
+          <li style="margin-bottom:6px">فریم اول بدون حرف اضافه، فقط مشکل.</li>
           <li>آخر هر هفته یک جمع‌بندی از پربازدیدترین‌ها.</li>
         </ul>
-        <blockquote style="margin:0 0 25px;padding:2.5px 20px 2.5px 0;border-inline-start:2.5px solid var(--bd-border-2);color:var(--bd-text-2)">اگر ترفندی را در سه فریم نشد گفت، جای آن اینجا نیست؛ برای ویدئوی بلند نگهش دار.</blockquote>
-        <p style="margin:0 0 15px">فهرست اولیهٔ موضوع‌ها:</p>
-        <div style="margin-bottom:10px"><span style="display:inline-block;width:16px;height:16px;border:1.5px solid var(--bd-accent);border-radius:5px;background:var(--bd-accent-soft);vertical-align:-2.5px;margin-inline-end:11px"></span>جابه‌جایی سریع بین پرونده‌ها</div>
-        <div style="margin-bottom:10px"><span style="display:inline-block;width:16px;height:16px;border:1.5px solid var(--bd-text-3);border-radius:5px;vertical-align:-2.5px;margin-inline-end:11px"></span>ویرایش چندنقطه‌ای هم‌زمان</div>
-        <div><span style="display:inline-block;width:16px;height:16px;border:1.5px solid var(--bd-text-3);border-radius:5px;vertical-align:-2.5px;margin-inline-end:11px"></span>قالب‌بندی خودکار هنگام ذخیره</div>
+        <blockquote style="margin:0 0 20px;padding:2px 16px 2px 0;border-inline-start:2px solid var(--bd-border-2);color:var(--bd-text-2)">اگر ترفندی را در سه فریم نشد گفت، جای آن اینجا نیست؛ برای ویدئوی بلند نگهش دار.</blockquote>
+        <p style="margin:0 0 12px">فهرست اولیهٔ موضوع‌ها:</p>
+        <div style="margin-bottom:8px"><span style="display:inline-block;width:13px;height:13px;border:1.5px solid var(--bd-accent);border-radius:4px;background:var(--bd-accent-soft);vertical-align:-2px;margin-inline-end:9px"></span>جابه‌جایی سریع بین پرونده‌ها</div>
+        <div style="margin-bottom:8px"><span style="display:inline-block;width:13px;height:13px;border:1.5px solid var(--bd-text-3);border-radius:4px;vertical-align:-2px;margin-inline-end:9px"></span>ویرایش چندنقطه‌ای هم‌زمان</div>
+        <div><span style="display:inline-block;width:13px;height:13px;border:1.5px solid var(--bd-text-3);border-radius:4px;vertical-align:-2px;margin-inline-end:9px"></span>قالب‌بندی خودکار هنگام ذخیره</div>
       </div>
 
       <sc-if value="{{ hasImgs }}" hint-placeholder-val="{{ true }}">
-        <div style="margin-top:50px">
-          <div style="font-size:15.5px;font-weight:600;color:var(--bd-text-3);margin-bottom:15px">پیوست‌ها</div>
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px">
+        <div style="margin-top:40px">
+          <div style="font-size:9.75px;font-weight:600;color:var(--bd-text-3);margin-bottom:12px">پیوست‌ها</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
             <sc-for list="{{ imgs }}" as="g" hint-placeholder-count="3">
-              <div style="aspect-ratio:4/3;border:1px dashed var(--bd-border-2);border-radius:12.5px;background:var(--bd-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--bd-text-3);font-size:15px"><i class="ph ph-image" style="font-size:27.5px;opacity:.7"></i>{{ g.label }}</div>
+              <div style="aspect-ratio:4/3;border:1px dashed var(--bd-border-2);border-radius:10px;background:var(--bd-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--bd-text-3);font-size:9.75px"><i class="ph ph-image" style="font-size:17.5px;opacity:.7"></i>{{ g.label }}</div>
             </sc-for>
           </div>
         </div>
       </sc-if>
 
       <sc-if value="{{ hasAudio }}" hint-placeholder-val="{{ true }}">
-        <div style="margin-top:20px;display:flex;align-items:center;gap:17.5px;padding:16px 20px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12.5px;max-width:650px">
-          <button type="button" onClick="{{ togglePlay }}" title="پخش" style="flex:none;width:45px;height:45px;border:0;border-radius:124px;background:var(--bd-accent);color:var(--bd-accent-ink);cursor:pointer;display:grid;place-items:center"><i class="ph ph-{{ playIcon }}-fill" style="font-size:19px"></i></button>
-          <div style="flex:1;display:flex;align-items:center;gap:2.5px;height:37.5px">
+        <div style="margin-top:16px;display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:10px;max-width:520px">
+          <button type="button" onClick="{{ togglePlay }}" title="پخش" style="flex:none;width:36px;height:36px;border:0;border-radius:99px;background:var(--bd-accent);color:var(--bd-accent-ink);cursor:pointer;display:grid;place-items:center"><i class="ph ph-{{ playIcon }}-fill" style="font-size:12px"></i></button>
+          <div style="flex:1;display:flex;align-items:center;gap:2px;height:30px">
             <sc-for list="{{ wave }}" as="b" hint-placeholder-count="40">
-              <span style="flex:1;border-radius:124px;background:var(--bd-accent);height:{{ b.h }}px;opacity:{{ b.op }}"></span>
+              <span style="flex:1;border-radius:99px;background:var(--bd-accent);height:{{ b.h }}px;opacity:{{ b.op }}"></span>
             </sc-for>
           </div>
-          <span style="flex:none;font-size:15.5px;color:var(--bd-text-2)">۰:۴۷</span>
+          <span style="flex:none;font-size:9.75px;color:var(--bd-text-2)">۰:۴۷</span>
         </div>
       </sc-if>
     </div>
   </div>
 
-  <div style="position:fixed;inset-inline:0;bottom:0;z-index:1140;background:var(--bd-surface);border-top:1px solid var(--bd-border);padding:11px 32.5px;display:flex;align-items:center;gap:7.5px">
+  <div style="position:fixed;inset-inline:0;bottom:0;z-index:1140;background:var(--bd-surface);border-top:1px solid var(--bd-border);padding:9px 26px;display:flex;align-items:center;gap:6px">
     <sc-for list="{{ tools1 }}" as="t" hint-placeholder-count="5">
-      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:21px"></i></button>
+      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:13.25px"></i></button>
     </sc-for>
-    <span style="width:1px;height:27.5px;background:var(--bd-border);margin:0 6px"></span>
+    <span style="width:1px;height:22px;background:var(--bd-border);margin:0 5px"></span>
     <sc-for list="{{ tools2 }}" as="t" hint-placeholder-count="3">
-      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:21px"></i></button>
+      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:13.25px"></i></button>
     </sc-for>
-    <span style="width:1px;height:27.5px;background:var(--bd-border);margin:0 6px"></span>
+    <span style="width:1px;height:22px;background:var(--bd-border);margin:0 5px"></span>
     <sc-for list="{{ tools3 }}" as="t" hint-placeholder-count="3">
-      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:21px"></i></button>
+      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:13.25px"></i></button>
     </sc-for>
-    <span style="width:1px;height:27.5px;background:var(--bd-border);margin:0 6px"></span>
+    <span style="width:1px;height:22px;background:var(--bd-border);margin:0 5px"></span>
     <sc-for list="{{ tools4 }}" as="t" hint-placeholder-count="4">
-      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:21px"></i></button>
+      <button type="button" onMouseDown="{{ t.run }}" title="{{ t.title }}" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-{{ t.icon }}" style="font-size:13.25px"></i></button>
     </sc-for>
-    <span style="width:1px;height:27.5px;background:var(--bd-border);margin:0 6px"></span>
-    <button type="button" onClick="{{ addImg }}" title="افزودن عکس" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-image" style="font-size:21px"></i></button>
-    <button type="button" onClick="{{ addAudio }}" title="ضبط صدا" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-microphone" style="font-size:21px"></i></button>
-    <button type="button" onClick="{{ addAudio }}" title="آپلود صدا" style="width:42.5px;height:42.5px;border:0;border-radius:10px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-upload-simple" style="font-size:21px"></i></button>
+    <span style="width:1px;height:22px;background:var(--bd-border);margin:0 5px"></span>
+    <button type="button" onClick="{{ addImg }}" title="افزودن عکس" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-image" style="font-size:13.25px"></i></button>
+    <button type="button" onClick="{{ addAudio }}" title="ضبط صدا" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-microphone" style="font-size:13.25px"></i></button>
+    <button type="button" onClick="{{ addAudio }}" title="آپلود صدا" style="width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-3);color:var(--bd-text)"><i class="ph ph-upload-simple" style="font-size:13.25px"></i></button>
     <div style="flex:1"></div>
   </div>
 </div>
@@ -649,13 +649,13 @@
 <sc-if value="{{ quick }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;z-index:1400;background:var(--dialog-overlay-bg);display:grid;place-items:center">
     <div onClick="{{ closeQuick }}" style="position:absolute;inset:0"></div>
-    <div style="position:relative;width:537.5px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:15px;box-shadow:var(--bd-shadow-lg);padding:25px;animation:bd-in 160ms ease-out">
-      <div style="font-size:17.5px;font-weight:600;margin-bottom:16px">ثبت سریع ایده</div>
-      <div style="display:flex;gap:11px">
-        <input autoFocus="{{ true }}" value="{{ qt }}" onChange="{{ setQt }}" onKeyDown="{{ qkKey }}" placeholder="ایده‌ات چیست؟" style="flex:1;height:52.5px;padding:0 16px;border:1px solid var(--bd-border-2);border-radius:11px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17.5px;outline:none">
-        <button type="button" onClick="{{ submitQuick }}" style="height:52.5px;padding:0 25px;border:0;border-radius:11px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:17px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ثبت</button>
+    <div style="position:relative;width:430px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12px;box-shadow:var(--bd-shadow-lg);padding:20px;animation:bd-in 160ms ease-out">
+      <div style="font-size:11.25px;font-weight:600;margin-bottom:13px">ثبت سریع ایده</div>
+      <div style="display:flex;gap:9px">
+        <input autoFocus="{{ true }}" value="{{ qt }}" onChange="{{ setQt }}" onKeyDown="{{ qkKey }}" placeholder="ایده‌ات چیست؟" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--bd-border-2);border-radius:9px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11.25px;outline:none">
+        <button type="button" onClick="{{ submitQuick }}" style="height:42px;padding:0 20px;border:0;border-radius:9px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:11px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ثبت</button>
       </div>
-      <button type="button" onClick="{{ openFull }}" style="margin-top:15px;border:0;background:transparent;color:var(--bd-text-3);font-family:var(--bd-font);font-size:15.5px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:4px" style-hover="color:var(--bd-accent)">باز کردن ادیتور کامل</button>
+      <button type="button" onClick="{{ openFull }}" style="margin-top:12px;border:0;background:transparent;color:var(--bd-text-3);font-family:var(--bd-font);font-size:9.75px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px" style-hover="color:var(--bd-accent)">باز کردن ادیتور کامل</button>
     </div>
   </div>
 </sc-if>
@@ -663,23 +663,23 @@
 <sc-if value="{{ cdOpen }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;z-index:1400;background:var(--dialog-overlay-bg);display:grid;place-items:center">
     <div onClick="{{ cdClose }}" style="position:absolute;inset:0"></div>
-    <div style="position:relative;width:500px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:15px;box-shadow:var(--bd-shadow-lg);padding:25px;animation:bd-in 160ms ease-out">
-      <div style="font-size:17.5px;font-weight:600;margin-bottom:19px">{{ cdTitle }}</div>
-      <label style="display:block;font-size:15.5px;color:var(--bd-text-2);margin-bottom:9px">نام دسته</label>
-      <input autoFocus="{{ true }}" value="{{ cdName }}" onChange="{{ cdSetName }}" placeholder="مثلاً محتوای یوتیوب" style="width:100%;height:50px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17px;outline:none">
-      <label style="display:block;font-size:15.5px;color:var(--bd-text-2);margin:20px 0 11px">رنگ</label>
-      <div style="display:flex;gap:11px;flex-wrap:wrap">
+    <div style="position:relative;width:400px;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12px;box-shadow:var(--bd-shadow-lg);padding:20px;animation:bd-in 160ms ease-out">
+      <div style="font-size:11.25px;font-weight:600;margin-bottom:15px">{{ cdTitle }}</div>
+      <label style="display:block;font-size:9.75px;color:var(--bd-text-2);margin-bottom:7px">نام دسته</label>
+      <input autoFocus="{{ true }}" value="{{ cdName }}" onChange="{{ cdSetName }}" placeholder="مثلاً محتوای یوتیوب" style="width:100%;height:40px;padding:0 12px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11px;outline:none">
+      <label style="display:block;font-size:9.75px;color:var(--bd-text-2);margin:16px 0 9px">رنگ</label>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
         <sc-for list="{{ cdColors }}" as="c" hint-placeholder-count="8">
-          <button type="button" onClick="{{ c.pick }}" style="width:32.5px;height:32.5px;border:0;border-radius:124px;cursor:pointer;background:{{ c.color }};box-shadow:0 0 0 2.5px var(--bd-surface),0 0 0 5px {{ c.ring }}"></button>
+          <button type="button" onClick="{{ c.pick }}" style="width:26px;height:26px;border:0;border-radius:99px;cursor:pointer;background:{{ c.color }};box-shadow:0 0 0 2px var(--bd-surface),0 0 0 4px {{ c.ring }}"></button>
         </sc-for>
       </div>
-      <div style="display:flex;gap:11px;margin-top:27.5px">
+      <div style="display:flex;gap:9px;margin-top:22px">
         <sc-if value="{{ cdIsEdit }}" hint-placeholder-val="{{ false }}">
-          <button type="button" onClick="{{ cdDelete }}" style="height:47.5px;padding:0 17.5px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">حذف</button>
+          <button type="button" onClick="{{ cdDelete }}" style="height:38px;padding:0 14px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">حذف</button>
         </sc-if>
         <div style="flex:1"></div>
-        <button type="button" onClick="{{ cdClose }}" style="height:47.5px;padding:0 19px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">انصراف</button>
-        <button type="button" onClick="{{ cdSave }}" style="height:47.5px;padding:0 22.5px;border:0;border-radius:10px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:16px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ذخیره</button>
+        <button type="button" onClick="{{ cdClose }}" style="height:38px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">انصراف</button>
+        <button type="button" onClick="{{ cdSave }}" style="height:38px;padding:0 18px;border:0;border-radius:8px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:10.25px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ذخیره</button>
       </div>
     </div>
   </div>
@@ -688,85 +688,85 @@
 <sc-if value="{{ remOpen }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;z-index:1400;background:var(--dialog-overlay-bg);display:grid;place-items:center">
     <div onClick="{{ closeRem }}" style="position:absolute;inset:0"></div>
-    <div style="position:relative;width:590px;max-height:86vh;overflow-y:auto;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:15px;box-shadow:var(--bd-shadow-lg);animation:bd-in 160ms ease-out">
-      <div style="display:flex;align-items:center;gap:12.5px;padding:21px 25px 17.5px;border-bottom:1px solid var(--bd-border)">
+    <div style="position:relative;width:472px;max-height:86vh;overflow-y:auto;background:var(--bd-surface);border:1px solid var(--bd-border);border-radius:12px;box-shadow:var(--bd-shadow-lg);animation:bd-in 160ms ease-out">
+      <div style="display:flex;align-items:center;gap:10px;padding:17px 20px 14px;border-bottom:1px solid var(--bd-border)">
         <sc-if value="{{ remStep2 }}" hint-placeholder-val="{{ false }}">
-          <button type="button" onClick="{{ backStep }}" title="مرحلهٔ قبل" style="width:35px;height:35px;border:0;border-radius:9px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrow-right" style="font-size:19px"></i></button>
+          <button type="button" onClick="{{ backStep }}" title="مرحلهٔ قبل" style="width:28px;height:28px;border:0;border-radius:7px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center" style-hover="background:var(--bd-surface-2)"><i class="ph ph-arrow-right" style="font-size:12px"></i></button>
         </sc-if>
-        <span style="flex:1;font-size:17.5px;font-weight:600">یادآوری</span>
-        <span style="font-size:15.5px;color:var(--bd-text-3)">{{ typeLabel }}</span>
+        <span style="flex:1;font-size:11.25px;font-weight:600">یادآوری</span>
+        <span style="font-size:9.75px;color:var(--bd-text-3)">{{ typeLabel }}</span>
       </div>
 
-      <div style="padding:22.5px 25px">
+      <div style="padding:18px 20px">
         <sc-if value="{{ remStep1 }}" hint-placeholder-val="{{ true }}">
-          <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:8px">
             <sc-for list="{{ remTypes }}" as="t" hint-placeholder-count="5">
-              <button type="button" onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:14px;height:55px;padding:0 17.5px;border:1px solid {{ t.bc }};border-radius:11px;background:{{ t.bg }};color:var(--bd-text);font-family:var(--bd-font);font-size:17px;cursor:pointer;text-align:right" style-hover="border-color:var(--bd-border-2)">
-                <i class="ph ph-{{ t.icon }}" style="font-size:21px;color:var(--bd-text-2)"></i>
+              <button type="button" onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:11px;height:44px;padding:0 14px;border:1px solid {{ t.bc }};border-radius:9px;background:{{ t.bg }};color:var(--bd-text);font-family:var(--bd-font);font-size:11px;cursor:pointer;text-align:right" style-hover="border-color:var(--bd-border-2)">
+                <i class="ph ph-{{ t.icon }}" style="font-size:13.25px;color:var(--bd-text-2)"></i>
                 <span style="flex:1;text-align:right">{{ t.label }}</span>
-                <sc-if value="{{ t.sel }}" hint-placeholder-val="{{ false }}"><i class="ph-fill ph-check-circle" style="font-size:21px;color:var(--bd-accent)"></i></sc-if>
+                <sc-if value="{{ t.sel }}" hint-placeholder-val="{{ false }}"><i class="ph-fill ph-check-circle" style="font-size:13.25px;color:var(--bd-accent)"></i></sc-if>
               </button>
             </sc-for>
           </div>
         </sc-if>
         <sc-if value="{{ remStep2 }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:22.5px">
+          <div style="display:flex;flex-direction:column;gap:18px">
             <sc-if value="{{ isWeekly }}" hint-placeholder-val="{{ false }}">
               <div>
-                <div style="font-size:15.5px;color:var(--bd-text-2);margin-bottom:11px">روزهای هفته</div>
-                <div style="display:flex;gap:7.5px;flex-wrap:wrap">
+                <div style="font-size:9.75px;color:var(--bd-text-2);margin-bottom:9px">روزهای هفته</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
                   <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7">
-                    <button type="button" onClick="{{ d.pick }}" style="height:42.5px;padding:0 15px;border:1px solid {{ d.bc }};border-radius:10px;background:{{ d.bg }};color:{{ d.fg }};font-family:var(--bd-font);font-size:15.5px;cursor:pointer">{{ d.label }}</button>
+                    <button type="button" onClick="{{ d.pick }}" style="height:34px;padding:0 12px;border:1px solid {{ d.bc }};border-radius:8px;background:{{ d.bg }};color:{{ d.fg }};font-family:var(--bd-font);font-size:9.75px;cursor:pointer">{{ d.label }}</button>
                   </sc-for>
                 </div>
               </div>
             </sc-if>
             <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ false }}">
               <div>
-                <div style="font-size:15.5px;color:var(--bd-text-2);margin-bottom:11px">روز ماه</div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+                <div style="font-size:9.75px;color:var(--bd-text-2);margin-bottom:9px">روز ماه</div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">
                   <sc-for list="{{ doms }}" as="d" hint-placeholder-count="31">
-                    <button type="button" onClick="{{ d.pick }}" style="height:40px;border:1px solid var(--bd-border);border-radius:9px;background:{{ d.bg }};color:{{ d.fg }};font-family:var(--bd-font);font-size:15.5px;cursor:pointer">{{ d.txt }}</button>
+                    <button type="button" onClick="{{ d.pick }}" style="height:32px;border:1px solid var(--bd-border);border-radius:7px;background:{{ d.bg }};color:{{ d.fg }};font-family:var(--bd-font);font-size:9.75px;cursor:pointer">{{ d.txt }}</button>
                   </sc-for>
                 </div>
               </div>
             </sc-if>
             <sc-if value="{{ isExact }}" hint-placeholder-val="{{ false }}">
               <div>
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12.5px">
-                  <button type="button" onClick="{{ calNext }}" title="ماه بعد" style="width:35px;height:35px;border:1px solid var(--bd-border);border-radius:9px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center"><i class="ph ph-caret-left" style="font-size:17.5px"></i></button>
-                  <span style="flex:1;text-align:center;font-size:17px;font-weight:600">{{ calTitle }}</span>
-                  <button type="button" onClick="{{ calPrev }}" title="ماه قبل" style="width:35px;height:35px;border:1px solid var(--bd-border);border-radius:9px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center"><i class="ph ph-caret-right" style="font-size:17.5px"></i></button>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                  <button type="button" onClick="{{ calNext }}" title="ماه بعد" style="width:28px;height:28px;border:1px solid var(--bd-border);border-radius:7px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center"><i class="ph ph-caret-left" style="font-size:11.25px"></i></button>
+                  <span style="flex:1;text-align:center;font-size:11px;font-weight:600">{{ calTitle }}</span>
+                  <button type="button" onClick="{{ calPrev }}" title="ماه قبل" style="width:28px;height:28px;border:1px solid var(--bd-border);border-radius:7px;background:transparent;color:var(--bd-text-2);cursor:pointer;display:grid;place-items:center"><i class="ph ph-caret-right" style="font-size:11.25px"></i></button>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:7.5px;font-size:14px;color:var(--bd-text-3);text-align:center">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;font-size:9px;color:var(--bd-text-3);text-align:center">
                   <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
                   <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="35">
-                    <button type="button" onClick="{{ c.pick }}" style="height:40px;border:0;border-radius:10px;background:{{ c.bg }};color:{{ c.fg }};font-family:var(--bd-font);font-size:15.5px;cursor:pointer">{{ c.txt }}</button>
+                    <button type="button" onClick="{{ c.pick }}" style="height:32px;border:0;border-radius:8px;background:{{ c.bg }};color:{{ c.fg }};font-family:var(--bd-font);font-size:9.75px;cursor:pointer">{{ c.txt }}</button>
                   </sc-for>
                 </div>
               </div>
             </sc-if>
             <div>
-              <div style="font-size:15.5px;color:var(--bd-text-2);margin-bottom:11px">ساعت</div>
-              <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:9.75px;color:var(--bd-text-2);margin-bottom:9px">ساعت</div>
+              <div style="display:flex;align-items:center;gap:8px">
                 <div style="position:relative">
-                  <button type="button" onClick="{{ hToggle }}" style="display:inline-flex;align-items:center;gap:10px;height:47.5px;padding:0 17.5px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:17.5px;cursor:pointer"><i class="ph ph-clock" style="font-size:19px;color:var(--bd-text-3)"></i>{{ timeTxt }}<i class="ph ph-caret-down" style="font-size:15px;color:var(--bd-text-3)"></i></button>
+                  <button type="button" onClick="{{ hToggle }}" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-bg);color:var(--bd-text);font-family:var(--bd-font);font-size:11.25px;cursor:pointer"><i class="ph ph-clock" style="font-size:12px;color:var(--bd-text-3)"></i>{{ timeTxt }}<i class="ph ph-caret-down" style="font-size:9.75px;color:var(--bd-text-3)"></i></button>
                   <sc-if value="{{ hOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="position:absolute;inset-inline-start:0;top:55px;z-index:1500;width:287.5px;padding:10px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);display:grid;grid-template-columns:repeat(6,1fr);gap:5px;animation:bd-pop 150ms ease-out">
+                    <div style="position:absolute;inset-inline-start:0;top:44px;z-index:1500;width:230px;padding:8px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);display:grid;grid-template-columns:repeat(6,1fr);gap:4px;animation:bd-pop 150ms ease-out">
                       <sc-for list="{{ hours }}" as="h" hint-placeholder-count="24">
-                        <button type="button" onClick="{{ h.pick }}" style="height:35px;border:0;border-radius:7.5px;background:{{ h.bg }};color:{{ h.fg }};font-family:var(--bd-font);font-size:15px;cursor:pointer">{{ h.txt }}</button>
+                        <button type="button" onClick="{{ h.pick }}" style="height:28px;border:0;border-radius:6px;background:{{ h.bg }};color:{{ h.fg }};font-family:var(--bd-font);font-size:9.75px;cursor:pointer">{{ h.txt }}</button>
                       </sc-for>
                     </div>
                   </sc-if>
                 </div>
                 <div style="position:relative">
-                  <button type="button" onClick="{{ miToggle }}" style="height:47.5px;padding:0 17.5px;border:1px solid var(--bd-border-2);border-radius:10px;background:var(--bd-bg);color:var(--bd-text-2);font-family:var(--bd-font);font-size:16px;cursor:pointer">دقیقه</button>
+                  <button type="button" onClick="{{ miToggle }}" style="height:38px;padding:0 14px;border:1px solid var(--bd-border-2);border-radius:8px;background:var(--bd-bg);color:var(--bd-text-2);font-family:var(--bd-font);font-size:10.25px;cursor:pointer">دقیقه</button>
                   <sc-if value="{{ miOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="position:absolute;inset-inline-start:0;top:55px;z-index:1500;padding:10px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:12.5px;box-shadow:var(--bd-shadow-lg);display:flex;gap:5px;animation:bd-pop 150ms ease-out">
+                    <div style="position:absolute;inset-inline-start:0;top:44px;z-index:1500;padding:8px;background:var(--bd-surface-2);border:1px solid var(--bd-border-2);border-radius:10px;box-shadow:var(--bd-shadow-lg);display:flex;gap:4px;animation:bd-pop 150ms ease-out">
                       <sc-for list="{{ mins }}" as="m" hint-placeholder-count="4">
-                        <button type="button" onClick="{{ m.pick }}" style="width:47.5px;height:35px;border:0;border-radius:7.5px;background:{{ m.bg }};color:{{ m.fg }};font-family:var(--bd-font);font-size:15px;cursor:pointer">{{ m.txt }}</button>
+                        <button type="button" onClick="{{ m.pick }}" style="width:38px;height:28px;border:0;border-radius:6px;background:{{ m.bg }};color:{{ m.fg }};font-family:var(--bd-font);font-size:9.75px;cursor:pointer">{{ m.txt }}</button>
                       </sc-for>
                     </div>
                   </sc-if>
@@ -777,16 +777,16 @@
         </sc-if>
       </div>
 
-      <div style="border-top:1px solid var(--bd-border);padding:19px 25px;display:flex;flex-direction:column;gap:16px">
-        <div style="display:flex;align-items:center;gap:15px">
-          <x-import component-from-global-scope="UIUXProMaxDesignSystem_bf6e9f.Switch" checked="{{ remOn }}" onChange="{{ setRemOn }}" hint-size="50px,27.5px"></x-import>
-          <span style="flex:1;font-size:15.5px;color:var(--bd-text-2)">{{ remPreview }}</span>
+      <div style="border-top:1px solid var(--bd-border);padding:15px 20px;display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <x-import component-from-global-scope="UIUXProMaxDesignSystem_bf6e9f.Switch" checked="{{ remOn }}" onChange="{{ setRemOn }}" hint-size="40px,22px"></x-import>
+          <span style="flex:1;font-size:9.75px;color:var(--bd-text-2)">{{ remPreview }}</span>
         </div>
-        <div style="display:flex;gap:11px">
-          <button type="button" onClick="{{ delRem }}" style="height:47.5px;padding:0 17.5px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">حذف یادآوری</button>
+        <div style="display:flex;gap:9px">
+          <button type="button" onClick="{{ delRem }}" style="height:38px;padding:0 14px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-danger);font-family:var(--bd-font);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">حذف یادآوری</button>
           <div style="flex:1"></div>
-          <button type="button" onClick="{{ closeRem }}" style="height:47.5px;padding:0 19px;border:1px solid var(--bd-border-2);border-radius:10px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:16px;cursor:pointer" style-hover="background:var(--bd-surface-2)">انصراف</button>
-          <button type="button" onClick="{{ saveRem }}" style="height:47.5px;padding:0 22.5px;border:0;border-radius:10px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:16px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ذخیره</button>
+          <button type="button" onClick="{{ closeRem }}" style="height:38px;padding:0 15px;border:1px solid var(--bd-border-2);border-radius:8px;background:transparent;color:var(--bd-text);font-family:var(--bd-font);font-size:10.25px;cursor:pointer" style-hover="background:var(--bd-surface-2)">انصراف</button>
+          <button type="button" onClick="{{ saveRem }}" style="height:38px;padding:0 18px;border:0;border-radius:8px;background:var(--bd-accent);color:var(--bd-accent-ink);font-family:var(--bd-font);font-size:10.25px;font-weight:600;cursor:pointer" style-hover="background:var(--bd-accent-hover)">ذخیره</button>
         </div>
       </div>
     </div>
@@ -794,7 +794,7 @@
 </sc-if>
 
 <sc-if value="{{ showFab }}" hint-placeholder-val="{{ true }}">
-  <button type="button" onClick="{{ openQuick }}" title="ثبت سریع ایده" style="position:fixed;left:35px;bottom:{{ fabBottom }};z-index:1150;width:67.5px;height:67.5px;border:0;border-radius:124px;background:var(--bd-accent);color:var(--bd-accent-ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 12.5px 30px -10px rgba(16,185,129,.5)" style-hover="background:var(--bd-accent-hover)"><i class="ph ph-plus" style="font-size:30px"></i></button>
+  <button type="button" onClick="{{ openQuick }}" title="ثبت سریع ایده" style="position:fixed;left:28px;bottom:{{ fabBottom }};z-index:1150;width:54px;height:54px;border:0;border-radius:99px;background:var(--bd-accent);color:var(--bd-accent-ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 10px 24px -8px rgba(16,185,129,.5)" style-hover="background:var(--bd-accent-hover)"><i class="ph ph-plus" style="font-size:19px"></i></button>
 </sc-if>
 
 </div>
@@ -917,10 +917,10 @@ class Component extends DCLogic {
       const act=st.cat===c.id&&st.route==='ideas';
       return Object.assign({},c,{
         countTxt:this.fa(st.ideas.filter(i=>i.cat===c.id&&!i.arch).length),
-        tab:act,me:act?'0':'10px',radius:act?'0 21px 21px 0':'10px',fw:act?600:400,
+        tab:act,me:act?'0':'8px',radius:act?'0 17px 17px 0':'8px',fw:act?600:400,
         fg:act?'var(--bd-accent)':'var(--bd-sb-fg-2)',hfg:act?'var(--bd-accent)':'var(--bd-sb-fg)',
         bg:act?'var(--bd-bg)':'transparent',hbg:act?'var(--bd-bg)':'var(--bd-sb-hover)',
-        dotShadow:act?'0 0 0 4px '+c.color+'22':'0 0 0 1.5px var(--bd-sb-fg)',countFg:act?'var(--bd-text-3)':'var(--bd-sb-fg-3)',
+        dotShadow:act?'0 0 0 3px '+c.color+'22':'0 0 0 1.5px var(--bd-sb-fg)',countFg:act?'var(--bd-text-3)':'var(--bd-sb-fg-3)',
         menuFg:act?'var(--bd-text-3)':'var(--bd-sb-fg-3)',menuHbg:act?'var(--bd-surface-2)':'var(--bd-sb-hover)',menuHfg:act?'var(--bd-text)':'var(--bd-sb-fg)',
         open:st.menu==='cat-'+c.id,
         pick:()=>this.setState({route:'ideas',cat:c.id,menu:null,page:1}),
@@ -1006,7 +1006,7 @@ class Component extends DCLogic {
     const d=this.dec(i,0);
     const allTags=[];st.ideas.forEach(x=>x.tags.forEach(t=>{if(allTags.indexOf(t)<0)allTags.push(t);}));
     const imgs=[];for(let k=0;k<i.img;k++)imgs.push({k:k,label:'عکس '+this.fa(k+1)});
-    const wave=[];for(let k=0;k<56;k++)wave.push({h:Math.round((5+Math.round(18*Math.abs(Math.sin(k*1.7)))+(k%3))*1.25),op:k<22?1:.35});
+    const wave=[];for(let k=0;k<56;k++)wave.push({h:Math.round((5+Math.round(18*Math.abs(Math.sin(k*1.7)))+(k%3))),op:k<22?1:.35});
     const T=(icon,title,c,a)=>({icon:icon,title:title,run:this.cmd(c,a)});
     return {
       note:d,noteId:i.id,
@@ -1035,7 +1035,7 @@ class Component extends DCLogic {
       playIcon:st.playing?'pause':'play',
       tools1:[T('text-b','ضخیم','bold'),T('text-italic','مورب','italic'),T('text-underline','زیرخط','underline'),T('text-strikethrough','خط‌خورده','strikeThrough'),T('highlighter','هایلایت','hiliteColor','rgba(245,158,11,.35)')],
       tools2:[T('text-h-one','عنوان بزرگ','formatBlock','H1'),T('text-h-two','عنوان متوسط','formatBlock','H2'),T('text-h-three','عنوان کوچک','formatBlock','H3')],
-      tools3:[T('list-bullets','لیست نقطه‌ای','insertUnorderedList'),T('list-numbers','لیست شماره‌دار','insertOrderedList'),T('check-square','چک‌لیست','insertHTML','<div><span style="display:inline-block;width:16px;height:16px;border:1.5px solid #9BA1A7;border-radius:5px;vertical-align:-2.5px;margin-inline-end:10px"></span>مورد جدید</div>')],
+      tools3:[T('list-bullets','لیست نقطه‌ای','insertUnorderedList'),T('list-numbers','لیست شماره‌دار','insertOrderedList'),T('check-square','چک‌لیست','insertHTML','<div><span style="display:inline-block;width:13px;height:13px;border:1.5px solid #9BA1A7;border-radius:4px;vertical-align:-2px;margin-inline-end:8px"></span>مورد جدید</div>')],
       tools4:[T('quotes','نقل‌قول','formatBlock','BLOCKQUOTE'),T('code','کد','formatBlock','PRE'),T('link','لینک','createLink','#'),T('minus','جداکننده','insertHorizontalRule')]
     };
   }
@@ -1118,7 +1118,7 @@ class Component extends DCLogic {
       const act=st.route===r&&!(r==='ideas'&&st.cat);
       return {label:label,icon:icon,go:()=>this.setState({route:r,cat:r==='ideas'?null:st.cat,menu:null,page:1}),
         fg:act?'var(--bd-accent)':'var(--bd-sb-fg-2)',hfg:act?'var(--bd-accent)':'var(--bd-sb-fg)',bg:act?'var(--bd-bg)':'transparent',hbg:act?'var(--bd-bg)':'var(--bd-sb-hover)',fw:act?600:400,
-        me:act?'0':'10px',radius:act?'0 24px 24px 0':'11px',
+        me:act?'0':'8px',radius:act?'0 19px 19px 0':'9px',
         badge:r==='notifications'&&unread>0,badgeTxt:this.fa(unread),badgeBg:act?'var(--bd-accent)':'var(--bd-sb-fg)',badgeFg:act?'var(--bd-accent-ink)':'var(--bd-sb-bg)',active:act};
     });
     const today=live.filter(i=>i.rem&&i.rem.on&&(i.rem.type==='daily'||(i.rem.type==='exact'&&this.abs(i.rem.date)===this.abs(this.TODAY)))).map((i,x)=>this.dec(i,x));
@@ -1130,7 +1130,7 @@ class Component extends DCLogic {
     return Object.assign({
       light:dark?'':'bd-light',expanded:exp,sbw:exp?312:82,
       logoClick:()=>{if(this.state.collapsed)this.setState({collapsed:false,menu:null});},logoTitle:exp?'BrainDock':'باز کردن نوار',logoCursor:exp?'default':'pointer',
-      hdrTitle:hdr[0],hdrSub:hdr[1],hasHdrSub:!!hdr[1],hdrSize:r==='dashboard'?'32.5px':'27.5px',hdrDot:lv.hasDot&&r==='ideas',
+      hdrTitle:hdr[0],hdrSub:hdr[1],hasHdrSub:!!hdr[1],hdrSize:r==='dashboard'?'26px':'22px',hdrDot:lv.hasDot&&r==='ideas',
       searchOpen:searchOpen,searchClosed:!searchOpen,
       openSearch:()=>this.setState({searchOpen:true,menu:null}),
       closeSearch:()=>this.setState({searchOpen:false,q:'',page:1}),
@@ -1149,7 +1149,7 @@ class Component extends DCLogic {
       setDark:()=>this.setState({theme:'dark'}),setLight:()=>this.setState({theme:'light'}),
       toggleCollapse:()=>this.setState(s=>({collapsed:!s.collapsed,menu:null})),
       anyMenu:!!st.menu,closeMenu:()=>this.setState({menu:null}),
-      showFab:st.route!=='login',fabBottom:st.route==='note'?'107.5px':'35px',
+      showFab:st.route!=='login',fabBottom:st.route==='note'?'86px':'28px',
       openQuick:()=>this.openQuick(),
       today:today,noToday:today.length===0,nToday:this.fa(today.length),
       week:week,noWeek:week.length===0,nWeek:this.fa(week.length),

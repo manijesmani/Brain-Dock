@@ -7,11 +7,10 @@ Nginx via X-Accel-Redirect so Python is not tied up streaming them.
 """
 
 from typing import ClassVar
-from urllib.parse import quote
 
-from django.conf import settings
 from django.db.models import QuerySet
-from django.http import FileResponse, HttpResponse
+from django.db.models.fields.files import FieldFile
+from django.http import HttpResponse
 from rest_framework import mixins, status, viewsets
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -22,6 +21,8 @@ from rest_framework.views import APIView
 from apps.ideas import selectors, services
 from apps.ideas.models import Attachment
 from apps.ideas.serializers import AttachmentSerializer, AttachmentUploadSerializer
+from apps.users import plans
+from core.files import private_file_response
 from core.permissions import IsOwner
 
 
@@ -47,6 +48,11 @@ class AttachmentViewSet(
         return queryset
 
     def create(self, request: Request, *args: object, **kwargs: object) -> Response:
+        # Refused before the upload is inspected, which is the costly part.
+        # The service checks again for every other caller.
+        if not plans.can_attach_media(request.user):
+            raise plans.PremiumRequired()
+
         serializer = AttachmentUploadSerializer(
             data=request.data, context=self.get_serializer_context()
         )
@@ -72,17 +78,10 @@ class BaseAttachmentFileView(APIView):
     def get_attachment(self, request: Request, pk: int) -> Attachment | None:
         return selectors.attachment_queryset(owner=request.user).filter(pk=pk).first()
 
-    def deliver(self, *, file_field: object, content_type: str, filename: str) -> HttpResponse:
-        if settings.DEBUG:
-            # No Nginx in front of the development server, so Django serves
-            # the bytes itself.
-            return FileResponse(file_field.open("rb"), content_type=content_type)
-
-        response = HttpResponse(content_type=content_type)
-        response["X-Accel-Redirect"] = f"{settings.MEDIA_INTERNAL_URL}{quote(file_field.name)}"
-        # The name may be Persian, so it is sent in the RFC 5987 form only.
-        response["Content-Disposition"] = f"inline; filename*=UTF-8''{quote(filename)}"
-        return response
+    def deliver(self, *, file_field: FieldFile, content_type: str, filename: str) -> HttpResponse:
+        return private_file_response(
+            file_field=file_field, content_type=content_type, filename=filename
+        )
 
 
 class AttachmentFileView(BaseAttachmentFileView):

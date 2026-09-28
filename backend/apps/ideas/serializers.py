@@ -114,7 +114,8 @@ class AttachmentUploadSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         request = self.context.get("request")
         if request is not None and request.user.is_authenticated:
-            self.fields["idea"].queryset = Idea.objects.filter(owner=request.user)
+            # Nothing is added to an idea in the trash.
+            self.fields["idea"].queryset = Idea.objects.filter(owner=request.user).outside_trash()
 
 
 class IdeaSerializer(serializers.ModelSerializer):
@@ -223,6 +224,16 @@ class IdeaListSerializer(IdeaSerializer):
     def get_has_attachments(self, obj: Idea) -> bool:
         # Reads the prefetched rows rather than issuing a COUNT per idea.
         return bool(obj.attachments.all())
+
+
+class TrashedIdeaSerializer(IdeaListSerializer):
+    """A row of the trash: the listing's fields, and when it was deleted."""
+
+    deleted_at = serializers.DateTimeField(read_only=True)
+
+    class Meta(IdeaListSerializer.Meta):
+        fields = [*IdeaListSerializer.Meta.fields, "deleted_at"]
+        read_only_fields = fields
 
 
 class IdeaStatusChoiceSerializer(serializers.Serializer):

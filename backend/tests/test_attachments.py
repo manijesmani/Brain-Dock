@@ -272,14 +272,17 @@ class TestAttachmentLifecycle:
         assert not Path(file_path).exists()
         assert not Path(thumbnail_path).exists()
 
-    def test_deleting_an_idea_removes_its_attachment_files(
+    def test_deleting_an_idea_for_good_removes_its_attachment_files(
         self, auth_client: APIClient, user: User
     ) -> None:
         idea = IdeaFactory(owner=user)
         upload(auth_client, idea.pk, image_upload(), AttachmentKind.IMAGE)
         file_path = Attachment.objects.get().file.path
 
+        # Deleting moves the idea to the trash; emptying it there is what
+        # deletes for good.
         auth_client.delete(reverse("ideas:idea-detail", args=[idea.pk]))
+        auth_client.delete(reverse("ideas:trash-detail", args=[idea.pk]))
 
         from pathlib import Path
 

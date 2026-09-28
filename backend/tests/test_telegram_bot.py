@@ -21,7 +21,7 @@ from apps.reminders.models import DeliveryChannel, DeliveryStatus, ReminderRecur
 from apps.telegrambot import handlers, messages
 from apps.telegrambot.models import TelegramLinkToken
 from apps.users.models import User
-from tests.factories import IdeaFactory
+from tests.factories import IdeaFactory, UserFactory
 from tests.media_fixtures import image_bytes
 
 pytestmark = pytest.mark.django_db
@@ -64,6 +64,12 @@ def recorder(monkeypatch) -> BotRecorder:
     for module in ("apps.telegrambot.handlers", "apps.notifications.channels.telegram"):
         monkeypatch.setattr(f"{module}.bot", recording, raising=False)
     return recording
+
+
+@pytest.fixture
+def user() -> User:
+    """The bot serves the site's owner alone, so that is who uses it here."""
+    return UserFactory(is_superuser=True)
 
 
 @pytest.fixture
@@ -170,6 +176,8 @@ class TestAccountLinking:
         self, recorder, linked_user: User, other_user: User
     ) -> None:
         """Otherwise a second person's ideas would land in the first's account."""
+        other_user.is_superuser = True
+        other_user.save(update_fields=["is_superuser"])
         token = TelegramLinkToken.objects.create(
             user=other_user, expires_at=timezone.now() + timedelta(minutes=10)
         )
@@ -482,11 +490,10 @@ class TestWebhookEndpoint:
         assert response.status_code == 403
 
     def test_a_valid_secret_is_accepted_and_never_retried(
-        self, api_client: APIClient, settings, monkeypatch
+        self, api_client: APIClient, settings
     ) -> None:
         """Anything but 200 makes Telegram redeliver the same update forever."""
         settings.TELEGRAM_WEBHOOK_SECRET = "correct-secret"
-        monkeypatch.setattr("apps.telegrambot.views.bot.get_bot", lambda: None, raising=False)
 
         response = api_client.post(
             reverse("telegrambot:webhook"),
@@ -497,11 +504,8 @@ class TestWebhookEndpoint:
 
         assert response.status_code == 200
 
-    def test_a_broken_payload_still_answers_200(
-        self, api_client: APIClient, settings, monkeypatch
-    ) -> None:
+    def test_a_broken_payload_still_answers_200(self, api_client: APIClient, settings) -> None:
         settings.TELEGRAM_WEBHOOK_SECRET = "correct-secret"
-        monkeypatch.setattr("apps.telegrambot.views.bot.get_bot", lambda: None, raising=False)
 
         response = api_client.post(
             reverse("telegrambot:webhook"),

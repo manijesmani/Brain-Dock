@@ -1,0 +1,41 @@
+# BrainDock -- the Celery beat scheduler.
+#
+# Exactly one of these may run. Two schedulers would fire every reminder
+# twice; the delivery table's unique constraint would stop the second send,
+# but the correct number is still one.
+#
+# Installed and restarted by deploy/deploy.sh.
+
+[Unit]
+Description=BrainDock Celery beat
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=exec
+User=braindock
+Group=braindock
+WorkingDirectory=/srv/braindock/app/backend
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+Environment=PYTHONUNBUFFERED=1
+
+# /var/lib/braindock survives restarts and redeploys. The schedule file in it
+# records when each entry last ran; losing it would make beat treat every
+# entry as new and send the daily stale digest a second time.
+StateDirectory=braindock
+
+# --pidfile= is empty on purpose: a pid file left by an unclean stop would
+# keep the scheduler from starting again, and systemd already tracks the pid.
+ExecStart=/srv/braindock/app/backend/.venv/bin/celery -A config beat \
+    --loglevel=INFO \
+    --schedule=/var/lib/braindock/celerybeat-schedule \
+    --pidfile=
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

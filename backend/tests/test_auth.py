@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.core.cache import cache
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -129,4 +130,4 @@ class TestCsrf:
         response = api_client.get(reverse("users:csrf"))
 
         assert response.status_code == 200
-        assert "csrftoken" in response.cookies
+        assert settings.CSRF_COOKIE_NAME in response.cookies

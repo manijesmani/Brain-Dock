@@ -12,6 +12,7 @@ from typing import Any
 from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
 from django.db.models.functions import Lower
+from django.utils import timezone
 
 from apps.ideas.attachments import prepare_audio, prepare_image
 from apps.ideas.content import extract_plain_text, sanitize_document
@@ -24,11 +25,30 @@ from apps.ideas.models import (
     IdeaStatus,
     Tag,
 )
+from apps.users import plans
 from apps.users.models import User
 
 # The status an idea returns to when it is taken out of the archive. The
 # design reference resets to "idea" rather than restoring the previous value.
 RESTORED_STATUS = IdeaStatus.IDEA
+
+
+def ensure_room_for_an_idea(owner: User) -> None:
+    """Refuses another idea to an account already holding all it may.
+
+    Archived ideas count too: archiving is a status, not a way around the
+    limit. Ideas in the trash do not -- deleting one frees its place -- and
+    so taking one back out of the trash asks for a place like a new idea.
+    The account's row is locked first, so two requests racing for the last
+    free place cannot both find it free.
+    """
+    limit = plans.idea_limit(owner)
+    if limit is None:
+        return
+
+    User.objects.select_for_update().only("pk").get(pk=owner.pk)
+    if Idea.objects.filter(owner=owner).outside_trash().count() >= limit:
+        raise plans.IdeaLimitReached(limit)
 
 
 def create_category(*, owner: User, name: str, color: str) -> Category:
@@ -107,6 +127,7 @@ def create_idea(
     status: str = IdeaStatus.IDEA,
     priority: str = IdeaPriority.MID,
 ) -> Idea:
+    ensure_room_for_an_idea(owner)
     document = sanitize_document(content)
 
     idea = Idea.objects.create(
@@ -169,6 +190,9 @@ def create_attachment(*, idea: Idea, upload: UploadedFile, kind: str) -> Attachm
     The declared kind decides which inspector runs; the inspector then decides
     whether the bytes really are what they claim to be.
     """
+    if not plans.can_attach_media(idea.owner):
+        raise plans.PremiumRequired()
+
     original_name = (upload.name or "")[:255]
 
     if kind == AttachmentKind.IMAGE:
@@ -225,3 +249,31 @@ def restore_idea(*, idea: Idea) -> Idea:
     idea.status = RESTORED_STATUS
     idea.save(update_fields=["status", "updated_at"])
     return idea
+
+
+# The trash. `updated_at` is left as it was on the way in and out: being
+# deleted is not an edit, and a restored idea should sort, and count as
+# stale, exactly as it did before.
+
+
+def trash_idea(*, idea: Idea) -> Idea:
+    """Moves an idea to the trash. Its status -- archived or not -- is kept."""
+    if idea.deleted_at is None:
+        idea.deleted_at = timezone.now()
+        idea.save(update_fields=["deleted_at"])
+    return idea
+
+
+@transaction.atomic
+def untrash_idea(*, idea: Idea) -> Idea:
+    """Takes an idea back out of the trash, to wherever it was before."""
+    if idea.deleted_at is not None:
+        ensure_room_for_an_idea(idea.owner)
+        idea.deleted_at = None
+        idea.save(update_fields=["deleted_at"])
+    return idea
+
+
+def delete_idea(*, idea: Idea) -> None:
+    """Deletes an idea for good: its attachments' files, reminders and all."""
+    idea.delete()

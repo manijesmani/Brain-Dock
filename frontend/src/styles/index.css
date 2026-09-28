@@ -30,10 +30,10 @@
   --font-wordmark: "Outfit", "Vazirmatn Variable", system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* The interface is drawn at 125% of the original mock, as the design file
-     now is. Every length below is scaled, and so is the spacing unit behind
-     Tailwind's numeric utilities (p-3, gap-2, size-7 and the rest). */
-  --spacing: calc(0.25rem * 1.25);
+  /* The interface is drawn at the original mock's own size, as the design
+     file now is, after a spell at 125% and 112.5%. That is also Tailwind's
+     own spacing unit, behind p-3, gap-2, size-7 and the rest. */
+  --spacing: 0.25rem;
 
   /* Surfaces */
   --color-bd-bg: #0f1113;
@@ -73,6 +73,10 @@
   --color-bd-warn: #fbbf24;
   --color-bd-warn-bg: rgba(245, 158, 11, 0.12);
   --color-bd-danger: #f87171;
+  --color-bd-danger-bg: rgba(248, 113, 113, 0.1);
+  /* A filled button, white on red: the plain danger ink is too light for it. */
+  --color-bd-danger-solid: #dc2626;
+  --color-bd-danger-solid-hover: #b91c1c;
 
   /* Sidebar: a deep emerald fill with white ink at three strengths */
   --color-bd-sb-bg: #064e3b;
@@ -84,14 +88,14 @@
   --color-bd-sb-line: rgba(255, 255, 255, 0.12);
 
   /* Radii */
-  --radius-button: 10px;
-  --radius-input: 10px;
-  --radius-card: 12.5px;
-  --radius-dialog: 15px;
+  --radius-button: 8px;
+  --radius-input: 8px;
+  --radius-card: 10px;
+  --radius-dialog: 12px;
 
   /* Shadows */
-  --shadow-bd: 0 1px 2.5px rgba(0, 0, 0, 0.35);
-  --shadow-bd-lg: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+  --shadow-bd: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-bd-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.7);
 
   /* Entrance animations */
   --animate-bd-in: bd-in 200ms ease-out;
@@ -146,6 +150,9 @@
   --color-bd-warn: #b45309;
   --color-bd-warn-bg: rgba(180, 83, 9, 0.09);
   --color-bd-danger: #dc2626;
+  --color-bd-danger-bg: rgba(220, 38, 38, 0.07);
+  --color-bd-danger-solid: #dc2626;
+  --color-bd-danger-solid-hover: #b91c1c;
 
   --color-bd-sb-bg: #047857;
   --color-bd-sb-fg: #ffffff;
@@ -155,14 +162,53 @@
   --color-bd-sb-active: rgba(255, 255, 255, 0.17);
   --color-bd-sb-line: rgba(255, 255, 255, 0.16);
 
-  --shadow-bd: 0 1px 2.5px rgba(16, 24, 40, 0.06);
-  --shadow-bd-lg: 0 20px 45px -20px rgba(16, 24, 40, 0.22);
+  --shadow-bd: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-bd-lg: 0 16px 36px -16px rgba(16, 24, 40, 0.22);
+}
+
+/*
+ * The height of the screen as it is actually visible. On a phone 100vh is
+ * the height with the browser's own bars hidden, so a page that tall ran
+ * underneath them; dvh follows the bars as they come and go. A browser that
+ * does not know dvh keeps the vh line.
+ */
+@utility min-h-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@utility h-page {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/*
+ * Touch targets. On a touch screen every button and link answers to at
+ * least 44 x 44 pixels -- Apple's and Google's minimum -- even where it is
+ * drawn smaller, through an invisible area centred on it. Nothing moves or
+ * changes size; only where a finger counts as a hit.
+ *
+ * Kept in the base layer, so an `absolute` or `fixed` utility on a control
+ * still decides its position.
+ */
+@layer base {
+  :where(button, a[href]) {
+    position: relative;
+  }
+
+  @media (pointer: coarse) {
+    :where(button, a[href])::after {
+      content: "";
+      position: absolute;
+      inset: min(0px, calc((100% - 44px) / 2));
+    }
+  }
 }
 
 @keyframes bd-in {
   from {
     opacity: 0;
-    transform: translateY(7.5px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -173,7 +219,7 @@
 @keyframes bd-pop {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
@@ -206,7 +252,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: 12.5px;
+  border-radius: 10px;
   background: var(--color-bd-surface);
   border: 1px solid var(--color-bd-border);
   box-shadow: var(--shadow-bd);
@@ -229,10 +275,21 @@
 }
 
 .bd-trow:hover::before {
-  inset: -4px -12.5px;
+  inset: -3px -10px;
   background: var(--color-bd-accent);
   border-color: var(--color-bd-accent);
-  box-shadow: 0 17.5px 37.5px -15px color-mix(in srgb, var(--color-bd-accent) 60%, transparent);
+  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--color-bd-accent) 60%, transparent);
+}
+
+/* Strips that scroll sideways on a narrow screen -- the status tabs, the
+   editor toolbar -- are moved by touch; a scrollbar under them would only
+   take room. */
+.bd-no-scrollbar {
+  scrollbar-width: none;
+}
+
+.bd-no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Base element styling, mirroring the `[data-bd]` rules in the design file. */
@@ -247,7 +304,7 @@
     background: var(--color-bd-bg);
     color: var(--color-bd-text);
     font-family: var(--font-sans);
-    font-size: 17.5px;
+    font-size: 14px;
     line-height: 1.6;
   }
 
@@ -264,14 +321,14 @@
   }
 
   ::-webkit-scrollbar {
-    width: 12.5px;
-    height: 12.5px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
     background: var(--color-bd-border-2);
-    border-radius: 10px;
-    border: 4px solid transparent;
+    border-radius: 8px;
+    border: 3px solid transparent;
     background-clip: content-box;
   }
 }
@@ -284,40 +341,40 @@
  * mock -- which drew the same markup by hand.
  */
 .bd-prose {
-  font-size: 20.5px;
+  font-size: 16.5px;
   line-height: 2.05;
   color: var(--color-bd-text);
 }
 
 .bd-prose p {
-  margin: 0 0 25px;
+  margin: 0 0 20px;
 }
 
 .bd-prose h1 {
-  font-size: 31px;
+  font-size: 25px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 40px 0 17.5px;
+  margin: 32px 0 14px;
 }
 
 .bd-prose h2 {
-  font-size: 26px;
+  font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 37.5px 0 15px;
+  margin: 30px 0 12px;
 }
 
 .bd-prose h3 {
-  font-size: 22.5px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 32.5px 0 12.5px;
+  margin: 26px 0 10px;
 }
 
 .bd-prose ul,
 .bd-prose ol {
-  margin: 0 0 25px;
-  padding-inline-start: 27.5px;
+  margin: 0 0 20px;
+  padding-inline-start: 22px;
 }
 
 .bd-prose ul {
@@ -329,7 +386,7 @@
 }
 
 .bd-prose li {
-  margin-bottom: 7.5px;
+  margin-bottom: 6px;
 }
 
 .bd-prose li:last-child {
@@ -337,20 +394,20 @@
 }
 
 .bd-prose blockquote {
-  margin: 0 0 25px;
-  padding: 2.5px 20px 2.5px 0;
-  border-inline-start: 2.5px solid var(--color-bd-border-2);
+  margin: 0 0 20px;
+  padding: 2px 16px 2px 0;
+  border-inline-start: 2px solid var(--color-bd-border-2);
   color: var(--color-bd-text-2);
 }
 
 .bd-prose pre {
-  margin: 0 0 25px;
-  padding: 17.5px 20px;
-  border-radius: 12.5px;
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 10px;
   background: var(--color-bd-surface-2);
   border: 1px solid var(--color-bd-border);
   font-family: var(--font-mono);
-  font-size: 17px;
+  font-size: 13.5px;
   line-height: 1.8;
   overflow-x: auto;
   direction: ltr;
@@ -363,13 +420,13 @@
 }
 
 .bd-prose :not(pre) > code {
-  padding: 1px 7.5px;
-  border-radius: 6px;
+  padding: 1px 6px;
+  border-radius: 5px;
   background: var(--color-bd-surface-2);
 }
 
 .bd-prose hr {
-  margin: 32.5px 0;
+  margin: 26px 0;
   border: 0;
   border-top: 1px solid var(--color-bd-border);
 }
@@ -377,11 +434,31 @@
 .bd-prose mark {
   background: rgba(245, 158, 11, 0.35);
   color: inherit;
-  padding: 0 2.5px;
-  border-radius: 4px;
+  padding: 0 2px;
+  border-radius: 3px;
 }
 
-/* Task lists: the design draws a 16px square with a 1.5px border, filled with
+/* A phone reads closer to the eye: the same rhythm, one step smaller. */
+@media (width < 40rem) {
+  .bd-prose {
+    font-size: 14.5px;
+    line-height: 1.95;
+  }
+
+  .bd-prose h1 {
+    font-size: 21px;
+  }
+
+  .bd-prose h2 {
+    font-size: 18px;
+  }
+
+  .bd-prose h3 {
+    font-size: 16px;
+  }
+}
+
+/* Task lists: the design draws a 13px square with a 1.5px border, filled with
    the accent when ticked. The mock hard-codes that border colour, which would
    not adapt to the light theme; the token is used here instead. */
 .bd-prose ul[data-type="taskList"] {
@@ -392,13 +469,13 @@
 .bd-prose ul[data-type="taskList"] li {
   display: flex;
   align-items: flex-start;
-  gap: 11px;
-  margin-bottom: 10px;
+  gap: 9px;
+  margin-bottom: 8px;
 }
 
 .bd-prose ul[data-type="taskList"] li > label {
   flex: none;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .bd-prose ul[data-type="taskList"] li > div {
@@ -408,12 +485,12 @@
 
 .bd-prose input[type="checkbox"] {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   border: 1.5px solid var(--color-bd-text-3);
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  vertical-align: -2.5px;
+  vertical-align: -2px;
 }
 
 .bd-prose input[type="checkbox"]:checked {

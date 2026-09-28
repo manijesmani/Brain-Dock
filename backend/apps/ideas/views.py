@@ -1,8 +1,8 @@
 from typing import ClassVar
 
-from django.db.models import Count, QuerySet
+from django.db.models import QuerySet
+from rest_framework import mixins, viewsets
 from rest_framework import status as http_status
-from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request
@@ -17,6 +17,7 @@ from apps.ideas.serializers import (
     IdeaListSerializer,
     IdeaSerializer,
     TagSerializer,
+    TrashedIdeaSerializer,
 )
 from core.permissions import IsOwner
 
@@ -41,7 +42,7 @@ class CategoryViewSet(OwnedModelViewSet):
         # silently leaves the result unordered unless it is restated here.
         return (
             selectors.category_queryset(owner=self.request.user)
-            .annotate(idea_count=Count("ideas", distinct=True))
+            .annotate(idea_count=selectors.count_ideas())
             .order_by("name")
         )
 
@@ -65,7 +66,7 @@ class TagViewSet(OwnedModelViewSet):
     def get_queryset(self) -> QuerySet[Tag]:
         return (
             selectors.tag_queryset(owner=self.request.user)
-            .annotate(idea_count=Count("ideas", distinct=True))
+            .annotate(idea_count=selectors.count_ideas())
             .order_by("name")
         )
 
@@ -122,6 +123,10 @@ class IdeaViewSet(OwnedModelViewSet):
 
         serializer.instance = services.update_idea(idea=serializer.instance, **data)
 
+    def perform_destroy(self, instance: Idea) -> None:
+        # Deleting moves the idea to the trash; only the trash deletes for good.
+        services.trash_idea(idea=instance)
+
     @action(detail=True, methods=["post"])
     def archive(self, request: Request, pk: str | None = None) -> Response:
         idea = services.archive_idea(idea=self.get_object())
@@ -131,3 +136,26 @@ class IdeaViewSet(OwnedModelViewSet):
     def restore(self, request: Request, pk: str | None = None) -> Response:
         idea = services.restore_idea(idea=self.get_object())
         return Response(self.get_serializer(idea).data, status=http_status.HTTP_200_OK)
+
+
+class TrashViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """The account's trash.
+
+    GET lists the deleted ideas, `restore` takes one back out, and DELETE
+    removes it for good. Each works on the requesting account's own trash
+    alone: anyone else's idea -- or one that is not in the trash -- is a 404.
+    """
+
+    serializer_class = TrashedIdeaSerializer
+    permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, IsOwner]
+
+    def get_queryset(self) -> QuerySet[Idea]:
+        return selectors.trashed_idea_queryset(owner=self.request.user)
+
+    def perform_destroy(self, instance: Idea) -> None:
+        services.delete_idea(idea=instance)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request: Request, pk: str | None = None) -> Response:
+        idea = services.untrash_idea(idea=self.get_object())
+        return Response(IdeaSerializer(idea, context=self.get_serializer_context()).data)

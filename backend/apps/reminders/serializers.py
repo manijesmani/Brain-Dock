@@ -93,7 +93,8 @@ class ReminderSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         request = self.context.get("request")
         if request is not None and request.user.is_authenticated:
-            self.fields["idea"].queryset = Idea.objects.filter(owner=request.user)
+            # No reminder is set on an idea in the trash.
+            self.fields["idea"].queryset = Idea.objects.filter(owner=request.user).outside_trash()
 
     def get_description(self, obj: Reminder) -> str:
         return describe_schedule(obj)
@@ -144,3 +145,9 @@ class ReminderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return attrs
+
+
+class SnoozeSerializer(serializers.Serializer):
+    """How far to push a reminder back: an hour unless told otherwise."""
+
+    minutes = serializers.IntegerField(min_value=1, max_value=24 * 60, default=60)

@@ -12,7 +12,9 @@ from core.formatting import user_timezone
 
 
 def reminder_queryset(*, owner: User) -> QuerySet[Reminder]:
-    return Reminder.objects.filter(owner=owner).select_related("idea", "idea__category", "owner")
+    return Reminder.objects.filter(owner=owner, idea__deleted_at__isnull=True).select_related(
+        "idea", "idea__category", "owner"
+    )
 
 
 def _start_of_today() -> datetime:

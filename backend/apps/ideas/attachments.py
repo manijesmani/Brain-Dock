@@ -23,6 +23,8 @@ from django.core.files.uploadedfile import UploadedFile
 from PIL import Image, ImageOps, UnidentifiedImageError
 from rest_framework import serializers
 
+from core.formatting import to_persian_digits
+
 # Pillow format name -> the extension and MIME type used for storage.
 ALLOWED_IMAGE_FORMATS: dict[str, tuple[str, str]] = {
     "JPEG": (".jpg", "image/jpeg"),
@@ -42,6 +44,20 @@ ALLOWED_AUDIO_CODECS: dict[str, tuple[str, str]] = {
     "pcm_s16le": (".wav", "audio/wav"),
     "pcm_s24le": (".wav", "audio/wav"),
 }
+
+# The formats by the names people know them by, for messages and for the
+# upload hints in the interface (see core.views.SiteView).
+IMAGE_FORMAT_NAMES = ("JPEG", "PNG", "WebP")
+AUDIO_FORMAT_NAMES = ("MP3", "M4A", "OGG", "FLAC", "WAV")
+
+
+def persian_list(names: tuple[str, ...]) -> str:
+    """JPEG، PNG یا WebP"""
+    return "، ".join(names[:-1]) + " یا " + names[-1]
+
+
+IMAGE_FORMATS_TEXT = persian_list(IMAGE_FORMAT_NAMES)
+AUDIO_FORMATS_TEXT = persian_list(AUDIO_FORMAT_NAMES)
 
 # Guards against a decompression bomb: a small file that expands into an
 # image large enough to exhaust memory.
@@ -71,20 +87,24 @@ def _reject(message: str) -> None:
     raise serializers.ValidationError(message)
 
 
-def _human_megabytes(value: int) -> str:
-    return f"{value / (1024 * 1024):.0f}"
+def human_megabytes(value: int) -> str:
+    return to_persian_digits(f"{value / (1024 * 1024):.0f}")
 
 
 def check_size(upload: UploadedFile, *, limit: int, label: str) -> None:
     if upload.size is None:
         _reject("حجم فایل قابل تشخیص نیست.")
     if upload.size > limit:
-        _reject(f"حجم {label} نباید از {_human_megabytes(limit)} مگابایت بیشتر باشد.")
+        _reject(f"حجم {label} نباید از {human_megabytes(limit)} مگابایت بیشتر باشد.")
 
 
-def prepare_image(upload: UploadedFile) -> PreparedImage:
-    """Validates an image and returns the re-encoded original and thumbnail."""
-    check_size(upload, limit=settings.MAX_IMAGE_UPLOAD_BYTES, label="عکس")
+def open_image(upload: UploadedFile, *, limit: int, label: str) -> tuple[Image.Image, str]:
+    """Checks an upload really is an allowed image and decodes it.
+
+    Returns the image upright and without its metadata, with its Pillow
+    format. Shared by attachments and the profile picture.
+    """
+    check_size(upload, limit=limit, label=label)
 
     upload.seek(0)
     try:
@@ -95,13 +115,11 @@ def prepare_image(upload: UploadedFile) -> PreparedImage:
         image = Image.open(upload)
         image.load()
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
-        _reject("این فایل یک عکس معتبر نیست.")
+        _reject(f"این فایل عکس معتبری نیست؛ فقط {IMAGE_FORMATS_TEXT} پذیرفته می‌شود.")
 
     image_format = image.format
     if image_format not in ALLOWED_IMAGE_FORMATS:
-        _reject("فقط عکس با فرمت JPEG، PNG یا WebP پذیرفته می‌شود.")
-
-    extension, content_type = ALLOWED_IMAGE_FORMATS[image_format]
+        _reject(f"فقط عکس با فرمت {IMAGE_FORMATS_TEXT} پذیرفته می‌شود.")
 
     # Applies the EXIF orientation to the pixels and returns an image with no
     # EXIF block, so the rotation survives and the metadata does not.
@@ -110,10 +128,18 @@ def prepare_image(upload: UploadedFile) -> PreparedImage:
     if image_format == "JPEG" and image.mode not in ("RGB", "L"):
         image = image.convert("RGB")
 
-    original = _encode(image, image_format)
+    return image, image_format
+
+
+def prepare_image(upload: UploadedFile) -> PreparedImage:
+    """Validates an image and returns the re-encoded original and thumbnail."""
+    image, image_format = open_image(upload, limit=settings.MAX_IMAGE_UPLOAD_BYTES, label="عکس")
+    extension, content_type = ALLOWED_IMAGE_FORMATS[image_format]
+
+    original = encode_image(image, image_format)
     thumbnail_image = image.copy()
     thumbnail_image.thumbnail(settings.ATTACHMENT_THUMBNAIL_SIZE, Image.LANCZOS)
-    thumbnail = _encode(thumbnail_image, image_format)
+    thumbnail = encode_image(thumbnail_image, image_format)
 
     return PreparedImage(
         content=original,
@@ -125,7 +151,7 @@ def prepare_image(upload: UploadedFile) -> PreparedImage:
     )
 
 
-def _encode(image: Image.Image, image_format: str) -> ContentFile:
+def encode_image(image: Image.Image, image_format: str) -> ContentFile:
     buffer = BytesIO()
     options: dict[str, Any] = {"format": image_format}
 
@@ -163,7 +189,7 @@ def prepare_audio(upload: UploadedFile) -> PreparedAudio:
 
     codec = audio_streams[0].get("codec_name")
     if codec not in ALLOWED_AUDIO_CODECS:
-        _reject("این قالب صوتی پشتیبانی نمی‌شود.")
+        _reject(f"این قالب صوتی پشتیبانی نمی‌شود؛ فقط {AUDIO_FORMATS_TEXT}.")
 
     extension, content_type = ALLOWED_AUDIO_CODECS[codec]
 
@@ -218,7 +244,7 @@ def _probe(upload: UploadedFile) -> dict[str, Any]:
             _reject("پردازش فایل صوتی ناموفق بود.")
 
     if completed.returncode != 0:
-        _reject("این فایل یک فایل صوتی معتبر نیست.")
+        _reject(f"این فایل صوتی معتبری نیست؛ فقط {AUDIO_FORMATS_TEXT} پذیرفته می‌شود.")
 
     try:
         return json.loads(completed.stdout)

@@ -1,0 +1,15 @@
+# BrainDock -- one backup of the database and the attachments.
+#
+# Started nightly by braindock-backup.timer. By hand:
+#   sudo systemctl start braindock-backup
+#   journalctl -u braindock-backup
+
+[Unit]
+Description=BrainDock backup
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=braindock
+Group=braindock
+ExecStart=/srv/braindock/app/deploy/backup.sh

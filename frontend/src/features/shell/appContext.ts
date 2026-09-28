@@ -24,6 +24,8 @@ export interface AppContextValue {
   openQuickCapture: () => void;
   openCategoryDialog: (category?: Category) => void;
   openReminderDialog: (ideaId: number) => void;
+  /** Slides the sidebar in on screens too narrow to show it beside the page. */
+  openNav: () => void;
 }
 
 export const AppContext = createContext<AppContextValue | null>(null);

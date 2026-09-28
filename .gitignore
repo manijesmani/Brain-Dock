@@ -10,6 +10,11 @@ venv/
 /backend/media/
 /backend/staticfiles/
 
+# Celery beat's record of when each entry last ran, rewritten by every running
+# scheduler. The pattern also catches the files some storage backends write
+# beside it, such as SQLite's -wal and -shm.
+celerybeat-schedule*
+
 # Environment
 .env
 .env.*
@@ -17,7 +22,8 @@ venv/
 
 # Node
 node_modules/
-/frontend/dist/
+# dist.new and dist.old exist only while deploy/deploy.sh swaps a build in.
+/frontend/dist*/
 npm-debug.log*
 
 # Testing and tooling caches

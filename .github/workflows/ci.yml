@@ -36,7 +36,9 @@ jobs:
           --health-retries 5
 
     env:
-      DJANGO_SECRET_KEY: ci-only-key-not-used-to-protect-anything
+      # At least 50 characters: `check --deploy` below fails on anything
+      # shorter (security.W009), even though this key protects nothing.
+      DJANGO_SECRET_KEY: ci-only-key-long-enough-for-check-deploy-but-protecting-nothing
       DATABASE_URL: postgres://braindock:braindock@127.0.0.1:5432/braindock
 
     defaults:
@@ -51,6 +53,12 @@ jobs:
           python-version: "3.13"
           cache: pip
           cache-dependency-path: backend/requirements/*.txt
+
+      # ffprobe is how an audio attachment is recognised, and the audio tests
+      # render their fixtures with ffmpeg. Without it those tests skip rather
+      # than fail, so a broken audio path would pass CI unnoticed.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ffmpeg
 
       - name: Install dependencies
         run: pip install -r requirements/dev.txt

@@ -1,0 +1,15 @@
+# Runs braindock-backup.service every night.
+#
+#   systemctl list-timers braindock-backup.timer
+
+[Unit]
+Description=Nightly BrainDock backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=15min
+# A night missed while the machine was off is made up at the next boot.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

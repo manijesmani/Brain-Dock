@@ -32,8 +32,10 @@ def dispatch_due_reminders() -> dict[str, int]:
     """Fires every reminder that has come due."""
     now = timezone.now()
 
+    # An idea in the trash is not reminded of. Its reminder is left as it is,
+    # so taking the idea back out brings the reminder back with it.
     due_ids = list(
-        Reminder.objects.filter(is_active=True, next_run_at__lte=now)
+        Reminder.objects.filter(is_active=True, next_run_at__lte=now, idea__deleted_at__isnull=True)
         .order_by("next_run_at")
         .values_list("id", flat=True)[:MAX_REMINDERS_PER_TICK]
     )
@@ -65,7 +67,12 @@ def _process(reminder_id: int, now) -> bool:
         reminder = (
             Reminder.objects.select_for_update(skip_locked=True)
             .select_related("idea", "owner")
-            .filter(pk=reminder_id, is_active=True, next_run_at__lte=now)
+            .filter(
+                pk=reminder_id,
+                is_active=True,
+                next_run_at__lte=now,
+                idea__deleted_at__isnull=True,
+            )
             .first()
         )
 

@@ -106,6 +106,14 @@ class Tag(OwnedTimeStampedModel):
         return self.name
 
 
+class IdeaQuerySet(models.QuerySet["Idea"]):
+    def outside_trash(self) -> "IdeaQuerySet":
+        return self.filter(deleted_at__isnull=True)
+
+    def in_trash(self) -> "IdeaQuerySet":
+        return self.filter(deleted_at__isnull=False)
+
+
 class Idea(OwnedTimeStampedModel):
     """The central record of the product.
 
@@ -114,6 +122,11 @@ class Idea(OwnedTimeStampedModel):
     sets the status to `archived`, restoring sets it back to `idea` -- so a
     second field would carry no information and could only ever drift out of
     sync with the first.
+
+    The trash is the one thing that is not a status. Deleting sets
+    `deleted_at` and leaves `status` alone, so an idea taken back out of the
+    trash returns exactly where it was, the archive included. Nothing ever
+    empties the trash on its own.
     """
 
     title = models.CharField(max_length=200, verbose_name="عنوان")
@@ -163,6 +176,15 @@ class Idea(OwnedTimeStampedModel):
     # partial Persian word findable in a language PostgreSQL cannot stem.
     search_text = models.TextField(blank=True, default="", editable=False)
 
+    # When the idea was moved to the trash; empty while it is not there. An
+    # idea in the trash is left out of every listing, count, search and
+    # reminder -- see apps.ideas.selectors.
+    deleted_at = models.DateTimeField(
+        null=True, blank=True, editable=False, verbose_name="زمان انتقال به سطل زباله"
+    )
+
+    objects = IdeaQuerySet.as_manager()
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "ایده"
@@ -184,6 +206,10 @@ class Idea(OwnedTimeStampedModel):
     @property
     def is_archived(self) -> bool:
         return self.status == IdeaStatus.ARCHIVED
+
+    @property
+    def in_trash(self) -> bool:
+        return self.deleted_at is not None
 
 
 class AttachmentKind(models.TextChoices):

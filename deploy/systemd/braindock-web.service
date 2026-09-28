@@ -1,0 +1,56 @@
+# BrainDock -- the Django API, served by Gunicorn.
+#
+# Nginx reaches it through a Unix socket rather than a TCP port, so it cannot
+# collide with another project's port on the same host, and only members of
+# the braindock group -- the service itself and Nginx -- can open it.
+#
+# Installed and restarted by deploy/deploy.sh.
+
+[Unit]
+Description=BrainDock web (Gunicorn)
+After=network.target postgresql.service redis-server.service
+
+[Service]
+# Gunicorn reports READY to systemd once its workers are up.
+Type=notify
+NotifyAccess=main
+User=braindock
+Group=braindock
+WorkingDirectory=/srv/braindock/app/backend
+# manage.py and the Celery app both fall back to the development settings;
+# this one variable points every process at production.
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+Environment=PYTHONUNBUFFERED=1
+
+# /run/braindock, created on start and removed on stop. 0750 plus the group
+# is what keeps the socket away from every other local account.
+RuntimeDirectory=braindock
+RuntimeDirectoryMode=0750
+
+# --no-control-socket: Gunicorn 25.1+ otherwise opens a management socket in
+# the service account's home directory. systemctl already covers reloads and
+# restarts, so it would only be one more way in.
+ExecStart=/srv/braindock/app/backend/.venv/bin/gunicorn config.wsgi:application \
+    --bind unix:/run/braindock/gunicorn.sock \
+    --no-control-socket \
+    --workers 2 \
+    --timeout 60 \
+    --graceful-timeout 30 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --access-logfile - \
+    --error-logfile -
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=35
+Restart=on-failure
+RestartSec=5
+
+# The process writes only attachments (under /srv) and temporary uploads.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

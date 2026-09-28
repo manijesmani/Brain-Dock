@@ -162,7 +162,7 @@ class TestCsrf:
         client = Client(enforce_csrf_checks=True)
         client.force_login(user)
         client.get(reverse("users:csrf"))
-        token = client.cookies["csrftoken"].value
+        token = client.cookies[settings.CSRF_COOKIE_NAME].value
 
         response = client.post(
             reverse("ideas:idea-list"),
@@ -208,7 +208,7 @@ class TestSecurityHeaders:
 
 
 class TestUnauthenticatedSurface:
-    """Exactly three endpoints answer without a session, and no more."""
+    """Only the endpoints that start a session answer without one, and no more."""
 
     @pytest.mark.parametrize(
         "route",
@@ -220,6 +220,7 @@ class TestUnauthenticatedSurface:
             "notifications:notification-list",
             "users:me",
             "telegrambot:link",
+            "panel:user-list",
         ],
     )
     def test_everything_else_refuses_an_anonymous_reader(
@@ -234,6 +235,23 @@ class TestUnauthenticatedSurface:
     def test_csrf_is_open_by_design(self, api_client: APIClient) -> None:
         """The SPA needs a token before it can log in."""
         assert api_client.get(reverse("users:csrf")).status_code == 200
+
+    def test_guest_is_open_by_design(self, api_client: APIClient) -> None:
+        """The app is usable without an account; this is how it starts."""
+        assert api_client.post(reverse("users:guest")).status_code == 201
+
+    def test_site_is_open_by_design(self, api_client: APIClient) -> None:
+        """The sign-up page shows the owner's Telegram to visitors."""
+        assert api_client.get(reverse("site")).status_code == 200
+
+    def test_signup_is_open_by_design(self, api_client: APIClient) -> None:
+        response = api_client.post(
+            reverse("users:signup"),
+            {"first_name": "تازه", "username": "newcomer", "password": "quiet-harbour-lantern-47"},
+            format="json",
+        )
+
+        assert response.status_code == 201
 
 
 class TestFieldsThatMustNotBeWritable:
@@ -264,6 +282,18 @@ class TestFieldsThatMustNotBeWritable:
         user.refresh_from_db()
         assert user.is_staff is False
         assert user.is_superuser is False
+
+    def test_premium_cannot_be_granted_through_the_profile(self) -> None:
+        """Only the owner grants it, from the admin."""
+        user = UserFactory(is_premium=False)
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        client.patch(reverse("users:me"), {"is_premium": True, "is_guest": True}, format="json")
+
+        user.refresh_from_db()
+        assert user.is_premium is False
+        assert user.is_guest is False
 
     def test_the_telegram_chat_cannot_be_claimed_through_the_profile(
         self, auth_client: APIClient, user: User

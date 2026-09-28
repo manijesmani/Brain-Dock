@@ -13,6 +13,7 @@ urlpatterns = [
     path(settings.ADMIN_URL_PATH, admin.site.urls),
     path("api/", include("core.urls")),
     path("api/auth/", include("apps.users.urls")),
+    path("api/panel/", include("apps.users.panel_urls")),
     path("api/", include("apps.ideas.urls")),
     path("api/", include("apps.reminders.urls")),
     path("api/", include("apps.notifications.urls")),

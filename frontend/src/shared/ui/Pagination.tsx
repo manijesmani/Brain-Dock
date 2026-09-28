@@ -30,23 +30,24 @@ export function Pagination({ page, pages, count, pageSize, onChange }: Paginatio
   const to = Math.min(page * pageSize, count);
 
   return (
+    // On a phone the summary takes its own line and the numbers sit under it.
     <nav
       aria-label="صفحه‌بندی"
-      className="mt-5 flex items-center gap-1 text-[15.5px] text-bd-text-3"
+      className="mt-5 flex flex-wrap items-center justify-center gap-1 text-[12.5px] pointer-coarse:gap-2 text-bd-text-3 sm:justify-start"
     >
-      <span className="flex-1">
+      <span className="basis-full pb-1 text-center sm:flex-1 sm:basis-auto sm:pb-0 sm:text-start">
         نمایش {toPersianDigits(from)} تا {toPersianDigits(to)} از {toPersianDigits(count)}
       </span>
 
       <StepButton title="صفحهٔ قبل" disabled={page <= 1} onClick={() => onChange(page - 1)}>
-        <CaretRightIcon size={17.5} />
+        <CaretRightIcon size={14} />
       </StepButton>
 
       {visiblePages(page, pages).map((number, index) =>
         number === null ? (
           <span
             key={`gap-${index}`}
-            className="grid h-[37.5px] min-w-[37.5px] place-items-center text-[16px]"
+            className="grid h-[30px] min-w-[30px] place-items-center text-[13px] pointer-coarse:h-9 pointer-coarse:min-w-9"
           >
             …
           </span>
@@ -57,7 +58,7 @@ export function Pagination({ page, pages, count, pageSize, onChange }: Paginatio
             aria-current={number === page ? "page" : undefined}
             disabled={number === page}
             onClick={() => onChange(number)}
-            className={`h-[37.5px] min-w-[37.5px] rounded-button border-0 bg-transparent px-1.5 text-[16px] ${
+            className={`h-[30px] min-w-[30px] rounded-button border-0 bg-transparent px-1.5 text-[13px] pointer-coarse:h-9 pointer-coarse:min-w-9 ${
               number === page
                 ? "cursor-default font-bold text-bd-text"
                 : "cursor-pointer text-bd-text-3 hover:bg-bd-surface-2"
@@ -69,7 +70,7 @@ export function Pagination({ page, pages, count, pageSize, onChange }: Paginatio
       )}
 
       <StepButton title="صفحهٔ بعد" disabled={page >= pages} onClick={() => onChange(page + 1)}>
-        <CaretLeftIcon size={17.5} />
+        <CaretLeftIcon size={14} />
       </StepButton>
     </nav>
   );
@@ -92,7 +93,7 @@ function StepButton({
       title={title}
       disabled={disabled}
       onClick={onClick}
-      className="grid size-[37.5px] cursor-pointer place-items-center rounded-button border-0 bg-transparent text-bd-text-2 hover:bg-bd-surface-2 disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
+      className="grid size-[30px] cursor-pointer place-items-center rounded-button border-0 bg-transparent text-bd-text-2 pointer-coarse:size-9 hover:bg-bd-surface-2 disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
     >
       {children}
     </button>

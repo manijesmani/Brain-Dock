@@ -175,6 +175,12 @@ class TestReminderWindows:
 
 
 class TestTelegramLinking:
+    @pytest.fixture(autouse=True)
+    def site_owner(self, user: User) -> None:
+        """The Telegram section is the owner's alone; see tests/test_plans.py."""
+        user.is_superuser = True
+        user.save(update_fields=["is_superuser"])
+
     def test_it_reports_an_unlinked_account(self, auth_client: APIClient) -> None:
         response = auth_client.get(reverse("telegrambot:link"))
 

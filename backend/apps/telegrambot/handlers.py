@@ -22,6 +22,7 @@ from apps.reminders import services as reminder_services
 from apps.reminders.models import Reminder
 from apps.telegrambot import bot, messages
 from apps.telegrambot.models import TelegramLinkToken
+from apps.users import plans
 from apps.users.models import User
 
 logger = logging.getLogger(__name__)
@@ -102,7 +103,9 @@ def link_account(*, chat_id: int, token: str) -> str:
         .first()
     )
 
-    if record is None or not record.is_usable:
+    # A link issued to anyone but the owner -- before the bot became the
+    # owner's alone -- is no longer honoured.
+    if record is None or not record.is_usable or not plans.can_use_telegram(record.user):
         return messages.LINK_INVALID
 
     # A chat already belonging to someone else must not be re-pointed, or a
@@ -246,7 +249,10 @@ def _handle_callback(update: Update) -> None:
 
     action, _, raw_id = data.partition(":")
     reminder = (
-        Reminder.objects.filter(pk=raw_id, owner=user).select_related("idea").first()
+        # A button on a message about an idea since moved to the trash is spent.
+        Reminder.objects.filter(pk=raw_id, owner=user, idea__deleted_at__isnull=True)
+        .select_related("idea")
+        .first()
         if raw_id.isdigit()
         else None
     )
@@ -284,6 +290,11 @@ def _apply_action(action: str, reminder: Reminder) -> str:
 
 
 def _user_for(chat_id: int | None) -> User | None:
+    """The account behind a chat, as long as it may still use the bot."""
     if chat_id is None:
         return None
-    return User.objects.filter(telegram_chat_id=chat_id).first()
+
+    user = User.objects.filter(telegram_chat_id=chat_id).first()
+    if user is None or not plans.can_use_telegram(user):
+        return None
+    return user

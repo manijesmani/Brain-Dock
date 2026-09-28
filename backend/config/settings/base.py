@@ -56,6 +56,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # The account's signed-in devices, for «دستگاه‌های فعال» in settings.
+    "apps.users.middleware.DeviceSessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.SecurityHeadersMiddleware",
@@ -101,13 +103,41 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        # Django's default is eight. This is the only account there is, and it
-        # owns every idea, attachment and Telegram link in the system.
+        # Django's default is eight. Anyone can now sign up, and each account
+        # guards its own private ideas; the owner's also holds the Telegram
+        # link and the admin.
         "OPTIONS": {"min_length": 12},
     },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# --------------------------------------------------------------------------
+# Accounts
+# --------------------------------------------------------------------------
+
+# How many ideas a guest or a regular account may hold. Special accounts and
+# the owner have no limit. See apps.users.plans.
+FREE_IDEA_LIMIT = env.int("FREE_IDEA_LIMIT", default=2)
+
+# A guest has no password, so its session cookie is the only way back to its
+# ideas. It is kept for a year -- renewed on use in production -- instead of
+# the two weeks an account gets. Nothing is ever deleted either way: a
+# guest's ideas stay in the database for good.
+GUEST_SESSION_AGE = 60 * 60 * 24 * 365
+
+# The owner's own Telegram username, without the @: where a subscription is
+# bought. «خرید اشتراک» in the sidebar and the sign-up page both lead to it.
+# Set to an empty value, those Telegram buttons are not shown.
+OWNER_TELEGRAM_USERNAME = env("OWNER_TELEGRAM_USERNAME", default="manijesmani").strip().lstrip("@")
+
+# The CSRF cookie carries the project's own name. The site lives on a
+# subdomain beside others, and a browser sends it every cookie set for the
+# parent domain too: one named plain `csrftoken` by a neighbour would arrive
+# beside this one, and the frontend and Django would each read a different
+# one -- every write refused, however often the page is reloaded. The
+# frontend reads the same name; see frontend/src/shared/api/client.ts.
+CSRF_COOKIE_NAME = "braindock_csrftoken"
 
 # --------------------------------------------------------------------------
 # Internationalization
@@ -149,6 +179,13 @@ MEDIA_INTERNAL_URL = "/internal-media/"
 MAX_IMAGE_UPLOAD_BYTES = env.int("MAX_IMAGE_UPLOAD_BYTES", default=10 * 1024 * 1024)
 MAX_AUDIO_UPLOAD_BYTES = env.int("MAX_AUDIO_UPLOAD_BYTES", default=25 * 1024 * 1024)
 
+# The profile picture. The upload may be as large as the proxy lets through
+# (Nginx allows 26 MB), so a photo straight off a phone is accepted. What is
+# kept is bounded -- a square of at most this many pixels a side, several
+# times what most sites keep -- because it is drawn a few dozen pixels across.
+MAX_AVATAR_UPLOAD_BYTES = env.int("MAX_AVATAR_UPLOAD_BYTES", default=25 * 1024 * 1024)
+AVATAR_SIZE = 1024
+
 # Bounding box for the grid preview on the note page.
 ATTACHMENT_THUMBNAIL_SIZE = (800, 600)
 
@@ -178,9 +215,9 @@ REST_FRAMEWORK = {
     ],
     "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",
     # A ceiling on the whole API, generous enough that ordinary use never
-    # reaches it. Login and the Telegram webhook carry their own, much tighter
-    # limits on top of these -- those are the two endpoints reachable without
-    # a session.
+    # reaches it. Login, starting a guest session, signing up and the
+    # Telegram webhook carry their own, much tighter limits on top of these --
+    # those are the endpoints reachable without a session.
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.AnonRateThrottle",
@@ -189,6 +226,8 @@ REST_FRAMEWORK = {
         "user": env("USER_THROTTLE_RATE", default="2000/hour"),
         "anon": env("ANON_THROTTLE_RATE", default="120/hour"),
         "login": env("LOGIN_THROTTLE_RATE", default="10/min"),
+        "guest": env("GUEST_THROTTLE_RATE", default="30/hour"),
+        "signup": env("SIGNUP_THROTTLE_RATE", default="20/hour"),
         "telegram_webhook": env("WEBHOOK_THROTTLE_RATE", default="120/min"),
     },
 }
@@ -237,8 +276,9 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Throttle counters and Celery share one Redis instance. In development this
-# falls back to local memory so the app runs without Redis at all.
+# Throttle counters and Celery share one Redis instance, in development too:
+# every API request passes a throttle, so the API does not answer without
+# Redis. Only the test settings swap it for local memory.
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

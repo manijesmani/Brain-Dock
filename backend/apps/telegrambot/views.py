@@ -11,8 +11,9 @@ from rest_framework.throttling import BaseThrottle
 from rest_framework.views import APIView
 from telegram import Update
 
-from apps.telegrambot import bot, handlers, services
+from apps.telegrambot import handlers, services
 from apps.telegrambot.throttling import WebhookRateThrottle
+from apps.users.permissions import IsSiteOwner
 from apps.users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
@@ -35,10 +36,11 @@ class TelegramLinkView(APIView):
     """The Telegram section of the settings page.
 
     GET reports the current connection, POST issues a fresh one-time link and
-    DELETE drops the connection.
+    DELETE drops the connection. The bot serves the site's owner alone, so no
+    other account gets this far.
     """
 
-    permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated]
+    permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, IsSiteOwner]
 
     def get(self, request: Request) -> Response:
         return Response(_link_payload(request))
@@ -73,7 +75,10 @@ class TelegramWebhookView(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            update = Update.de_json(request.data, bot.get_bot())
+            # Parsed without a client: the handlers reply through
+            # apps.telegrambot.bot, never through an object's shortcut methods,
+            # so nothing on the update needs one.
+            update = Update.de_json(request.data)
         except Exception:
             logger.exception("Could not parse a Telegram update")
             return Response({"ok": True})

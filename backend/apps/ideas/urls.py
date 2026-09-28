@@ -6,7 +6,7 @@ from apps.ideas.attachment_views import (
     AttachmentThumbnailView,
     AttachmentViewSet,
 )
-from apps.ideas.views import CategoryViewSet, IdeaViewSet, TagViewSet
+from apps.ideas.views import CategoryViewSet, IdeaViewSet, TagViewSet, TrashViewSet
 
 app_name = "ideas"
 
@@ -15,6 +15,7 @@ router.register("ideas", IdeaViewSet, basename="idea")
 router.register("categories", CategoryViewSet, basename="category")
 router.register("tags", TagViewSet, basename="tag")
 router.register("attachments", AttachmentViewSet, basename="attachment")
+router.register("trash", TrashViewSet, basename="trash")
 
 urlpatterns = [
     *router.urls,

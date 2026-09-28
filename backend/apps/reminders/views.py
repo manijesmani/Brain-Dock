@@ -10,7 +10,7 @@ from rest_framework.serializers import BaseSerializer
 
 from apps.reminders import selectors, services
 from apps.reminders.models import Reminder
-from apps.reminders.serializers import ReminderSerializer
+from apps.reminders.serializers import ReminderSerializer, SnoozeSerializer
 from core.permissions import IsOwner
 
 
@@ -19,9 +19,11 @@ class ReminderViewSet(viewsets.ModelViewSet):
     permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, IsOwner]
 
     def get_queryset(self) -> QuerySet[Reminder]:
-        queryset = Reminder.objects.filter(owner=self.request.user).select_related(
-            "idea", "idea__category", "owner"
-        )
+        # A reminder on an idea in the trash is kept, but out of sight and
+        # silent until the idea is taken back out.
+        queryset = Reminder.objects.filter(
+            owner=self.request.user, idea__deleted_at__isnull=True
+        ).select_related("idea", "idea__category", "owner")
 
         window = self.request.query_params.get("window")
         if window in {"today", "week"}:
@@ -62,6 +64,9 @@ class ReminderViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def snooze(self, request: Request, pk: str | None = None) -> Response:
         """Pushes the next firing back by an hour, as the bot button does."""
-        minutes = int(request.data.get("minutes", 60))
-        reminder = services.snooze(reminder=self.get_object(), minutes=minutes)
+        form = SnoozeSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        reminder = services.snooze(
+            reminder=self.get_object(), minutes=form.validated_data["minutes"]
+        )
         return Response(self.get_serializer(reminder).data)

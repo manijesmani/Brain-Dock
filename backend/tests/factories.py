@@ -15,6 +15,10 @@ class UserFactory(DjangoModelFactory):
     username = factory.Sequence(lambda n: f"user{n}")
     email = factory.LazyAttribute(lambda obj: f"{obj.username}@braindock.test")
     first_name = "مانی"
+    # Most tests are about a feature rather than about the limits of a plan,
+    # so the default account has none. Tests of the limits ask for a free
+    # account or a guest by name; see tests/test_plans.py.
+    is_premium = True
 
     @factory.post_generation
     def password(self, create: bool, extracted: str | None, **kwargs: object) -> None:

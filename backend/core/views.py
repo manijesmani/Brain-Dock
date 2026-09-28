@@ -59,3 +59,47 @@ class HealthView(APIView):
         except Exception:
             return "error"
         return "ok"
+
+
+class SiteView(APIView):
+    """What the interface needs to know about this site before any session.
+
+    Deliberately unauthenticated: the sign-up page shows it to visitors. Only
+    what is meant to be public belongs here.
+    """
+
+    authentication_classes: ClassVar[list] = []
+    permission_classes: ClassVar[list[type[BasePermission]]] = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        from apps.ideas.attachments import (
+            ALLOWED_IMAGE_FORMATS,
+            AUDIO_FORMATS_TEXT,
+            IMAGE_FORMATS_TEXT,
+        )
+
+        image_types = sorted({mime for _, mime in ALLOWED_IMAGE_FORMATS.values()})
+        return Response(
+            {
+                # Where to ask the owner for a special account.
+                "owner_telegram": settings.OWNER_TELEGRAM_USERNAME or None,
+                # What may be uploaded, so the interface can say so before
+                # anything is sent, and check it before a large file travels.
+                "uploads": {
+                    "image": {
+                        "max_bytes": settings.MAX_IMAGE_UPLOAD_BYTES,
+                        "types": image_types,
+                        "formats": IMAGE_FORMATS_TEXT,
+                    },
+                    "audio": {
+                        "max_bytes": settings.MAX_AUDIO_UPLOAD_BYTES,
+                        "formats": AUDIO_FORMATS_TEXT,
+                    },
+                    "avatar": {
+                        "max_bytes": settings.MAX_AVATAR_UPLOAD_BYTES,
+                        "types": image_types,
+                        "formats": IMAGE_FORMATS_TEXT,
+                    },
+                },
+            }
+        )

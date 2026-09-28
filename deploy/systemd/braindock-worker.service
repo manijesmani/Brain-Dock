@@ -1,0 +1,37 @@
+# BrainDock -- the Celery worker that delivers reminders and digests.
+#
+# Installed and restarted by deploy/deploy.sh.
+
+[Unit]
+Description=BrainDock Celery worker
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=exec
+User=braindock
+Group=braindock
+WorkingDirectory=/srv/braindock/app/backend
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+Environment=PYTHONUNBUFFERED=1
+
+# The node name is braindock@<host> rather than Celery's default
+# celery@<host>, so it stays distinguishable from any other project's worker
+# on the same machine. %% is systemd's escape; Celery expands %h itself.
+ExecStart=/srv/braindock/app/backend/.venv/bin/celery -A config worker \
+    --loglevel=INFO \
+    --concurrency=2 \
+    --hostname=braindock@%%h
+# A warm shutdown lets a running task finish. Tasks are capped at 55 seconds
+# (CELERY_TASK_TIME_LIMIT), so this is long enough to wait for one.
+KillMode=mixed
+TimeoutStopSec=65
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

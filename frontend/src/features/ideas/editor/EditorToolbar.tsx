@@ -20,6 +20,8 @@ import {
 import type { Editor } from "@tiptap/react";
 import type { ReactNode } from "react";
 
+import { Crown } from "@/features/plans/PremiumNotice";
+
 /**
  * The bottom-anchored toolbar, in the design's order and grouping.
  *
@@ -32,6 +34,12 @@ interface EditorToolbarProps {
   onPickImage: () => void;
   onPickAudio: () => void;
   onRecordAudio: () => void;
+  /**
+   * Pictures and audio need a special account. Without one the three tools
+   * stay in place, marked with a crown, and explain themselves instead.
+   */
+  mediaLocked?: boolean;
+  onLockedMedia?: () => void;
 }
 
 export function EditorToolbar({
@@ -39,46 +47,50 @@ export function EditorToolbar({
   onPickImage,
   onPickAudio,
   onRecordAudio,
+  mediaLocked = false,
+  onLockedMedia,
 }: EditorToolbarProps) {
   if (!editor) return null;
 
   const chain = () => editor.chain().focus();
+  const media = (run: () => void) => (mediaLocked ? () => onLockedMedia?.() : run);
 
   return (
     <div
-      className="fixed bottom-0 z-[1140] flex items-center gap-1.5 border-t border-bd-border bg-bd-surface px-[32.5px] py-[11px]"
+      // Too many tools for a phone's width, so there the strip scrolls sideways.
+      className="bd-no-scrollbar fixed bottom-0 z-[1140] flex items-center gap-1.5 overflow-x-auto pointer-coarse:gap-2.5 border-t border-bd-border bg-bd-surface px-2 py-[9px] sm:px-[26px]"
       style={{ insetInline: 0 }}
     >
       <Tool title="ضخیم" active={editor.isActive("bold")} onRun={() => chain().toggleBold().run()}>
-        <TextBIcon size={21} />
+        <TextBIcon size={17} />
       </Tool>
       <Tool
         title="مورب"
         active={editor.isActive("italic")}
         onRun={() => chain().toggleItalic().run()}
       >
-        <TextItalicIcon size={21} />
+        <TextItalicIcon size={17} />
       </Tool>
       <Tool
         title="زیرخط"
         active={editor.isActive("underline")}
         onRun={() => chain().toggleUnderline().run()}
       >
-        <TextUnderlineIcon size={21} />
+        <TextUnderlineIcon size={17} />
       </Tool>
       <Tool
         title="خط‌خورده"
         active={editor.isActive("strike")}
         onRun={() => chain().toggleStrike().run()}
       >
-        <TextStrikethroughIcon size={21} />
+        <TextStrikethroughIcon size={17} />
       </Tool>
       <Tool
         title="هایلایت"
         active={editor.isActive("highlight")}
         onRun={() => chain().toggleHighlight().run()}
       >
-        <HighlighterIcon size={21} />
+        <HighlighterIcon size={17} />
       </Tool>
 
       <Divider />
@@ -88,21 +100,21 @@ export function EditorToolbar({
         active={editor.isActive("heading", { level: 1 })}
         onRun={() => chain().toggleHeading({ level: 1 }).run()}
       >
-        <TextHOneIcon size={21} />
+        <TextHOneIcon size={17} />
       </Tool>
       <Tool
         title="عنوان متوسط"
         active={editor.isActive("heading", { level: 2 })}
         onRun={() => chain().toggleHeading({ level: 2 }).run()}
       >
-        <TextHTwoIcon size={21} />
+        <TextHTwoIcon size={17} />
       </Tool>
       <Tool
         title="عنوان کوچک"
         active={editor.isActive("heading", { level: 3 })}
         onRun={() => chain().toggleHeading({ level: 3 }).run()}
       >
-        <TextHThreeIcon size={21} />
+        <TextHThreeIcon size={17} />
       </Tool>
 
       <Divider />
@@ -112,21 +124,21 @@ export function EditorToolbar({
         active={editor.isActive("bulletList")}
         onRun={() => chain().toggleBulletList().run()}
       >
-        <ListBulletsIcon size={21} />
+        <ListBulletsIcon size={17} />
       </Tool>
       <Tool
         title="لیست شماره‌دار"
         active={editor.isActive("orderedList")}
         onRun={() => chain().toggleOrderedList().run()}
       >
-        <ListNumbersIcon size={21} />
+        <ListNumbersIcon size={17} />
       </Tool>
       <Tool
         title="چک‌لیست"
         active={editor.isActive("taskList")}
         onRun={() => chain().toggleTaskList().run()}
       >
-        <CheckSquareIcon size={21} />
+        <CheckSquareIcon size={17} />
       </Tool>
 
       <Divider />
@@ -136,29 +148,29 @@ export function EditorToolbar({
         active={editor.isActive("blockquote")}
         onRun={() => chain().toggleBlockquote().run()}
       >
-        <QuotesIcon size={21} />
+        <QuotesIcon size={17} />
       </Tool>
       <Tool
         title="کد"
         active={editor.isActive("codeBlock")}
         onRun={() => chain().toggleCodeBlock().run()}
       >
-        <CodeIcon size={21} />
+        <CodeIcon size={17} />
       </Tool>
       <Tool title="جداکننده" onRun={() => chain().setHorizontalRule().run()}>
-        <MinusIcon size={21} />
+        <MinusIcon size={17} />
       </Tool>
 
       <Divider />
 
-      <Tool title="افزودن عکس" onRun={onPickImage}>
-        <ImageIcon size={21} />
+      <Tool title="افزودن عکس" locked={mediaLocked} onRun={media(onPickImage)}>
+        <ImageIcon size={17} />
       </Tool>
-      <Tool title="ضبط صدا" onRun={onRecordAudio}>
-        <MicrophoneIcon size={21} />
+      <Tool title="ضبط صدا" locked={mediaLocked} onRun={media(onRecordAudio)}>
+        <MicrophoneIcon size={17} />
       </Tool>
-      <Tool title="آپلود صدا" onRun={onPickAudio}>
-        <UploadSimpleIcon size={21} />
+      <Tool title="آپلود صدا" locked={mediaLocked} onRun={media(onPickAudio)}>
+        <UploadSimpleIcon size={17} />
       </Tool>
 
       <div className="flex-1" />
@@ -169,35 +181,43 @@ export function EditorToolbar({
 function Tool({
   title,
   active = false,
+  locked = false,
   onRun,
   children,
 }: {
   title: string;
   active?: boolean;
+  /** Needs a special account: dimmed, with a crown in the corner. */
+  locked?: boolean;
   onRun: () => void;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
-      title={title}
+      title={locked ? `${title} · مخصوص کاربر ویژه` : title}
       // Mouse-down rather than click, so the editor never loses its selection
       // before the command runs.
       onMouseDown={(event) => {
         event.preventDefault();
         onRun();
       }}
-      className="grid size-[42.5px] cursor-pointer place-items-center rounded-button border-0 hover:bg-bd-surface-3 hover:text-bd-text"
+      className="relative grid size-[34px] flex-none cursor-pointer place-items-center rounded-button border-0 hover:bg-bd-surface-3 hover:text-bd-text"
       style={{
         background: active ? "var(--color-bd-surface-3)" : "transparent",
-        color: active ? "var(--color-bd-accent)" : "var(--color-bd-text-2)",
+        color: active
+          ? "var(--color-bd-accent)"
+          : locked
+            ? "var(--color-bd-text-3)"
+            : "var(--color-bd-text-2)",
       }}
     >
       {children}
+      {locked ? <Crown size={11} className="absolute end-[3px] top-[3px]" /> : null}
     </button>
   );
 }
 
 function Divider() {
-  return <span className="mx-[6px] h-[27.5px] w-px bg-bd-border" />;
+  return <span className="mx-[5px] h-[22px] w-px flex-none bg-bd-border" />;
 }

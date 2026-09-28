@@ -1,7 +1,8 @@
 """Delivery over the Telegram bot.
 
-Unavailable for anyone who has not linked their account, and for everyone if
-no bot token is configured. The reminder engine already treats an unavailable
+Unavailable for anyone who has not linked their account, for every account
+but the site owner's -- the only one the bot serves -- and for everyone if no
+bot token is configured. The reminder engine already treats an unavailable
 channel as a failed delivery for that channel alone, so an unlinked user still
 gets the in-app notification.
 """
@@ -11,6 +12,7 @@ import logging
 from apps.notifications.channels.base import ChannelUnavailableError, Message
 from apps.telegrambot import bot, messages
 from apps.telegrambot.bot import BotNotConfiguredError
+from apps.users import plans
 from apps.users.models import User
 
 logger = logging.getLogger(__name__)
@@ -20,7 +22,7 @@ class TelegramChannel:
     name = "telegram"
 
     def is_available_for(self, user: User) -> bool:
-        return user.is_telegram_linked
+        return user.is_telegram_linked and plans.can_use_telegram(user)
 
     def send(self, message: Message) -> None:
         chat_id = message.recipient.telegram_chat_id

@@ -49,9 +49,11 @@ def recorder(monkeypatch) -> BotRecorder:
 
 @pytest.fixture
 def linked_user(user: User) -> User:
+    # Only the site's owner can link the bot.
+    user.is_superuser = True
     user.telegram_chat_id = CHAT_ID
     user.telegram_linked_at = timezone.now()
-    user.save(update_fields=["telegram_chat_id", "telegram_linked_at"])
+    user.save(update_fields=["is_superuser", "telegram_chat_id", "telegram_linked_at"])
     return user
 
 
