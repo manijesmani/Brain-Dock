@@ -9,10 +9,12 @@ becomes an idea. A callback query is one of the reminder buttons.
 """
 
 import logging
+from html import escape
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from telegram import Message, Update
 
 from apps.ideas.models import AttachmentKind, IdeaStatus
@@ -54,6 +56,9 @@ def handle_update(update: Update) -> None:
 
 
 def _handle_message(message: Message) -> None:
+    # Account tokens and private reminders must never be used in a group.
+    if message.chat.type != "private":
+        return
     chat_id = message.chat_id
     text = (message.text or "").strip()
 
@@ -66,14 +71,22 @@ def _handle_message(message: Message) -> None:
         bot.send_message(chat_id=chat_id, text=messages.NOT_LINKED)
         return
 
-    if message.photo:
-        _capture_photo(user, message)
-    elif message.voice or message.audio:
-        _capture_voice(user, message)
-    elif text:
-        _capture_text(user, text)
-    else:
-        bot.send_message(chat_id=chat_id, text=messages.UNSUPPORTED)
+    try:
+        if message.photo or message.voice or message.audio:
+            if not plans.can_attach_media(user):
+                raise plans.PremiumRequired()
+            if message.photo:
+                _capture_photo(user, message)
+            else:
+                _capture_voice(user, message)
+        elif text:
+            _capture_text(user, text)
+        else:
+            bot.send_message(chat_id=chat_id, text=messages.UNSUPPORTED)
+    except PermissionDenied as error:
+        bot.send_message(chat_id=chat_id, text=escape(str(error.detail)))
+    except ValidationError:
+        bot.send_message(chat_id=chat_id, text=messages.CAPTURE_FAILED)
 
 
 def _handle_start(chat_id: int, text: str) -> None:
@@ -96,16 +109,21 @@ def link_account(*, chat_id: int, token: str) -> str:
     The row is locked while it is checked and spent, so the same link opened
     twice at once cannot connect two chats.
     """
-    record = (
-        TelegramLinkToken.objects.select_for_update()
-        .filter(token=token)
-        .select_related("user")
-        .first()
-    )
+    if chat_id <= 0:
+        return messages.LINK_INVALID
 
-    # A link issued to anyone but the owner -- before the bot became the
-    # owner's alone -- is no longer honoured.
-    if record is None or not record.is_usable or not plans.can_use_telegram(record.user):
+    user_id = (
+        TelegramLinkToken.objects.filter(token=token).values_list("user_id", flat=True).first()
+    )
+    if user_id is None:
+        return messages.LINK_INVALID
+    # Match the lock order in link issuance and disconnect: user, then token.
+    user = User.objects.select_for_update().filter(pk=user_id).first()
+    if user is None or not plans.can_use_telegram(user):
+        return messages.LINK_INVALID
+    record = TelegramLinkToken.objects.select_for_update().filter(token=token).first()
+
+    if record is None or not record.is_usable:
         return messages.LINK_INVALID
 
     # A chat already belonging to someone else must not be re-pointed, or a
@@ -116,10 +134,14 @@ def link_account(*, chat_id: int, token: str) -> str:
 
     now = timezone.now()
 
-    user = record.user
     user.telegram_chat_id = chat_id
     user.telegram_linked_at = now
-    user.save(update_fields=["telegram_chat_id", "telegram_linked_at"])
+    try:
+        with transaction.atomic():
+            user.save(update_fields=["telegram_chat_id", "telegram_linked_at"])
+    except IntegrityError:
+        # Two accounts may try to claim the same chat at the same time.
+        return messages.LINK_TAKEN
 
     record.used_at = now
     record.save(update_fields=["used_at", "updated_at"])
@@ -143,6 +165,7 @@ def _capture_text(user: User, text: str) -> None:
     bot.send_message(chat_id=user.telegram_chat_id, text=messages.captured_text(idea))
 
 
+@transaction.atomic
 def _capture_photo(user: User, message: Message) -> None:
     # Telegram sends the same photo at several sizes, largest last.
     photo = message.photo[-1]
@@ -166,6 +189,7 @@ def _capture_photo(user: User, message: Message) -> None:
     bot.send_message(chat_id=user.telegram_chat_id, text=messages.captured_text(idea, kind="عکس"))
 
 
+@transaction.atomic
 def _capture_voice(user: User, message: Message) -> None:
     voice = message.voice or message.audio
     caption = (message.caption or "").strip()
@@ -239,6 +263,8 @@ def _announce(user: User, idea) -> None:
 
 def _handle_callback(update: Update) -> None:
     query = update.callback_query
+    if query.message is None or query.message.chat.type != "private":
+        return
     data = query.data or ""
     chat_id = query.message.chat_id if query.message else None
 

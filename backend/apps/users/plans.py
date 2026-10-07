@@ -14,8 +14,8 @@ itself and never from anything the client sends:
 
 Guests and regular accounts may hold FREE_IDEA_LIMIT ideas and cannot attach
 images or audio; reminders and everything else are open to them. A special
-account lifts both limits. Two things are the owner's alone: the Telegram bot
-and the user panel.
+account lifts both limits. Registered accounts can use the Telegram bot;
+only the owner can manage other accounts from the user panel.
 
 These rules are enforced where the writes happen -- apps.ideas.services, the
 Telegram views and handlers, the user panel -- and sent to the client with the
@@ -66,7 +66,7 @@ def can_attach_media(user: User) -> bool:
 
 
 def can_use_telegram(user: User) -> bool:
-    return user.is_site_owner
+    return user.is_active and not user.is_guest
 
 
 def can_manage_users(user: User) -> bool:

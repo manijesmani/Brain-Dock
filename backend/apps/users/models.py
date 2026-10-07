@@ -97,8 +97,7 @@ class User(AbstractUser):
         """Whether this is the person who runs the site.
 
         That is the superuser created at deployment. Signing up can never make
-        one, so the owner's extras -- the Telegram bot above all -- are out of
-        reach of every other account.
+        one, so managing other users stays out of reach of every other account.
         """
         return self.is_superuser
 

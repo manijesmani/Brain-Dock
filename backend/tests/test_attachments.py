@@ -257,7 +257,7 @@ class TestAttachmentLifecycle:
         assert Attachment.objects.count() == 0
 
     def test_deleting_an_attachment_removes_its_files(
-        self, auth_client: APIClient, user: User
+        self, auth_client: APIClient, user: User, django_capture_on_commit_callbacks
     ) -> None:
         idea = IdeaFactory(owner=user)
         created = upload(auth_client, idea.pk, image_upload(), AttachmentKind.IMAGE)
@@ -265,7 +265,8 @@ class TestAttachmentLifecycle:
         file_path = attachment.file.path
         thumbnail_path = attachment.thumbnail.path
 
-        auth_client.delete(reverse("ideas:attachment-detail", args=[created.json()["id"]]))
+        with django_capture_on_commit_callbacks(execute=True):
+            auth_client.delete(reverse("ideas:attachment-detail", args=[created.json()["id"]]))
 
         from pathlib import Path
 
@@ -273,7 +274,7 @@ class TestAttachmentLifecycle:
         assert not Path(thumbnail_path).exists()
 
     def test_deleting_an_idea_for_good_removes_its_attachment_files(
-        self, auth_client: APIClient, user: User
+        self, auth_client: APIClient, user: User, django_capture_on_commit_callbacks
     ) -> None:
         idea = IdeaFactory(owner=user)
         upload(auth_client, idea.pk, image_upload(), AttachmentKind.IMAGE)
@@ -282,7 +283,8 @@ class TestAttachmentLifecycle:
         # Deleting moves the idea to the trash; emptying it there is what
         # deletes for good.
         auth_client.delete(reverse("ideas:idea-detail", args=[idea.pk]))
-        auth_client.delete(reverse("ideas:trash-detail", args=[idea.pk]))
+        with django_capture_on_commit_callbacks(execute=True):
+            auth_client.delete(reverse("ideas:trash-detail", args=[idea.pk]))
 
         from pathlib import Path
 

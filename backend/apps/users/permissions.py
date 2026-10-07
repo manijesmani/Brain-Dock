@@ -6,8 +6,7 @@ from rest_framework.views import APIView
 class IsSiteOwner(BasePermission):
     """Lets through the site's owner alone: everyone else gets a 403.
 
-    Guards the owner's two exclusive features, the Telegram bot and the user
-    panel; see apps.users.plans. Not to be confused with
+    Guards the owner's user panel; see apps.users.plans. Not to be confused with
     core.permissions.IsOwner, which is about who owns a record.
     """
 

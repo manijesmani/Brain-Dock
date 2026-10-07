@@ -1,7 +1,7 @@
 """Account linking between a BrainDock user and a Telegram chat.
 
-The bot itself arrives in phase 6; what lives here is the half the settings
-page drives: issuing a one-time link and dropping an existing connection.
+Settings issues private one-time links and lets registered accounts drop
+an existing connection. Guests cannot access these operations.
 """
 
 from django.db import transaction
@@ -18,6 +18,7 @@ def issue_link_token(*, user: User) -> TelegramLinkToken:
     Only one live token per account: an old link left working would be a
     second, forgotten key to the same door.
     """
+    user = User.objects.select_for_update().get(pk=user.pk)
     TelegramLinkToken.objects.filter(user=user, used_at__isnull=True).update(
         expires_at=timezone.now()
     )
@@ -41,6 +42,7 @@ def active_link_token(*, user: User) -> TelegramLinkToken | None:
 @transaction.atomic
 def unlink(*, user: User) -> User:
     """Disconnects the chat and revokes any outstanding link."""
+    user = User.objects.select_for_update().get(pk=user.pk)
     user.telegram_chat_id = None
     user.telegram_linked_at = None
     user.save(update_fields=["telegram_chat_id", "telegram_linked_at"])

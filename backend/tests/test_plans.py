@@ -2,7 +2,7 @@
 
 The rules themselves are in apps.users.plans: guests and free accounts hold at
 most FREE_IDEA_LIMIT ideas and attach nothing, premium lifts both limits, and
-the Telegram bot is the site owner's alone.
+the Telegram bot is open to every registered account.
 """
 
 from datetime import timedelta
@@ -144,7 +144,7 @@ class TestTheAccountTellsTheClientItsPlan:
         assert body["plan"] == plan
         assert body["idea_limit"] == limit
         assert body["can_attach_media"] is media
-        assert body["can_use_telegram"] is owner_only
+        assert body["can_use_telegram"] is (plan != "guest")
         assert body["can_manage_users"] is owner_only
 
     def test_the_count_includes_archived_ideas(self, free_user: User) -> None:
@@ -258,41 +258,53 @@ class TestMedia:
         assert response.status_code == 200
 
 
-class TestTelegramIsTheOwnersAlone:
-    @pytest.mark.parametrize("account", ["guest", "free_user", "premium_user"])
-    def test_everyone_else_is_refused_the_link_section(self, request, account: str) -> None:
-        client = client_for(request.getfixturevalue(account))
-
-        assert client.get(reverse("telegrambot:link")).status_code == 403
-        assert client.post(reverse("telegrambot:link")).status_code == 403
+class TestTelegramAccounts:
+    def test_guests_are_refused_the_link_section(self, guest: User) -> None:
+        client = client_for(guest)
+        for method in (client.get, client.post, client.delete):
+            assert method(reverse("telegrambot:link")).status_code == 403
         assert TelegramLinkToken.objects.count() == 0
 
-    def test_the_owner_gets_it(self, site_owner: User) -> None:
-        assert client_for(site_owner).get(reverse("telegrambot:link")).status_code == 200
+    @pytest.mark.parametrize("account", ["free_user", "premium_user", "site_owner"])
+    def test_registered_accounts_can_link_and_disconnect(self, request, account, settings):
+        settings.TELEGRAM_BOT_TOKEN = "123:test-token"
+        settings.TELEGRAM_BOT_USERNAME = "braindock_test_bot"
+        user = request.getfixturevalue(account)
+        client = client_for(user)
+        assert client.get(reverse("telegrambot:link")).status_code == 200
+        response = client.post(reverse("telegrambot:link"))
+        assert response.status_code == 201
+        token = TelegramLinkToken.objects.get(user=user)
+        assert token.token in response.json()["link"]
+        assert handlers.link_account(chat_id=555, token=token.token) == messages.LINK_SUCCESS
+        user.refresh_from_db()
+        assert TelegramChannel().is_available_for(user)
+        assert client.delete(reverse("telegrambot:link")).json()["is_telegram_linked"] is False
+        user.refresh_from_db()
+        assert not TelegramChannel().is_available_for(user)
+        assert handlers._user_for(555) is None
 
-    def test_a_link_issued_to_anyone_else_is_not_honoured(self, premium_user: User) -> None:
-        """A token issued before the bot became the owner's alone."""
+    def test_a_guest_token_is_not_honoured(self, guest: User) -> None:
         token = TelegramLinkToken.objects.create(
-            user=premium_user, expires_at=timezone.now() + timedelta(minutes=10)
+            user=guest, expires_at=timezone.now() + timedelta(minutes=10)
         )
+        assert handlers.link_account(chat_id=555, token=token.token) == messages.LINK_INVALID
+        guest.refresh_from_db()
+        assert guest.telegram_chat_id is None
 
-        result = handlers.link_account(chat_id=555, token=token.token)
+    @pytest.mark.parametrize("attrs", [{"is_guest": True}, {"is_active": False}])
+    def test_unavailable_accounts_cannot_receive_or_capture(self, attrs):
+        user = UserFactory(telegram_chat_id=555, **attrs)
+        assert not TelegramChannel().is_available_for(user)
+        assert handlers._user_for(555) is None
 
-        premium_user.refresh_from_db()
-        assert result == messages.LINK_INVALID
-        assert premium_user.telegram_chat_id is None
-
-    def test_a_chat_linked_to_anyone_else_is_not_served(self, premium_user: User) -> None:
-        premium_user.telegram_chat_id = 555
-        premium_user.save(update_fields=["telegram_chat_id"])
-
-        assert TelegramChannel().is_available_for(premium_user) is False
-
-    def test_the_owners_linked_chat_is(self, site_owner: User) -> None:
-        site_owner.telegram_chat_id = 555
-        site_owner.save(update_fields=["telegram_chat_id"])
-
-        assert TelegramChannel().is_available_for(site_owner) is True
+    def test_an_unconfigured_bot_does_not_issue_a_broken_link(self, free_user, settings):
+        settings.TELEGRAM_BOT_TOKEN = ""
+        settings.TELEGRAM_BOT_USERNAME = ""
+        client = client_for(free_user)
+        assert client.get(reverse("telegrambot:link")).json()["is_available"] is False
+        assert client.post(reverse("telegrambot:link")).status_code == 503
+        assert not TelegramLinkToken.objects.exists()
 
 
 class TestSignup:

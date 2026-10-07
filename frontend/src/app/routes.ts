@@ -6,7 +6,7 @@
  * category editor are dialogs rather than routes, so they do not appear here.
  */
 export const ROUTES = {
-  dashboard: "/",
+  dashboard: "/dashboard",
   ideas: "/ideas",
   note: "/ideas/:ideaId",
   archive: "/archive",

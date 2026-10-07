@@ -21,6 +21,8 @@ class HealthView(APIView):
 
     authentication_classes: ClassVar[list] = []
     permission_classes: ClassVar[list[type[BasePermission]]] = [AllowAny]
+    # Container probes must not consume the visitor/login throttle buckets.
+    throttle_classes: ClassVar[list] = []
 
     def get(self, request: Request) -> Response:
         database_status = self._check_database()

@@ -22,9 +22,15 @@ from apps.users.permissions import IsSiteOwner
 from apps.users.serializers import NewAccountSerializer, PanelUserSerializer
 
 
-class UserPanelViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+class UserPanelViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     """GET lists the accounts, POST makes a special one, `upgrade` makes a
     regular one special and `downgrade` makes a special one regular.
+    DELETE permanently removes a listed account and its related data.
 
     The owner's alone: a 403 for everyone else, anonymous visitors included.
     The owner's own account and guests are not listed, so neither can have
@@ -50,6 +56,9 @@ class UserPanelViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.
 
         user = services.create_special_user(**serializer.validated_data)
         return Response(PanelUserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+    def perform_destroy(self, instance: User) -> None:
+        services.delete_account(user=instance)
 
     @action(detail=True, methods=["post"])
     def upgrade(self, request: Request, pk: str | None = None) -> Response:

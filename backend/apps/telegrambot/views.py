@@ -13,7 +13,7 @@ from telegram import Update
 
 from apps.telegrambot import handlers, services
 from apps.telegrambot.throttling import WebhookRateThrottle
-from apps.users.permissions import IsSiteOwner
+from apps.users.permissions import HasAccount
 from apps.users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ def _link_payload(request: Request) -> dict:
         "linked_at": request.user.telegram_linked_at,
         "link": token.deep_link if token else None,
         "expires_at": token.expires_at if token else None,
+        "is_available": bool(settings.TELEGRAM_BOT_TOKEN and settings.TELEGRAM_BOT_USERNAME),
     }
 
 
@@ -36,22 +37,26 @@ class TelegramLinkView(APIView):
     """The Telegram section of the settings page.
 
     GET reports the current connection, POST issues a fresh one-time link and
-    DELETE drops the connection. The bot serves the site's owner alone, so no
-    other account gets this far.
+    DELETE drops the connection. Available to every registered account.
     """
 
-    permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, IsSiteOwner]
+    permission_classes: ClassVar[list[type[BasePermission]]] = [IsAuthenticated, HasAccount]
 
     def get(self, request: Request) -> Response:
         return Response(_link_payload(request))
 
     def post(self, request: Request) -> Response:
+        if not settings.TELEGRAM_BOT_TOKEN or not settings.TELEGRAM_BOT_USERNAME:
+            return Response(
+                {"detail": "ربات تلگرام هنوز توسط مدیر سایت راه‌اندازی نشده است."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         services.issue_link_token(user=request.user)
         return Response(_link_payload(request), status=status.HTTP_201_CREATED)
 
     def delete(self, request: Request) -> Response:
-        services.unlink(user=request.user)
-        return Response(UserSerializer(request.user).data)
+        user = services.unlink(user=request.user)
+        return Response(UserSerializer(user).data)
 
 
 class TelegramWebhookView(APIView):

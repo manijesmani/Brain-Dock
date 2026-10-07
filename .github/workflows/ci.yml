@@ -12,6 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  docker:
+    name: Docker deployment and restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Deployment safety tests
+        run: python3 -m unittest discover -s deploy/tests -v
+      - name: Build and exercise disposable deployment
+        run: python3 -u deploy/verify.py
+
   backend:
     name: Backend
     runs-on: ubuntu-latest

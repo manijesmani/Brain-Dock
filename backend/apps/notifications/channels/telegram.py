@@ -1,9 +1,8 @@
 """Delivery over the Telegram bot.
 
-Unavailable for anyone who has not linked their account, for every account
-but the site owner's -- the only one the bot serves -- and for everyone if no
-bot token is configured. The reminder engine already treats an unavailable
-channel as a failed delivery for that channel alone, so an unlinked user still
+Unavailable for guests, inactive accounts, anyone who has not linked their
+account, and everyone if no bot token is configured. The reminder engine treats
+an unavailable channel as a failed delivery for that channel alone, so an unlinked user still
 gets the in-app notification.
 """
 

@@ -21,6 +21,7 @@ export const router = createBrowserRouter([
     // for someone who has signed in on this browser before.
     element: <AppLayout />,
     children: [
+      { path: "/", element: <Navigate to={ROUTES.ideas} replace /> },
       { path: ROUTES.dashboard, element: <DashboardPage /> },
       { path: ROUTES.ideas, element: <BrowsePage /> },
       { path: ROUTES.archive, element: <BrowsePage archived /> },

@@ -194,6 +194,7 @@ export interface AppNotification {
 }
 
 export interface TelegramLink {
+  is_available: boolean;
   is_linked: boolean;
   linked_at: string | null;
   link: string | null;

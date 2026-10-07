@@ -27,12 +27,12 @@ decides it from the account itself, never from anything the client sends; the
 rules live in `backend/apps/users/plans.py` and the interface only reflects
 them.
 
-| Account | How it comes about | Ideas | Images and audio | Telegram bot, user panel |
-| --- | --- | --- | --- | --- |
-| Guest (مهمان) | Opening the site with no session | 2 | No | No |
-| Regular (عادی) | Signing up with a name, username and password | 2 | No | No |
-| Special (ویژه) | Made or upgraded by the owner in the user panel | No limit | Yes | No |
-| Owner (مالک) | The superuser made with `createsuperuser` | No limit | Yes | Yes |
+| Account | How it comes about | Ideas | Images and audio | Telegram bot | User panel |
+| --- | --- | --- | --- | --- | --- |
+| Guest (مهمان) | Opening the site with no session | 2 | No | No | No |
+| Regular (عادی) | Signing up with a name, username and password | 2 | No | Yes | No |
+| Special (ویژه) | Made or upgraded by the owner in the user panel | No limit | Yes | Yes | No |
+| Owner (مالک) | The superuser made with `createsuperuser` | No limit | Yes | Yes | Yes |
 
 - Every account signs in on one page, `/panel`.
 - A guest works like anyone else and sees a permanent banner asking it to
@@ -48,11 +48,25 @@ them.
   Guests and regular accounts have a «خرید اشتراک» item at the foot of the
   sidebar, and sign-up an «ارتقا به کاربر ویژه» button; both open a Telegram
   chat with the owner, `OWNER_TELEGRAM_USERNAME` (`manijesmani` by default).
-- The Telegram section and the user panel are rendered for the owner alone,
-  and their endpoints answer everyone else with a 403. The owner's account is
-  marked «مالک» beside the logo.
+- Every registered account can connect Telegram from settings using its own
+  private, single-use link (valid for 30 minutes), then press Start in the bot.
+  One private Telegram chat belongs to one BrainDock account. Reminders and
+  stale-idea alerts reach that chat; messages capture ideas with the same plan
+  limits as the website. Guests cannot link or use the bot. Settings also offers
+  disconnecting, which revokes any outstanding link.
+- Only the owner sees the user panel; its endpoints refuse everyone else with
+  a 403. Each listed account has a delete button with an explicit permanent
+  deletion confirmation. It deletes that account and its ideas (including the
+  archive and trash), attachments, avatar, categories, tags, reminders,
+  notifications, Telegram links and login sessions. The owner cannot delete
+  their own account or another owner here. The owner's account is marked
+  «مالک» beside the logo.
+- The entry page and successful login/sign-up open «همهٔ ایده‌ها» at `/ideas`.
+  The dashboard remains available at `/dashboard`.
+- New browsers use the dark theme. A chosen dark/light theme is kept in
+  browser local storage and restored before the page is painted.
 - Nothing is ever deleted automatically: every idea, a guest's included,
-  stays in the database for good. A guest's session cookie is kept for a
+  stays until explicitly deleted. A guest's session cookie is kept for a
   year, since it is the guest's only way back to its ideas.
 - Every account but a guest has «دستگاه‌های فعال» in settings: each browser
   signed in to it, with its address and last use, and a way to sign any one
@@ -62,7 +76,24 @@ them.
   where it was; only «حذف دائمی» in the trash removes it, and nothing empties
   the trash on its own.
 
-## Requirements
+## Docker deployment
+
+The production setup keeps `database/`, `backend/`, and `frontend/` in this
+repository and runs them with Docker Compose. The existing shared host Nginx
+keeps ports 80/443; the application exposes only a loopback port. See the
+[Persian deployment and replacement guide](deploy/README.md).
+
+```bash
+./dock setup --domain braindock.ir
+./dock up
+./dock owner
+```
+
+Configuration is generated locally, with no default account/password. Existing
+native installation data is not imported. `./dock bundle` packages the local
+source changes for upload without pushing to GitHub or including credentials.
+
+## Native development requirements
 
 - Python 3.13
 - Node.js 22 LTS
@@ -154,7 +185,7 @@ In development nothing starts on its own. The app is available only while you
 run it: start Django and the Vite dev server, each in its own terminal, plus
 the Celery worker and scheduler when reminders should be delivered.
 PostgreSQL and Redis have to be running for the backend to start. On a server
-the same processes run under systemd; see [Deployment](#deployment).
+the same processes run in containers; see [Deployment](#deployment).
 
 ### Backend (from `backend/`)
 
@@ -180,25 +211,28 @@ the same processes run under systemd; see [Deployment](#deployment).
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs two jobs on every push and pull request: the
+`.github/workflows/ci.yml` runs three jobs on pushes to `main` and pull requests targeting it: the
 backend suite with a PostgreSQL service and ffmpeg plus `ruff` and
-`check --deploy`, and the frontend's lint, formatting, type-check and build.
+`check --deploy`, the frontend's lint, formatting, type-check and build,
+and an isolated Docker deployment with backup/restore verification.
 
 ## Deployment
 
-[`deploy/README.md`](deploy/README.md) sets BrainDock up on one Ubuntu 24.04
-host without containers: an Nginx site beside any others the host serves,
-Gunicorn and the two Celery processes under systemd, PostgreSQL 17, Redis,
-a Let's Encrypt certificate and nightly backups. After the first deployment,
-every update is one command:
+[`deploy/README.md`](deploy/README.md) covers Docker setup, replacing the old
+BrainDock site while preserving shared Nginx and certificates, owner creation,
+Telegram, consistent backups, restore, and optional nightly backups. After
+uploading the new source into the existing Docker deployment, update with:
 
 ```bash
-sudo /srv/braindock/app/deploy/deploy.sh
+sudo /srv/braindock-docker/dock up
 ```
 
 ## Layout
 
 ```
+database/       PostgreSQL image/bootstrap and private Redis configuration
+compose.yaml    Services, health checks, private networks, secrets and volumes
+dock            Setup, build/start, backup/restore and source packaging
 backend/
   config/       Split settings, URLs, WSGI/ASGI entry points
   core/         Abstract model bases, permissions, pagination, error handling
@@ -216,7 +250,7 @@ frontend/
     shared/     ui, api, lib, hooks
     styles/     Design tokens
     types/
-deploy/         Server setup: Nginx site, systemd units, deploy and backup scripts
+deploy/         Docker operations, host Nginx template, verification and guides
 .github/        CI workflow
 BrainDock.dc.html   Authoritative UI design reference
 ```
@@ -226,19 +260,25 @@ and serializers stay thin.
 
 ## Configuration
 
-All configuration is read from `backend/.env`. See `backend/.env.example` for
-the full list.
+Docker reads public configuration from the root `.env` and credentials from
+`.secrets/`, generated by `./dock setup`. Django supports file-based secrets
+with the `_FILE` suffix. Native development uses `backend/.env`; see
+`backend/.env.example` for its settings.
 
 `DJANGO_SETTINGS_MODULE` defaults to `config.settings.dev` via `manage.py` and
 to `config.settings.prod` via `wsgi.py` and `asgi.py`.
 
 ## Status
 
-Complete. The project skeleton, the idea API with session authentication,
+Implemented: the project skeleton, the idea API with session authentication,
 attachments, Persian search, the reminder engine and notification centre, the
 interface, the Telegram bot, stale-idea alerts and the dashboard, security
-hardening, a deployment without containers, a layout that adapts to phones
+hardening, Docker deployment, a layout that adapts to phones
 and tablets, and public use with guest, free, premium and owner accounts.
+
+Release readiness also requires passing the full backend and Docker checks.
+See [the validation record](deploy/VALIDATION.md) for completed checks and
+remaining environment limitations.
 
 The Telegram client is tested end to end against a local stand-in for the Bot
 API, over real HTTP. Talking to the real service still needs a token from

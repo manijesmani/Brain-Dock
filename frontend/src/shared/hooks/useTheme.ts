@@ -16,11 +16,10 @@ function readStoredTheme(): Theme {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === "light" || stored === "dark") return stored;
   } catch {
-    // Private windows and blocked site data both throw; light is the default.
+    // Private windows and blocked site data can throw; dark is the default.
   }
-  // Matches the class index.html stamps before React runs, so a first visit
-  // never flashes the dark palette.
-  return "light";
+  // Matches the initial palette applied before React runs.
+  return "dark";
 }
 
 function applyTheme(theme: Theme): void {

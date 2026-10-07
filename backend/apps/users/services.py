@@ -1,11 +1,12 @@
 """Changes to the account that are more than a field update.
 
-Nothing here deletes an account. A guest's ideas stay in the database for
-good, like everyone else's: there is no expiry and no clean-up job.
+Accounts and ideas never expire automatically. Only the owner can explicitly
+delete a registered account through the user panel.
 """
 
 import secrets
 
+from django.contrib.sessions.models import Session
 from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
@@ -16,6 +17,28 @@ from apps.users.models import User
 # Guest usernames start with this, and nobody may sign up with a name that
 # does, so a guest can never be mistaken for a real account.
 GUEST_USERNAME_PREFIX = "guest-"
+
+
+@transaction.atomic
+def delete_account(*, user: User) -> None:
+    """Permanently removes a managed account, its data and signed-in sessions."""
+    user = User.objects.select_for_update().get(pk=user.pk)
+    if user.is_site_owner or user.is_guest:
+        raise serializers.ValidationError("این حساب از پنل کاربران قابل حذف نیست.")
+
+    session_keys = set(user.devices.values_list("session_id", flat=True))
+    # Include older/unrecorded sessions, even expired ones, so no account
+    # data is left behind in the session table.
+    for session in Session.objects.filter(device__isnull=True).iterator():
+        if session.get_decoded().get("_auth_user_id") == str(user.pk):
+            session_keys.add(session.pk)
+    Session.objects.filter(pk__in=session_keys).delete()
+
+    avatar_name = user.avatar.name
+    avatar_storage = user.avatar.storage
+    user.delete()
+    if avatar_name:
+        transaction.on_commit(lambda: avatar_storage.delete(avatar_name))
 
 
 def set_avatar(*, user: User, upload: UploadedFile) -> User:

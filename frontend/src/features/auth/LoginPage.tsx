@@ -38,7 +38,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
 
   // An account has nothing to do here; a guest does.
   if (!isPending && user && user.plan !== "guest") {
-    return <Navigate to={ROUTES.dashboard} replace />;
+    return <Navigate to={ROUTES.ideas} replace />;
   }
 
   const guest = user?.plan === "guest";
@@ -50,7 +50,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
     try {
       if (signup) await register.mutateAsync({ first_name: firstName, username, password });
       else await login.mutateAsync({ username, password });
-      void navigate(ROUTES.dashboard, { replace: true });
+      void navigate(ROUTES.ideas, { replace: true });
     } catch (caught) {
       if (errorStatus(caught) === 429) setError(TOO_MANY);
       // Sign-up explains itself: a taken name, a weak password.
@@ -64,7 +64,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
 
     try {
       await startGuest.mutateAsync();
-      void navigate(ROUTES.dashboard, { replace: true });
+      void navigate(ROUTES.ideas, { replace: true });
     } catch (caught) {
       setError(errorStatus(caught) === 429 ? TOO_MANY : "ادامه بدون حساب ناموفق بود.");
     }
@@ -174,7 +174,7 @@ export function LoginPage({ signup = false }: { signup?: boolean }) {
 
       {guest ? (
         <Link
-          to={ROUTES.dashboard}
+          to={ROUTES.ideas}
           className="inline-flex items-center gap-1.5 text-[13px] text-bd-text-2 no-underline hover:text-bd-text"
         >
           <ArrowRightIcon size={15} />
