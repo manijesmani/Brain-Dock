@@ -1,8 +1,13 @@
-import { CrownSimpleIcon, XIcon } from "@phosphor-icons/react";
+import { CrownSimpleIcon, TrashIcon, XIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { errorMessage } from "@/shared/api/errors";
-import { useChangeUserPlan, useCreateSpecialUser, usePanelUsers } from "@/shared/api/queries";
+import {
+  useChangeUserPlan,
+  useCreateSpecialUser,
+  useDeleteUser,
+  usePanelUsers,
+} from "@/shared/api/queries";
 import { useToast } from "@/shared/hooks/useToast";
 import { toPersianDigits } from "@/shared/lib/persian";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
@@ -29,10 +34,27 @@ function UserPanel({ onClose }: { onClose: () => void }) {
   const total = data?.pagination.count ?? 0;
 
   const change = useChangeUserPlan();
+  const remove = useDeleteUser();
   const toast = useToast();
   const [changing, setChanging] = useState<PanelUser | null>(null);
   const [changeError, setChangeError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<PanelUser | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const toPremium = changing?.plan !== "premium";
+
+  const confirmDelete = () => {
+    if (!deleting || remove.isPending) return;
+    const { id, display_name: name } = deleting;
+    setDeleteError(null);
+    remove.mutate(id, {
+      onSuccess: () => {
+        setDeleting(null);
+        toast.show(`حساب «${name}» برای همیشه حذف شد`);
+      },
+      onError: (caught) =>
+        setDeleteError(errorMessage(caught, "حذف کاربر ناموفق بود. دوباره امتحان کن.")),
+    });
+  };
 
   const confirmChange = () => {
     if (!changing) return;
@@ -88,6 +110,10 @@ function UserPanel({ onClose }: { onClose: () => void }) {
                 setChangeError(null);
                 setChanging(user);
               }}
+              onDelete={() => {
+                setDeleteError(null);
+                setDeleting(user);
+              }}
             />
           ))
         )}
@@ -122,6 +148,30 @@ function UserPanel({ onClose }: { onClose: () => void }) {
           {toPremium
             ? "بدون محدودیت ایده می‌سازد و می‌تواند عکس و صدا اضافه کند."
             : "همهٔ ایده‌هایش می‌ماند، اما محدودیت‌های حساب عادی دوباره برایش اعمال می‌شود: تعداد ایده محدود، و بدون عکس و صدا."}
+        </span>
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={deleting !== null}
+        title="آیا از حذف دائمی این کاربر مطمئن هستید؟"
+        confirmLabel="حذف دائمی کاربر"
+        danger
+        pending={remove.isPending}
+        error={deleteError}
+        onConfirm={confirmDelete}
+        onClose={() => {
+          setDeleting(null);
+          setDeleteError(null);
+        }}
+      >
+        <span className="font-semibold text-bd-text">
+          {deleting?.display_name}{" "}
+          <span dir="ltr" className="font-normal text-bd-text-3">
+            @{deleting?.username}
+          </span>
+        </span>
+        <span className="mt-1 block">
+          حساب و تمام ایده‌ها، فایل‌ها، یادآوری‌ها و اطلاعات وابستهٔ این کاربر برای همیشه حذف
+          می‌شوند. اتصال تلگرام و همهٔ نشست‌های ورود او هم حذف می‌شوند. این کار قابل برگشت نیست.
         </span>
       </ConfirmDialog>
     </div>
@@ -236,10 +286,12 @@ function UserRow({
   user,
   first,
   onChange,
+  onDelete,
 }: {
   user: PanelUser;
   first: boolean;
   onChange: () => void;
+  onDelete: () => void;
 }) {
   const special = user.plan === "premium";
 
@@ -285,6 +337,15 @@ function UserRow({
         className="h-8 flex-none cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-3 text-[12.5px] text-bd-text hover:border-bd-accent hover:text-bd-accent pointer-coarse:h-9"
       >
         {special ? "تبدیل به عادی" : "تبدیل به ویژه"}
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        title={`حذف ${user.display_name}`}
+        aria-label={`حذف ${user.display_name}`}
+        className="grid size-8 flex-none cursor-pointer place-items-center rounded-button border border-bd-border-2 bg-transparent text-bd-danger hover:bg-bd-surface-2 pointer-coarse:size-9"
+      >
+        <TrashIcon size={16} />
       </button>
     </div>
   );

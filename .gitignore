@@ -19,6 +19,9 @@ celerybeat-schedule*
 .env
 .env.*
 !.env.example
+/.secrets/
+/.dock.lock
+/deploy/generated/
 
 # Node
 node_modules/
@@ -34,6 +37,7 @@ htmlcov/
 
 # Database dumps. They hold copies of every idea and attachment.
 /backups/
+/releases/
 
 # Editors
 .idea/

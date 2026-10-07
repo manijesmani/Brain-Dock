@@ -1,198 +1,176 @@
-# Deployment
+<div dir="rtl">
 
-One Ubuntu 24.04 host, no containers. Nginx is shared with whatever else the
-host serves; BrainDock adds one site to it and three systemd services beside
-it.
+# راه‌اندازی نسخهٔ داکری برین‌داک
 
-```
-             :80  :443
-               │
-          ┌────▼─────┐   /                 frontend/dist (the SPA)
-          │  nginx   │   /api/, the admin  ──► /run/braindock/gunicorn.sock
-          │          │   /static/          backend/staticfiles
-          └────┬─────┘   /internal-media/  backend/media, X-Accel-Redirect only
-               │
-     ┌─────────▼────────┐  ┌──────────────────┐  ┌────────────────┐
-     │  braindock-web   │  │ braindock-worker │  │ braindock-beat │
-     │    (Gunicorn)    │  │     (Celery)     │  │ (Celery beat)  │
-     └─────────┬────────┘  └────────┬─────────┘  └───────┬────────┘
-               └────────────────────┼────────────────────┘
-                          PostgreSQL 17, Redis
-```
+این راهنما برای دامنهٔ **braindock.ir** و سروری است که چند سایت دارد. وب‌سرور مشترک و گواهی فعلی حفظ می‌شوند. نصب جدید **هیچ حساب، ایده یا فایل قبلی را منتقل نمی‌کند**؛ حساب مالک را خودتان می‌سازید.
 
-| Path | What |
-| --- | --- |
-| `/srv/braindock/` | Home of the `braindock` system account, `0750` |
-| `/srv/braindock/app/` | This repository |
-| `/srv/braindock/app/backend/.env` | Configuration, `0600` |
-| `/srv/braindock/app/backend/media/` | Attachments |
-| `/run/braindock/gunicorn.sock` | Gunicorn, reachable by the `braindock` group only |
-| `/var/lib/braindock/` | Celery beat's schedule |
-| `/var/backups/braindock/` | Nightly backups, `0700` |
+## ساختار و پیش‌نیاز
 
-`www-data` is added to the `braindock` group, which is how Nginx reads the
-built frontend and the attachments while no other account on the host can.
+سه بخش در یک پوشه قرار دارند:
 
-## First deployment
+- `database/`: دیتابیس مستقل و صف کارها؛ هیچ پورتی روی سرور منتشر نمی‌کنند.
+- `backend/`: برنامه، پردازش یادآوری‌ها و زمان‌بند؛ بدون دسترسی مدیر داخل کانتینر اجرا می‌شوند.
+- `frontend/`: رابط کاربری و وب‌سرور داخلی؛ فقط روی نشانی محلی سرور، پورت ۸۰۸۸، در دسترس است.
 
-### 1. System packages
+فایل `compose.yaml` این بخش‌ها را به هم وصل می‌کند. دیتابیس، فایل‌ها و وضعیت زمان‌بند در فضای پایدار داکر هستند و با خاموش‌کردن یا جایگزینی کانتینرها حذف نمی‌شوند. پردازشگر و زمان‌بند، دو اجرای جدا از همان کد بک‌اند هستند.
 
-Ubuntu 24.04 ships Python 3.12 and PostgreSQL 16; the project targets 3.13
-and 17, so both come from their upstream repositories.
+روی سرور به داکر با ابزار کامپوز، پایتون نسخهٔ ۳٫۱۰ یا جدیدتر و وب‌سرور و گواهی موجود نیاز دارید؛ نصب جداگانهٔ نود، پایتون پروژه، پستگرس یا ردیس لازم نیست. نصب داکر را مطابق [راهنمای رسمی اوبونتو](https://docs.docker.com/engine/install/ubuntu/) و نسخهٔ سیستم‌عامل سرور انجام دهید. بسته‌های قدیمی دیتابیس یا وب‌سرور را حذف نکنید؛ ممکن است سایت‌های دیگر از آن‌ها استفاده کنند.
 
 ```bash
-sudo apt update
-sudo apt install -y software-properties-common postgresql-common curl git
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
-sudo apt install -y python3.13 python3.13-venv postgresql-17 redis-server \
-    nginx certbot ffmpeg nodejs
+sudo docker version
+sudo docker compose version
+python3 --version
+df -h
+free -h
+sudo ss -ltnp 'sport = :8088'
 ```
 
-- `ffmpeg` provides `ffprobe`, which every audio attachment is checked with.
-  Without it all audio uploads, Telegram voice messages included, are refused.
-- Node.js is only needed to build the frontend.
-- If the host already runs another PostgreSQL, `postgresql-17` becomes a
-  second cluster on the next free port (`pg_lsclusters` shows which); put
-  that port in `DATABASE_URL` below.
+اگر پورت ۸۰۸۸ اشغال است، هنگام ساخت تنظیمات عدد آزاد دیگری را با گزینهٔ `--port` بدهید. پورت‌های ۸۰ و ۴۴۳ همچنان متعلق به وب‌سرور مشترک هستند.
 
-### 2. Account and checkout
+## ۱. انتقال همین نسخهٔ لپ‌تاپ
+
+روی لپ‌تاپ و در پوشهٔ پروژه:
 
 ```bash
-sudo adduser --system --group --home /srv/braindock braindock
-sudo chmod 750 /srv/braindock
-sudo -u braindock git -C /srv/braindock clone https://github.com/manijesmani/Brain-Dock.git app
+./dock bundle
 ```
 
-### 3. Database
+در پاورشل ویندوز، با پایتون نصب‌شده اجرا کنید:
+
+```powershell
+python deploy/docker.py bundle
+```
+
+اگر محیط مجزای بک‌اند را ساخته‌اید، می‌توانید به جای `python` از `backend/.venv/Scripts/python.exe` استفاده کنید. بسته‌ساز پایان خط و مجوز اجرای اسکریپت‌ها را برای لینوکس آماده می‌کند. سایر فرمان‌های استقرار روی سرور لینوکسی اجرا می‌شوند.
+
+بسته داخل پوشهٔ `releases/` ساخته می‌شود و تغییرات ذخیره‌نشده در گیت را هم دارد. رمزها، داده‌ها، وابستگی‌های نصب‌شده و پوشهٔ گیت در آن نیستند. همین بسته را با ابزار انتقال فایل خودتان به سرور بفرستید؛ از گیت‌هاب نسخهٔ قدیمی را دریافت نکنید.
+
+روی سرور، به جای نام نمونه نام فایل انتقال‌یافته را بنویسید:
 
 ```bash
-sudo locale-gen en_US.UTF-8
-sudo -u postgres createuser braindock
-sudo -u postgres createdb --owner=braindock --template=template0 \
-    --encoding=UTF8 --locale=en_US.UTF-8 braindock
+sudo install -d -m 750 /srv/braindock-docker
+sudo tar -xzf /tmp/braindock-PACKAGE.tar.gz -C /srv/braindock-docker --strip-components=1
+cd /srv/braindock-docker
+sudo ./dock setup --domain braindock.ir
+sudo ./dock up
+sudo ./dock owner
+sudo ./dock health
 ```
 
-The role has no password. It connects over the local socket with peer
-authentication, which lets the `braindock` account in as the `braindock` role
-and nobody else, so there is no database secret to keep.
+دستور اول تنظیمات فقط یک بار اجرا می‌شود. رمزهای تصادفی قوی می‌سازد و تنظیمات قبلی را بازنویسی نمی‌کند. دستور مالک نام کاربری و رمز انتخابی شما را در ترمینال می‌پرسد؛ هیچ رمز یا حساب پیش‌فرضی وجود ندارد. دستور اجرای پروژه ابتدا ایمیج‌ها را می‌سازد، آماده‌شدن دیتابیس را بررسی می‌کند، ساختار دیتابیس را به‌روز می‌کند و سپس سرویس‌ها را بالا می‌آورد.
 
-`en_US.UTF-8` rather than the server's default `C.UTF-8`: under `C`, Persian
-names sort by code point, which puts پ, چ, ژ, گ and ی after the rest of the
-alphabet.
-
-Do not create `pg_trgm` by hand. The first migration creates it as the
-database owner; one created by `postgres` would belong to `postgres`, and a
-restore, which drops and recreates it, would then fail.
-
-### 4. Configuration
-
-The file is created empty and private first, so the secrets are never
-readable by anyone else, even for a moment.
+در این مرحله سایت عمومی هنوز به نسخهٔ قبلی وصل است. برای دیدن وضعیت:
 
 ```bash
-sudo -u braindock install -m 600 /dev/null /srv/braindock/app/backend/.env
-sudo -u braindock tee /srv/braindock/app/backend/.env > /dev/null <<EOF
-DJANGO_SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')
-DATABASE_URL=postgres:///braindock
-REDIS_URL=redis://127.0.0.1:6379/0
-DJANGO_ALLOWED_HOSTS=braindock.example.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://braindock.example.com
-SITE_URL=https://braindock.example.com
-DJANGO_ADMIN_URL_PATH=$(python3 -c 'import secrets; print(secrets.token_hex(8))')/
-TELEGRAM_BOT_USERNAME=
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_WEBHOOK_SECRET=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')
-EOF
+sudo ./dock status
+sudo ./dock logs backend frontend worker
 ```
 
-- If other projects on the host use Redis, give BrainDock a database number
-  of its own (`/0` → another index). Sharing one would let their Celery
-  workers take BrainDock's tasks and the other way round.
-- If the second PostgreSQL cluster landed on another port,
-  `DATABASE_URL=postgres://:5433/braindock` (with that port).
-- `DJANGO_ADMIN_URL_PATH` moves the admin off `/admin/`. The generated value
-  is the admin's address: `https://<domain>/<value>`.
+با کلیدهای کنترل و سی فقط نمایش گزارش‌ها بسته می‌شود. اگر ساخت یا آزمایش سلامت خطا داد، قبل از مرحلهٔ بعد آن را رفع کنید.
 
-### 5. Certificate
+## ۲. جایگزینی فقط سایت برین‌داک
+
+قبل از تغییر، از نسخهٔ قدیمی پشتیبان بگیرید. اگر طبق روش قبلی همین پروژه نصب شده است:
 
 ```bash
-sudo /srv/braindock/app/deploy/nginx.sh
-sudo certbot certonly --webroot -w /var/www/letsencrypt -d braindock.example.com \
-    --deploy-hook "systemctl reload nginx"
+sudo /srv/braindock/app/deploy/backup.sh
+sudo certbot certificates
+sudo cp -a /etc/nginx/sites-available/braindock.conf /root/braindock-nginx-before-docker.conf
 ```
 
-The first `nginx.sh` installs only the plain-HTTP half of the site, which is
-what Let's Encrypt checks. Certbot's own timer renews the certificate and the
-deploy hook makes Nginx pick up each renewal.
+این مسیرها مربوط به نصب قبلیِ مستند پروژه‌اند. اگر سرور با روش دیگری نصب شده، ابتدا مسیر واقعی تنظیمات همان دامنه و نام سرویس‌های برین‌داک را مشخص کنید. فایل جدید در `deploy/generated/braindock.conf` آماده است. مسیر گواهی داخل آن باید با خروجی دستور گواهی‌ها مطابقت داشته باشد؛ بعضی نصب‌ها پسوندی مثل `-0001` دارند. همان مسیر موجود را استفاده کنید و گواهی را حذف نکنید.
 
-### 6. Deploy
+تنها فایل مربوط به این دامنه را جایگزین کنید؛ تنظیمات بقیهٔ سایت‌ها و فایل اصلی وب‌سرور را تغییر ندهید. فرمان زیر ابتدا اعتبار تنظیمات را می‌سنجد و تنها در صورت موفقیت بازخوانی می‌کند؛ در صورت خطا فایل قبلی برمی‌گردد:
 
 ```bash
-sudo /srv/braindock/app/deploy/deploy.sh
-sudo /srv/braindock/app/deploy/manage.sh createsuperuser
+sudo cp /srv/braindock-docker/deploy/generated/braindock.conf /etc/nginx/sites-available/braindock.conf
+if sudo nginx -t; then
+    sudo systemctl reload nginx
+else
+    sudo cp /root/braindock-nginx-before-docker.conf /etc/nginx/sites-available/braindock.conf
+    echo 'Previous configuration restored; investigate the error before continuing.'
+fi
 ```
 
-`deploy.sh` ends by asking Gunicorn for `/api/health/` directly, then
-fetching the site through Nginx the way a browser would.
+اگر نصب قبلی به جای پوشهٔ سایت‌ها از مسیر `conf.d` استفاده کرده، مسیر همان فایل موجود را در هر دو فرمان عوض کنید. **یک تنظیم دوم برای همان دامنه نسازید.** پوشهٔ چالش گواهی در نمونه `/var/www/letsencrypt` است؛ با تنظیم فعلی تمدید گواهی تطبیق دهید. سازوکار تمدید گواهی و بازخوانی وب‌سرور را حفظ کنید.
 
-## Updating
+اکنون سایت را باز کنید و ورود مالک، ثبت ایده و بخش تنظیمات را بررسی کنید. سپس فقط سرویس‌های قدیمی برین‌داک را متوقف و غیرفعال کنید:
 
 ```bash
-sudo /srv/braindock/app/deploy/deploy.sh
+sudo systemctl disable --now braindock-web.service braindock-worker.service braindock-beat.service braindock-backup.timer
 ```
 
-It pulls `main`, installs dependencies, runs `check --deploy`, migrates,
-builds the frontend beside the live one and swaps it in, reinstalls the
-units and the Nginx site, and restarts the services. Every step is safe to
-repeat.
-
-## Telegram
-
-The bot needs a token from @BotFather in `TELEGRAM_BOT_TOKEN` and its username
-in `TELEGRAM_BOT_USERNAME`. Then:
+وب‌سرور، دیتابیس یا ردیس سراسری سرور را خاموش نکنید. بعد از اطمینان از اجرای نسخهٔ جدید، فایل‌های واحدهای اختصاصی قدیمی را می‌توانید حذف کنید؛ فایل اصلی تنظیمات دامنه قبلاً جایگزین شده است:
 
 ```bash
-sudo systemctl restart braindock-web braindock-worker
-sudo /srv/braindock/app/deploy/manage.sh telegram_webhook set
-sudo /srv/braindock/app/deploy/manage.sh telegram_webhook info
+sudo rm -f /etc/systemd/system/braindock-web.service /etc/systemd/system/braindock-worker.service /etc/systemd/system/braindock-beat.service /etc/systemd/system/braindock-backup.service /etc/systemd/system/braindock-backup.timer
+sudo systemctl daemon-reload
 ```
 
-While `TELEGRAM_WEBHOOK_SECRET` is empty the webhook refuses every request.
+پوشه و پشتیبان نسخهٔ قبلی را تا پایان بررسی نگه دارید. حذف کاربران سیستم یا دیتابیس قدیمی جزو این مراحل نیست و باید پس از بررسی وابستگی سایت‌های دیگر انجام شود.
 
-## Backups
+## ۳. فعال‌کردن ربات
 
-`braindock-backup.timer` runs `deploy/backup.sh` every night: a `pg_dump`
-archive and a tar of the attachments in `/var/backups/braindock`, both read
-back before they count, kept for 14 days. By hand:
+توکن را در فایل خصوصی `.secrets/telegram_bot_token` بگذارید و نام ربات بدون علامت ات را در متغیر `TELEGRAM_BOT_USERNAME` فایل `.env` بنویسید. فایل توکن فقط خود توکن باشد، بدون کوتیشن و بدون خط جدید پایانی. این فایل‌ها را در گفتگو یا گیت قرار ندهید.
+
+بعد از انتقال دامنه به نسخهٔ جدید:
 
 ```bash
-sudo systemctl start braindock-backup
-journalctl -u braindock-backup
+sudo ./dock up
+sudo ./dock manage telegram_webhook set
+sudo ./dock manage telegram_webhook info
 ```
 
-Copy them off the machine now and then. A backup on the same disk as the
-database protects against mistakes, not against the disk.
+کلید امنیتی وب‌هوک از قبل ساخته شده است. حساب‌های عادی، ویژه و مالک از تنظیمات خودشان ربات را متصل می‌کنند؛ مهمان امکان اتصال ندارد. آزمایش خودکار به تلگرام واقعی پیام نمی‌فرستد؛ ارسال واقعی بعد از تنظیم توکن و دامنه باید بررسی شود.
 
-To restore, which stops the services and asks before overwriting anything:
+## استفادهٔ روزمره و پشتیبان
 
 ```bash
-sudo /srv/braindock/app/deploy/restore.sh \
-    /var/backups/braindock/braindock-db-<stamp>.dump \
-    /var/backups/braindock/braindock-media-<stamp>.tar.gz
+sudo ./dock up        # ساخت و راه‌اندازی یا به‌روزرسانی همین فایل‌های محلی
+sudo ./dock status    # وضعیت سرویس‌ها
+sudo ./dock health    # بررسی وب، دیتابیس و کش
+sudo ./dock backup    # پشتیبان هماهنگ دیتابیس و فایل‌ها
+sudo ./dock down      # خاموش‌کردن؛ داده‌ها حفظ می‌شوند
 ```
 
-## Operating it
+دستور به‌روزرسانی از گیت دریافت نمی‌کند. ابتدا بستهٔ جدید را در همان پوشه باز کنید و سپس دستور اجرا را بزنید. بسته تنظیمات و داده‌های موجود را ندارد و آن‌ها را جایگزین نمی‌کند. تا وقتی ساخت ایمیج موفق نشده، سایت فعال متوقف نمی‌شود. برای به‌روزرسانی یک نصب فعال، قبل از تغییر دیتابیس پشتیبان گرفته می‌شود؛ این مرحله و پشتیبان روزانه برای هماهنگی داده و فایل‌ها **وقفهٔ کوتاه** در سایت دارند. اگر مهاجرت یا شروع سرویس شکست خورد، خروجی `status` و `logs` را بررسی کنید؛ برگشت خودکار ساختار دیتابیس انجام نمی‌شود.
 
-| Task | Command |
-| --- | --- |
-| Status | `systemctl status 'braindock-*'` |
-| Logs | `journalctl -u braindock-web -u braindock-worker -u braindock-beat -f` |
-| Restart | `sudo systemctl restart braindock-web braindock-worker braindock-beat` |
-| Django command | `sudo /srv/braindock/app/deploy/manage.sh <command>` |
-| Next backups | `systemctl list-timers braindock-backup.timer` |
+پشتیبان‌ها زیر `backups/` هستند و تنظیمات و رمزها را هم دارند. دسترسی این پوشه خصوصی است. یک کپی رمزگذاری‌شده را خارج از سرور نگه دارید. پشتیبان‌ها خودکار حذف نمی‌شوند؛ فضای دیسک را کنترل و نسخه‌های قدیمیِ منتقل‌شده را با تصمیم خودتان پاک کنید. گزارش کانتینرها محدود شده‌اند تا بی‌حد رشد نکنند.
 
-Run exactly one `braindock-beat`. Two schedulers would fire every reminder
-twice; the delivery table's unique constraint would stop the second send, but
-the correct number is still one.
+برای پشتیبان هر شب، اگر مسیر نصب همان مسیر بالا است:
+
+```bash
+sudo cp deploy/docker-systemd/braindock-docker-backup.service /etc/systemd/system/
+sudo cp deploy/docker-systemd/braindock-docker-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now braindock-docker-backup.timer
+sudo systemctl list-timers braindock-docker-backup.timer
+```
+
+زمان اجرا حدود ساعت ۳:۳۰ شب به وقت سرور است. نتیجه را با `journalctl -u braindock-docker-backup.service` بررسی کنید. اگر مسیر نصب متفاوت است، مسیرهای فایل سرویس را قبل از نصب اصلاح کنید.
+
+بازیابی در همین نصب:
+
+```bash
+sudo ./dock restore backups/NAME
+sudo ./dock up
+```
+
+بازیابی ابتدا سلامت پشتیبان را می‌سنجد، تأیید تایپی می‌گیرد و از وضعیت فعلی نیز پشتیبان می‌گیرد. سپس دیتابیس و فایل‌ها را جایگزین و صف و کش مخصوص همین پروژه را پاک می‌کند. سرویس‌ها تا اجرای دستور بعدی بسته می‌مانند. نسخهٔ کد باید با پشتیبان سازگار باشد. تنظیمات و رمزهای آرشیو خودکار اعمال نمی‌شوند؛ برای انتقال به سرور تازه باید همان `.env` و پوشهٔ رمزها را با دسترسی خصوصی برگردانید، دیتابیس خالی را راه بیندازید و سپس بازیابی کنید. پوشهٔ رمزها باید دسترسی `0700` و فایل‌های داخل آن `0444` داشته باشند تا کانتینرهای غیرمدیر بخوانند ولی کاربران دیگر میزبان نتوانند وارد پوشه شوند.
+
+هیچ‌وقت برای به‌روزرسانی عادی حجم‌های داکر را حذف نکنید و نام پروژه، رمز دیتابیس یا رمز ردیس را بدون فرایند تغییر رمز عوض نکنید. دیتابیس موجود با تغییر فایل رمز، خودکار رمز جدید نمی‌گیرد.
+
+## آزمایش قبل از انتشار
+
+```bash
+python3 -m unittest discover -s deploy/tests -v
+sudo python3 deploy/verify.py
+```
+
+آزمایش دوم یک نصب موقت مستقل می‌سازد و پس از پایان، فقط کانتینرها و حجم‌های همان آزمایش را حذف می‌کند. ساخت از صفر، دسترسی محدود دیتابیس، ورود و کنترل درخواست جعلی، فایل خصوصی، پردازشگر یادآوری و چرخهٔ پشتیبان و بازیابی را بررسی می‌کند.
+
+## منابع و نصب قبلی
+
+[راهنمای اسرار در کامپوز](https://docs.docker.com/compose/how-tos/use-secrets/)، [ترتیب شروع سرویس‌ها](https://docs.docker.com/compose/how-tos/startup-order/) و [وب‌سرور بدون دسترسی مدیر](https://github.com/nginx/docker-nginx-unprivileged) مبنای تنظیمات هستند. اسرار کامپوز فایل محلی‌اند و خزانهٔ رمزگذاری‌شده محسوب نمی‌شوند. [راهنمای نصب قبلی](README-legacy.md) فقط برای شناخت و برگشت به روش قبلی نگه داشته شده است؛ اسکریپت‌های قدیمی را برای نصب داکری اجرا نکنید.
+
+</div>

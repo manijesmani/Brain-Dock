@@ -90,9 +90,7 @@ export function SettingsPage() {
       <div className="flex max-w-[740px] flex-col gap-4">
         {guest ? <GuestAccount /> : null}
 
-        {/* The bot serves the site's owner alone, so nobody else sees it at
-            all. The profile picture sits at the foot of its card, and has a
-            card of its own for everyone else -- a guest has no profile. */}
+        {/* Every registered account can connect its own Telegram chat. */}
         {user.can_use_telegram ? (
           <TelegramSection />
         ) : guest ? null : (
@@ -101,7 +99,7 @@ export function SettingsPage() {
           </Section>
         )}
 
-        {/* The owner's other exclusive feature; not rendered for anyone else. */}
+        {/* Only the owner can manage users. */}
         {user.can_manage_users ? <UserPanelSection /> : null}
 
         <Section>
@@ -240,88 +238,89 @@ export function SettingsPage() {
   );
 }
 
-/** Linking the Telegram bot: the owner's alone. */
+/** A private, one-time link for each registered account. */
 function TelegramSection() {
-  const { data: telegram } = useTelegramLink();
+  const { data: telegram, isPending, error: loadError } = useTelegramLink();
   const createLink = useCreateTelegramLink();
   const disconnect = useDisconnectTelegram();
   const toast = useToast();
 
   const linked = telegram?.is_linked ?? false;
-  const failure = createLink.error ?? disconnect.error;
+  const available = telegram?.is_available ?? false;
+  const failure = loadError ?? createLink.error ?? disconnect.error;
+  const busy = createLink.isPending || disconnect.isPending;
 
   return (
     <Section>
       <div className="mb-1.5 flex items-center gap-2.5">
         <h2 className="m-0 text-[15px] font-semibold">اتصال ربات تلگرام</h2>
-        <span
-          className="inline-flex items-center gap-1.5 text-[12.5px]"
-          style={{
-            color: linked ? "var(--color-bd-accent)" : "var(--color-bd-text-3)",
-          }}
-        >
-          <span
-            className="size-[7px] rounded-full"
-            style={{
-              background: linked ? "var(--color-bd-accent)" : "var(--color-bd-text-3)",
-            }}
-          />
-          {linked ? "متصل" : "متصل نیست"}
+        <span className={`text-[12.5px] ${linked ? "text-bd-accent" : "text-bd-text-3"}`}>
+          {isPending ? "در حال بررسی…" : linked ? "متصل" : "متصل نیست"}
         </span>
       </div>
       <p className="m-0 mb-[15px] text-[13px] leading-[1.8] text-bd-text-2">
-        ایده‌ها را در تلگرام بفرست تا مستقیم در BrainDock ثبت شوند.
+        {linked
+          ? "یادآوری‌هایت در تلگرام هم ارسال می‌شوند. برای ثبت ایدهٔ تازه به ربات پیام بده؛ محدودیت‌های حسابت همان محدودیت‌های سایت است."
+          : "لینک مخصوص حسابت را باز کن و در تلگرام دکمهٔ Start (شروع) را بزن. بعد از اتصال، یادآوری‌هایت را آنجا می‌گیری و می‌توانی با پیام دادن ایده ثبت کنی."}
       </p>
 
-      {/* A link, so one tap opens the bot -- in the Telegram app on a
-          phone. Long, so it wraps rather than running off a narrow screen. */}
-      {telegram?.link ? (
-        <a
-          // The API sends the address as the design shows it, without a
-          // scheme; as an href that would be read as a path on this site.
-          href={telegram.link.includes("://") ? telegram.link : `https://${telegram.link}`}
-          target="_blank"
-          rel="noreferrer"
-          title="باز کردن در تلگرام"
-          className="mb-[13px] flex items-center gap-2.5 rounded-[9px] border border-bd-border bg-bd-surface-2 px-3.5 py-[11px] no-underline hover:border-bd-accent"
-        >
-          <LinkIcon size={16} className="flex-none text-bd-text-3" />
-          <span dir="ltr" className="min-w-0 flex-1 font-mono text-[12.5px] break-all text-bd-text">
-            {telegram.link}
-          </span>
-          <span className="flex-none text-[11.5px] text-bd-text-3">یک‌بارمصرف</span>
-        </a>
+      {telegram && !available ? (
+        <InlineAlert className="mb-3">
+          ربات تلگرام هنوز توسط مدیر سایت راه‌اندازی نشده است.
+        </InlineAlert>
       ) : null}
 
-      <div className="flex flex-wrap gap-[9px]">
-        {linked ? (
+      {linked ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            createLink.reset();
+            disconnect.mutate(undefined, {
+              onSuccess: () => toast.show("اتصال تلگرام قطع شد"),
+            });
+          }}
+          className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[15px] text-[13px] text-bd-danger hover:bg-bd-surface-2 disabled:opacity-60"
+        >
+          قطع اتصال
+        </button>
+      ) : available && telegram?.link ? (
+        <div className="flex flex-col items-start gap-2.5">
+          <a
+            href={telegram.link.includes("://") ? telegram.link : `https://${telegram.link}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-[38px] items-center gap-2 rounded-button bg-bd-accent px-[15px] text-[13px] font-medium text-bd-accent-ink no-underline hover:bg-bd-accent-hover"
+          >
+            <LinkIcon size={16} />
+            باز کردن ربات تلگرام
+          </a>
+          <span className="text-[12px] leading-[1.8] text-bd-text-3">
+            در تلگرام Start را بزن. این لینک خصوصی، یک‌بارمصرف و تا ۳۰ دقیقه معتبر است؛ آن را برای
+            دیگران نفرست.
+          </span>
           <button
             type="button"
-            onClick={() => {
-              createLink.reset();
-              disconnect.mutate(undefined, {
-                onSuccess: () => toast.show("اتصال تلگرام قطع شد"),
-              });
-            }}
-            className="h-[38px] cursor-pointer rounded-button border border-bd-border-2 bg-transparent px-[15px] text-[13px] text-bd-danger hover:bg-bd-surface-2"
+            disabled={busy}
+            onClick={() => createLink.mutate()}
+            className="cursor-pointer border-0 bg-transparent p-0 text-[12px] text-bd-text-2 underline disabled:opacity-60"
           >
-            قطع اتصال
+            ساخت لینک تازه
           </button>
-        ) : null}
+        </div>
+      ) : (
         <button
           type="button"
           onClick={() => {
             disconnect.reset();
-            createLink.mutate(undefined, {
-              onSuccess: () => toast.show("لینک اتصال ساخته شد"),
-            });
+            createLink.mutate();
           }}
-          disabled={createLink.isPending}
+          disabled={!available || busy}
           className="h-[38px] cursor-pointer rounded-button border-0 bg-bd-accent px-[15px] text-[13px] font-medium text-bd-accent-ink hover:bg-bd-accent-hover disabled:opacity-60"
         >
-          ساخت لینک اتصال
+          {createLink.isPending ? "در حال آماده‌سازی…" : "دریافت لینک اتصال تلگرام"}
         </button>
-      </div>
+      )}
       {failure ? (
         <InlineAlert className="mt-3">
           {errorMessage(failure, "این کار با تلگرام انجام نشد. دوباره امتحان کن.")}
@@ -341,7 +340,7 @@ function UserPanelSection() {
     <Section>
       <h2 className="m-0 mb-1.5 text-[15px] font-semibold">کاربران</h2>
       <p className="m-0 mb-[15px] text-[13px] leading-[1.8] text-bd-text-2">
-        ساختن کاربر ویژه، و تغییر نقش کاربرها بین عادی و ویژه.
+        ساختن کاربر ویژه، تغییر نقش بین عادی و ویژه، و حذف دائمی حساب کاربران.
       </p>
       <button
         type="button"

@@ -13,7 +13,7 @@ from celery.schedules import crontab
 # backend/config/settings/base.py, so three parents up.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-env = environ.Env()
+env = environ.FileAwareEnv()
 environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")

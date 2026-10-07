@@ -268,14 +268,17 @@ class TestDeletingForGood:
         assert response.status_code == 204
         assert not Idea.objects.filter(pk=idea.pk).exists()
 
-    def test_removes_its_files_too(self, auth_client: APIClient, user: User) -> None:
+    def test_removes_its_files_too(
+        self, auth_client: APIClient, user: User, django_capture_on_commit_callbacks
+    ) -> None:
         idea = IdeaFactory(owner=user)
         attachment = create_attachment(idea=idea, upload=image_upload(), kind=AttachmentKind.IMAGE)
         path = Path(attachment.file.path)
         trash(auth_client, idea)
         assert path.exists()
 
-        auth_client.delete(reverse("ideas:trash-detail", args=[idea.pk]))
+        with django_capture_on_commit_callbacks(execute=True):
+            auth_client.delete(reverse("ideas:trash-detail", args=[idea.pk]))
 
         assert not Attachment.objects.exists()
         assert not path.exists()

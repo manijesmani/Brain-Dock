@@ -1,0 +1,11 @@
+[Unit]
+Description=Consistent BrainDock Docker backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/braindock-docker
+ExecStart=/srv/braindock-docker/dock backup
+UMask=0077
+TimeoutStartSec=30min

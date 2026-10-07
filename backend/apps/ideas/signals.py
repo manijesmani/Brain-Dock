@@ -7,6 +7,7 @@ cascade when its idea is deleted -- would leave the bytes on disk forever.
 
 from typing import Any
 
+from django.db import transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
@@ -17,6 +18,8 @@ from apps.ideas.models import Attachment
 def delete_attachment_files(sender: type[Attachment], instance: Attachment, **kwargs: Any) -> None:
     for field in (instance.file, instance.thumbnail):
         if field:
-            # `save=False` matters: the row is already gone, so writing back
-            # to it would resurrect it.
-            field.delete(save=False)
+            # A failed account/idea deletion must leave its files intact.
+            # Capture the path now; the model instance is no longer saved.
+            transaction.on_commit(
+                lambda storage=field.storage, name=field.name: storage.delete(name)
+            )

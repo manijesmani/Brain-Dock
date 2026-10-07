@@ -598,6 +598,14 @@ export function useTelegramLink() {
   return useQuery({
     queryKey: keys.telegram,
     queryFn: async () => (await apiClient.get<TelegramLink>("/telegram/link/")).data,
+    refetchOnWindowFocus: true,
+    // Stop polling once Start consumes the link or the link expires.
+    refetchInterval: (query) => {
+      const link = query.state.data;
+      return link?.link && link.expires_at && Date.parse(link.expires_at) > Date.now()
+        ? 3000
+        : false;
+    },
   });
 }
 
@@ -656,6 +664,29 @@ export function useCreateSpecialUser() {
     mutationFn: async (account: NewAccount) =>
       (await apiClient.post<PanelUser>("/panel/users/", account)).data,
     onSuccess: () => {
+      void client.invalidateQueries({ queryKey: keys.panelUsers });
+    },
+  });
+}
+
+/** Permanent deletion is available only in the owner's user panel. */
+export function useDeleteUser() {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/panel/users/${id}/`);
+    },
+    onSuccess: (_, id) => {
+      client.setQueryData<Paginated<PanelUser>>(keys.panelUsers, (list) =>
+        list
+          ? {
+              ...list,
+              results: list.results.filter((user) => user.id !== id),
+              pagination: { ...list.pagination, count: Math.max(0, list.pagination.count - 1) },
+            }
+          : list,
+      );
       void client.invalidateQueries({ queryKey: keys.panelUsers });
     },
   });

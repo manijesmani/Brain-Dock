@@ -1,0 +1,173 @@
+name: ${COMPOSE_PROJECT_NAME:-braindock}
+
+x-logging: &logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-backend: &backend
+  image: ${COMPOSE_PROJECT_NAME:-braindock}-backend:local
+  build: ./backend
+  env_file: .env
+  environment:
+    DJANGO_SETTINGS_MODULE: config.settings.prod
+    DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+    DATABASE_URL_FILE: /run/secrets/database_url
+    REDIS_URL_FILE: /run/secrets/redis_url
+    TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+    TELEGRAM_WEBHOOK_SECRET_FILE: /run/secrets/telegram_webhook_secret
+  secrets:
+    - django_secret_key
+    - database_url
+    - redis_url
+    - telegram_bot_token
+    - telegram_webhook_secret
+  volumes:
+    - media:/app/media
+    - static:/app/staticfiles
+  networks: [app, data]
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=256m
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  init: true
+  pids_limit: 256
+  stop_grace_period: 40s
+  logging: *logging
+
+services:
+  database:
+    build: ./database
+    image: ${COMPOSE_PROJECT_NAME:-braindock}-database:local
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    secrets: [postgres_admin_password, db_app_password]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks: [data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -h 127.0.0.1 -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+    shm_size: 128mb
+    pids_limit: 256
+    logging: *logging
+
+  redis:
+    image: redis:7.4-alpine
+    user: redis
+    entrypoint: [/bin/sh, /etc/redis/start.sh]
+    secrets: [redis_password]
+    volumes:
+      - redis:/data
+      - ./database/redis.conf:/etc/redis/redis.conf:ro
+      - ./database/redis-start.sh:/etc/redis/start.sh:ro
+    networks: [data]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$(cat /run/secrets/redis_password)" redis-cli ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    pids_limit: 64
+    logging: *logging
+
+  migrate:
+    <<: *backend
+    command: [sh, -c, "python manage.py check --deploy --fail-level WARNING && python manage.py migrate --noinput && python manage.py collectstatic --noinput --clear"]
+    depends_on:
+      database: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    restart: "no"
+
+  backend:
+    <<: *backend
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, container/healthcheck.py]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  worker:
+    <<: *backend
+    command: [celery, -A, config, worker, --loglevel=info, --concurrency=2]
+    depends_on:
+      backend: {condition: service_healthy}
+    restart: unless-stopped
+
+  beat:
+    <<: *backend
+    command: [celery, -A, config, beat, --loglevel=info, --schedule=/var/lib/braindock/celerybeat-schedule]
+    volumes:
+      - beat:/var/lib/braindock
+    depends_on:
+      backend: {condition: service_healthy}
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: ${COMPOSE_PROJECT_NAME:-braindock}-frontend:local
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Run ./dock setup first}
+      DJANGO_ADMIN_URL_PATH: ${DJANGO_ADMIN_URL_PATH:?Run ./dock setup first}
+    ports:
+      - "127.0.0.1:${APP_PORT:-8088}:8080"
+    volumes:
+      - media:/app/media:ro
+      - static:/app/staticfiles:ro
+    networks: [app]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      backend: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --header "Host: $$SITE_DOMAIN" -O /dev/null http://127.0.0.1:8080/healthz']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    pids_limit: 128
+    logging: *logging
+
+networks:
+  app:
+  data:
+    internal: true
+
+volumes:
+  postgres:
+  redis:
+  media:
+  static:
+  beat:
+
+secrets:
+  postgres_admin_password: {file: ./.secrets/postgres_admin_password}
+  db_app_password: {file: ./.secrets/db_app_password}
+  database_url: {file: ./.secrets/database_url}
+  django_secret_key: {file: ./.secrets/django_secret_key}
+  redis_password: {file: ./.secrets/redis_password}
+  redis_url: {file: ./.secrets/redis_url}
+  telegram_bot_token: {file: ./.secrets/telegram_bot_token}
+  telegram_webhook_secret: {file: ./.secrets/telegram_webhook_secret}

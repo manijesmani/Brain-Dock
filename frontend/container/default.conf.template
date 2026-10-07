@@ -1,0 +1,37 @@
+server {
+    listen 8080 default_server;
+    server_name _;
+    return 444;
+}
+server {
+    listen 8080;
+    server_name ${SITE_DOMAIN};
+    root /usr/share/nginx/html;
+    index index.html;
+    client_max_body_size 26m;
+
+    location = /healthz { access_log off; return 200 "ok\n"; }
+    location /api/ { include /etc/nginx/proxy.conf; }
+    location /${DJANGO_ADMIN_URL_PATH} { include /etc/nginx/proxy.conf; }
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 7d;
+        include /etc/nginx/security-headers.conf;
+    }
+    location /internal-media/ {
+        internal;
+        alias /app/media/;
+    }
+    location /media/ { return 404; }
+    location ~ /\. { deny all; }
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        include /etc/nginx/security-headers.conf;
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-store" always;
+        include /etc/nginx/security-headers.conf;
+    }
+}

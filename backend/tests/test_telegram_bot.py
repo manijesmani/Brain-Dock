@@ -68,8 +68,8 @@ def recorder(monkeypatch) -> BotRecorder:
 
 @pytest.fixture
 def user() -> User:
-    """The bot serves the site's owner alone, so that is who uses it here."""
-    return UserFactory(is_superuser=True)
+    """A registered special account can use every capture format."""
+    return UserFactory(is_superuser=False, is_premium=True)
 
 
 @pytest.fixture
@@ -88,6 +88,7 @@ def linked_user(user: User) -> User:
 class FakeChat:
     def __init__(self, chat_id: int) -> None:
         self.id = chat_id
+        self.type = "private" if chat_id > 0 else "group"
 
 
 class FakeMessage:
@@ -276,6 +277,8 @@ class TestCapture:
         handlers.handle_update(FakeUpdate(FakeMessage(photo=[FakePhotoSize()])))
 
         assert Attachment.objects.count() == 0
+        assert Idea.objects.count() == 0
+        assert recorder.sent[-1].text == messages.CAPTURE_FAILED
 
     def test_an_empty_message_is_reported_as_unsupported(self, recorder, linked_user: User) -> None:
         handlers.handle_update(FakeUpdate(FakeMessage()))
@@ -515,3 +518,60 @@ class TestWebhookEndpoint:
         )
 
         assert response.status_code == 200
+
+
+class TestPublicBot:
+    def test_free_accounts_can_capture_until_their_limit(self, recorder, settings):
+        settings.FREE_IDEA_LIMIT = 2
+        user = UserFactory(is_premium=False, telegram_chat_id=CHAT_ID)
+        for title in ("اول", "دوم", "سوم"):
+            handlers.handle_update(FakeUpdate(FakeMessage(text=title)))
+        assert Idea.objects.filter(owner=user).count() == 2
+        assert "۲" in recorder.sent[-1].text
+        assert "ارتقا" in recorder.sent[-1].text
+
+    @pytest.mark.parametrize("payload", [{"photo": [FakePhotoSize()]}, {"voice": FakeVoice()}])
+    def test_free_media_is_refused_without_creating_an_idea(self, recorder, payload):
+        UserFactory(is_premium=False, telegram_chat_id=CHAT_ID)
+        handlers.handle_update(FakeUpdate(FakeMessage(**payload)))
+        assert not Idea.objects.exists()
+        assert not Attachment.objects.exists()
+        assert "مخصوص کاربر ویژه" in recorder.sent[-1].text
+
+    def test_a_link_cannot_bind_a_group(self, recorder, user):
+        token = TelegramLinkToken.objects.create(
+            user=user, expires_at=timezone.now() + timedelta(minutes=10)
+        )
+        handlers.handle_update(FakeUpdate(FakeMessage(chat_id=-123, text=f"/start {token.token}")))
+        assert handlers.link_account(chat_id=-123, token=token.token) == messages.LINK_INVALID
+        user.refresh_from_db()
+        token.refresh_from_db()
+        assert user.telegram_chat_id is None
+        assert token.used_at is None
+        assert not recorder.sent
+
+    def test_accounts_capture_only_into_their_own_inbox(self, recorder):
+        first = UserFactory(is_premium=False, telegram_chat_id=CHAT_ID)
+        second = UserFactory(telegram_chat_id=CHAT_ID + 1)
+        handlers.handle_update(FakeUpdate(FakeMessage(text="اول")))
+        handlers.handle_update(FakeUpdate(FakeMessage(chat_id=CHAT_ID + 1, text="دوم")))
+        assert list(Idea.objects.filter(owner=first).values_list("title", flat=True)) == ["اول"]
+        assert list(Idea.objects.filter(owner=second).values_list("title", flat=True)) == ["دوم"]
+
+    def test_free_accounts_receive_reminders_and_can_use_the_buttons(self, recorder):
+        from apps.reminders.models import Reminder
+        from apps.reminders.tasks import dispatch_due_reminders
+
+        user = UserFactory(is_premium=False, telegram_chat_id=CHAT_ID)
+        reminder = reminder_services.set_reminder(
+            idea=IdeaFactory(owner=user), recurrence=ReminderRecurrence.DAILY, hour=9, minute=0
+        )
+        Reminder.objects.filter(pk=reminder.pk).update(
+            next_run_at=timezone.now() - timedelta(seconds=1)
+        )
+        dispatch_due_reminders()
+        assert recorder.sent[-1].chat_id == CHAT_ID
+        handlers.handle_update(FakeUpdate(callback_query=FakeCallbackQuery(f"mute:{reminder.pk}")))
+        reminder.refresh_from_db()
+        assert not reminder.is_active
+        assert recorder.answered[-1] == messages.MUTED_ACK
